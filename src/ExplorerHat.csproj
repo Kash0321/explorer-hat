@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <Compile Include="Gpio\GpioController.cs" />
+    <Compile Include="Light\Led.cs" />
+    <Compile Include="Light\Light.cs" />
+    <None Include="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Iot.Device.Bindings" Version="1.0.0-prerelease.19413.1" />
+    <PackageReference Include="System.Drawing.Common" Version="4.6.0-preview8.19405.3" />
+  </ItemGroup>
+
+</Project>
