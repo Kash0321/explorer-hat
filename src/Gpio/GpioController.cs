@@ -1,6 +1,6 @@
 ﻿using System.Device.Gpio;
 
-namespace ExplorerHat.Gpio
+namespace Iot.Device.ExplorerHat.Gpio
 {
     /// <summary>
     /// Gpio controller

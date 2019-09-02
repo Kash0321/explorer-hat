@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ExplorerHat.Light
+namespace Iot.Device.ExplorerHat.Lighting
 {
     /// <summary>
     /// Represents the Explorer HAT led array

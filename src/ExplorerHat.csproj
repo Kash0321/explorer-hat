@@ -3,13 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
+    <AssemblyName>Iot.Device.ExplorerHat</AssemblyName>
+    <RootNamespace>Iot.Device.ExplorerHat</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="*.cs" />
     <Compile Include="Gpio\GpioController.cs" />
-    <Compile Include="Light\Led.cs" />
-    <Compile Include="Light\Light.cs" />
+    <Compile Include="Lighting\Led.cs" />
+    <Compile Include="Lighting\Light.cs" />
+    <Compile Include="Motorization\Motor.cs" />
     <None Include="README.md" />
   </ItemGroup>
 

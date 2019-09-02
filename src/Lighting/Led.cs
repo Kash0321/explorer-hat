@@ -1,6 +1,6 @@
-﻿using ExplorerHat.Gpio;
+﻿using Iot.Device.ExplorerHat.Gpio;
 
-namespace ExplorerHat.Light
+namespace Iot.Device.ExplorerHat.Lighting
 {
     /// <summary>
     /// Represents a led light
@@ -23,6 +23,12 @@ namespace ExplorerHat.Light
         public string Name { get; private set; }
 
         /// <summary>
+        /// Gets if led is switched on or not
+        /// </summary>
+        /// <value></value>
+        public bool IsOn { get; set; }
+
+        /// <summary>
         /// Initializes a <see cref="Led"/> instance
         /// </summary>
         public Led(int number, string name, int pin)
@@ -33,7 +39,7 @@ namespace ExplorerHat.Light
         }
 
         /// <summary>
-        /// 
+        /// Switch on this led light
         /// </summary>
         public void On()
         {

@@ -1,4 +1,5 @@
-using ExplorerHat.Light;
+using Iot.Device.ExplorerHat.Lighting;
+using Iot.Device.ExplorerHat.Motorization;
 using System;
 
 namespace Iot.Device.ExplorerHat
@@ -8,8 +9,8 @@ namespace Iot.Device.ExplorerHat
     /// </summary>
     public class ExplorerHat : IDisposable
     {
-        Motor Motor { get; set; }
-        Light Light { get; set; }
+        public Motor Motor { get; set; }
+        public Light Light { get; set; }
 
         /// <summary>
         /// Initialize <see cref="ExplorerHat"/> instance
