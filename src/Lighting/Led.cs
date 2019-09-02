@@ -8,7 +8,7 @@ namespace Iot.Device.ExplorerHat.Lighting
     public class Led
     {
         /// <summary>
-        /// GPIO pin to which pin is attached
+        /// GPIO pin to which led is attached
         /// </summary>
         public int Pin { get; private set; }
         
@@ -31,11 +31,12 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// <summary>
         /// Initializes a <see cref="Led"/> instance
         /// </summary>
-        public Led(int number, string name, int pin)
+        internal Led(int number, string name, int pin)
         {
             Number = number;
             Name = name;
             Pin = pin;
+            IsOn = false;
         }
 
         /// <summary>
@@ -43,7 +44,27 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// </summary>
         public void On()
         {
-            GpioController.EnsureOpenPin(Pin, System.Device.Gpio.PinMode.Output);
+
+            if (!IsOn)
+            {
+                GpioController.EnsureOpenPin(Pin, System.Device.Gpio.PinMode.Output);
+                GpioController.Current.Write(Pin, System.Device.Gpio.PinValue.High);
+                IsOn = true;
+            }
+        }
+
+        /// <summary>
+        /// Switch off this led light
+        /// </summary>
+        public void Off()
+        {
+
+            if (IsOn)
+            {
+                GpioController.EnsureOpenPin(Pin, System.Device.Gpio.PinMode.Output);
+                GpioController.Current.Write(Pin, System.Device.Gpio.PinValue.Low);
+                IsOn = false;
+            }
         }
     }
 }

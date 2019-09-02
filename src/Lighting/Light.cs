@@ -81,7 +81,7 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// <summary>
         /// Initializes a <see cref="Light"/> instance
         /// </summary>
-        public Light()
+        internal Light()
         {
             LedArray = new List<Led>()
             {

@@ -1,0 +1,50 @@
+{
+    // Use IntelliSense para saber los atributos posibles.
+    // Mantenga el puntero para ver las descripciones de los existentes atributos 
+    // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Publish & .NET Core Launch (remote console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "publish",
+            "program": "/home/pi/dotnet/dotnet",
+            "args": ["/home/pi/Work/dotnet/explorerhat/ExplorerHat.LightingSample.dll"], //Ruta remota a la dll que arranca el código que vamos a depurar
+            "cwd": "/home/pi/Work/dotnet/explorerhat", //Ruta en la Raspberry Pi al deirectorio de ejecución
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "C:\\work\\putty\\plink.exe", //Ruta local hasta la línea de comandos de putty (en el equipo de desarrollo)
+                "pipeArgs": [
+                    "-pw",
+                    "raspberry", //Contraseña para el usuario root en la Raspberry Pi
+                    "root@harlequin.local" //Usuario (debe ser root) y nombre de host (o IP) de la Raspberry Pi
+                ],
+                "debuggerPath": "/home/pi/vsdbg/vsdbg" //Ruta al visual studio debugger que hemos instalado en la Raspberry Pi
+            }
+        },
+        {
+            "name": "RE-Publish & .NET Core Launch (remote console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "republish",
+            "program": "/home/pi/dotnet/dotnet",
+            "args": ["/home/pi/Work/dotnet/explorerhat/ExplorerHat.LightingSample.dll"], //Ruta remota a la dll que arranca el código que vamos a depurar
+            "cwd": "/home/pi/Work/dotnet/explorerhat", //Ruta en la Raspberry Pi al deirectorio de ejecución
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "C:\\work\\putty\\plink.exe",
+                "pipeArgs": [
+                    "-pw",
+                    "raspberry", 
+                    "root@harlequin.local"
+                ],
+                "debuggerPath": "/home/pi/vsdbg/vsdbg"
+            }
+        }
+    ]
+}
