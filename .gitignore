@@ -330,4 +330,5 @@ ASALocalRun/
 .mfractor/
 
 # Ficheros de configuración de tareas y depuración para Visual Studio Code
-.vscode/
+.vscode/launch.json
+.vscode/tasks.json
