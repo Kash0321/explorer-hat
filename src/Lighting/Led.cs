@@ -31,6 +31,9 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// <summary>
         /// Initializes a <see cref="Led"/> instance
         /// </summary>
+        /// <param name="number"></param>
+        /// <param name="name"></param>
+        /// <param name="pin"></param>
         internal Led(int number, string name, int pin)
         {
             Number = number;

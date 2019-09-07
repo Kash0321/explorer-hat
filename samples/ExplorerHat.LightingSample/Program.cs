@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ExplorerHat.LightingSample
 {
@@ -9,12 +10,27 @@ namespace ExplorerHat.LightingSample
         {
             using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())
             {
+                Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        hat.Lights.Blue.On();
+                        Thread.Sleep(500);
+                        hat.Lights.Blue.Off();
+                        Thread.Sleep(200);
+                    }
+                });
+
                 while (true)
                 {
-                    hat.Light.Blue.On();
-                    Thread.Sleep(500);
-                    hat.Light.Blue.Off();
-                    Thread.Sleep(200);
+                    hat.Motors.Forwards(0.50d);
+                    Thread.Sleep(10000);
+                    hat.Motors.Stop();
+
+
+                    hat.Motors.Backwards();
+                    Thread.Sleep(10000);
+                    hat.Motors.Stop();
                 }
             }
         }

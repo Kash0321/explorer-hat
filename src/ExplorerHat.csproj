@@ -11,8 +11,9 @@
     <Compile Include="*.cs" />
     <Compile Include="Gpio\GpioController.cs" />
     <Compile Include="Lighting\Led.cs" />
-    <Compile Include="Lighting\Light.cs" />
+    <Compile Include="Lighting\Lights.cs" />
     <Compile Include="Motorization\Motor.cs" />
+    <Compile Include="Motorization\Motors.cs" />
     <None Include="README.md" />
   </ItemGroup>
 

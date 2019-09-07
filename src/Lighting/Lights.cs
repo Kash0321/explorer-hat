@@ -7,7 +7,7 @@ namespace Iot.Device.ExplorerHat.Lighting
     /// <summary>
     /// Represents the Explorer HAT led array
     /// </summary>
-    public class Light
+    public class Lights : IDisposable
     {
         const int LED1_PIN = 4;
         const int LED2_PIN = 17;
@@ -86,7 +86,7 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// <summary>
         /// Initializes a <see cref="Light"/> instance
         /// </summary>
-        internal Light()
+        internal Lights()
         {
             LedArray = new List<Led>()
             {
@@ -96,5 +96,30 @@ namespace Iot.Device.ExplorerHat.Lighting
                 new Led(4, "green", LED4_PIN)
             };
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // Para detectar llamadas redundantes
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    this[0].Off();
+                    this[1].Off();
+                    this[2].Off();
+                    this[3].Off();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }
