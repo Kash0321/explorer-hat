@@ -44,7 +44,6 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// </summary>
         public void On()
         {
-
             if (!IsOn)
             {
                 GpioController.EnsureOpenPin(Pin, System.Device.Gpio.PinMode.Output);
@@ -58,7 +57,6 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// </summary>
         public void Off()
         {
-
             if (IsOn)
             {
                 GpioController.EnsureOpenPin(Pin, System.Device.Gpio.PinMode.Output);

@@ -9,6 +9,11 @@ namespace Iot.Device.ExplorerHat.Lighting
     /// </summary>
     public class Light
     {
+        const int LED1_PIN = 4;
+        const int LED2_PIN = 17;
+        const int LED3_PIN = 27;
+        const int LED4_PIN = 5;
+
         List<Led> LedArray { get; set; }
 
         /// <summary>
@@ -85,10 +90,10 @@ namespace Iot.Device.ExplorerHat.Lighting
         {
             LedArray = new List<Led>()
             {
-                new Led(1, "blue", 4),
-                new Led(2, "yellow", 17),
-                new Led(3, "red", 27),
-                new Led(4, "green", 5)
+                new Led(1, "blue", LED1_PIN),
+                new Led(2, "yellow", LED2_PIN),
+                new Led(3, "red", LED3_PIN),
+                new Led(4, "green", LED4_PIN)
             };
         }
     }
