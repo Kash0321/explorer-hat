@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExplorerHat", "src\ExplorerHat.csproj", "{CF8B9159-7C8C-437B-88E0-D4C4B7CDDF25}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{A8A979C4-D20B-472B-9064-356196DA9EA3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A8A979C4-D20B-472B-9064-356196DA9EA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExplorerHat.LightingSample", "samples\ExplorerHat.LightingSample\ExplorerHat.LightingSample.csproj", "{5B9D61BC-7F6C-4435-BB1C-5C385398DAAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExplorerHat.LightingSample", "samples\ExplorerHat.LightingSample\ExplorerHat.LightingSample.csproj", "{5B9D61BC-7F6C-4435-BB1C-5C385398DAAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
