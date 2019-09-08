@@ -71,8 +71,9 @@ namespace Iot.Device.ExplorerHat.Lighting
 
         #region IDisposable Support
 
-        private bool disposedValue = false; // Para detectar llamadas redundantes
+        private bool disposedValue = false;
 
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -86,6 +87,9 @@ namespace Iot.Device.ExplorerHat.Lighting
             }
         }
 
+        /// <summary>
+        /// Disposes the <see cref="Led"/> instance
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

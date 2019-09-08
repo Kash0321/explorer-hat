@@ -10,8 +10,15 @@ namespace Iot.Device.ExplorerHat
     /// </summary>
     public class ExplorerHat : IDisposable
     {
-        public Motors Motors { get; set; }
-        public Lights Lights { get; set; }
+        /// <summary>
+        /// Explorer HAT DCMotors collection
+        /// </summary>
+        public Motors Motors { get; private set; }
+
+        /// <summary>
+        /// Explorer HAT led array
+        /// </summary>
+        public Lights Lights { get; private set; }
 
         /// <summary>
         /// Initialize <see cref="ExplorerHat"/> instance
@@ -24,8 +31,9 @@ namespace Iot.Device.ExplorerHat
 
         #region IDisposable Support
 
-        private bool disposedValue = false; // Para detectar llamadas redundantes
+        private bool disposedValue = false;
 
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -41,6 +49,9 @@ namespace Iot.Device.ExplorerHat
             }
         }
 
+        /// <summary>
+        /// Disposes the <see cref="ExplorerHat"/> instance
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

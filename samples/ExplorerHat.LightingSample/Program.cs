@@ -8,22 +8,6 @@ namespace ExplorerHat.LightingSample
     {
         const int MOTOR_TIME = 2000;
 
-/*         public Task BlinkLed(Iot.Device.ExplorerHat.ExplorerHat hat, int ledNumber)
-        {                
-            var task = Task.Run(() =>
-                {
-                    while (true)
-                    {
-                        hat.Lights[ledNumber - 1].On();
-                        Thread.Sleep(500);
-                        hat.Lights[ledNumber - 1].Off();
-                        Thread.Sleep(200);
-                    }
-                });
-
-            return task;
-        } */
-
         static void Main(string[] args)
         {
             using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())

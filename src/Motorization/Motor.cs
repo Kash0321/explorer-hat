@@ -19,14 +19,14 @@ namespace Iot.Device.ExplorerHat.Motorization
         public int Number { get; private set; }
 
         /// <summary>
-        /// GPIO pin to which motor bw is attached
+        /// GPIO pin to control speed
         /// </summary>
-        public int PinBw { get; private set; }
+        public int SpeedControlPin { get; private set; }
 
         /// <summary>
-        /// GPIO pin to which motor fw is attached
+        /// GPIO pin to control direction
         /// </summary>
-        public int PinFw { get; private set; }
+        public int DirectionPin { get; private set; }
 
         /// <summary>
         /// Current speed
@@ -76,6 +76,9 @@ namespace Iot.Device.ExplorerHat.Motorization
             Speed = Math.Abs(speed) * -1;
         }
 
+        /// <summary>
+        /// Stops the <see cref="Motor"/>
+        /// </summary>
         public void Stop()
         {
             InnerMotor.Speed = 0;
@@ -84,23 +87,24 @@ namespace Iot.Device.ExplorerHat.Motorization
         /// <summary>
         /// Initializes a <see cref="Motor"/> instance
         /// </summary>
-        /// <param name="number"></param>
-        /// <param name="pinBw"></param>
-        /// <param name="pinFw"></param>
-        internal Motor(int number, int pinBw, int pinFw)
+        /// <param name="number">Motor #</param>
+        /// <param name="speedControlPin">GPIO pin to control speed</param>
+        /// <param name="directionPin">GPIO pin to control direction</param>
+        internal Motor(int number, int speedControlPin, int directionPin)
         {
             Number = number;
-            PinBw = pinBw;
-            PinFw = pinFw;
+            SpeedControlPin = speedControlPin;
+            DirectionPin = directionPin;
 
-            InnerMotor = DCMotor.DCMotor.Create(PinBw, PinFw, GpioController.Current);
+            InnerMotor = DCMotor.DCMotor.Create(SpeedControlPin, DirectionPin, GpioController.Current);
             Stop();
         }
 
         #region IDisposable Support
         
-        private bool disposedValue = false; // Para detectar llamadas redundantes
+        private bool disposedValue = false;
 
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -115,6 +119,9 @@ namespace Iot.Device.ExplorerHat.Motorization
             }
         }
 
+        /// <summary>
+        /// Disposes the <see cref="Motor"/> instance
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

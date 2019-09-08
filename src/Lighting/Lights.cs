@@ -17,68 +17,44 @@ namespace Iot.Device.ExplorerHat.Lighting
         List<Led> LedArray { get; set; }
 
         /// <summary>
-        /// Blue led (number 1)
+        /// Blue led (#1)
         /// </summary>
-        public Led One
-        {
-            get => LedArray[0];
-        }
+        public Led One { get => LedArray[0]; }
 
         /// <summary>
-        /// Yellow led (number 2)
+        /// Yellow led (#2)
         /// </summary>
-        public Led Two
-        {
-            get => LedArray[1];
-        }
+        public Led Two { get => LedArray[1]; }
 
         /// <summary>
-        /// Red led (number 3)
+        /// Red led (#3)
         /// </summary>
-        public Led Three
-        {
-            get => LedArray[2];
-        }
+        public Led Three { get => LedArray[2]; }
 
         /// <summary>
-        /// Green led (number 4)
+        /// Green led (#4)
         /// </summary>
-        public Led Four
-        {
-            get => LedArray[3];
-        }
+        public Led Four { get => LedArray[3]; }
 
         /// <summary>
-        /// Blue led (number 1)
+        /// Blue led (#1)
         /// </summary>
-        public Led Blue
-        {
-            get => LedArray[0];
-        }
+        public Led Blue { get => LedArray[0]; }
 
         /// <summary>
-        /// Yellow led (number 2)
+        /// Yellow led (#2)
         /// </summary>
-        public Led Yellow
-        {
-            get => LedArray[1];
-        }
+        public Led Yellow { get => LedArray[1]; }
 
         /// <summary>
-        /// Red led (number 3)
+        /// Red led (#3)
         /// </summary>
-        public Led Red
-        {
-            get => LedArray[2];
-        }
+        public Led Red { get => LedArray[2]; }
 
         /// <summary>
-        /// Green led (number 4)
+        /// Green led (#4)
         /// </summary>
-        public Led Green
-        {
-            get => LedArray[3];
-        }
+        public Led Green { get => LedArray[3]; }
 
         /// <summary>
         /// Gets the <see cref="Led"/> at the specified index
@@ -116,7 +92,7 @@ namespace Iot.Device.ExplorerHat.Lighting
         }
 
         /// <summary>
-        /// Initializes a <see cref="Light"/> instance
+        /// Initializes a <see cref="Lights"/> instance
         /// </summary>
         internal Lights()
         {
@@ -133,22 +109,26 @@ namespace Iot.Device.ExplorerHat.Lighting
 
         private bool disposedValue = false; // Para detectar llamadas redundantes
 
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    this[0].Dispose();
-                    this[1].Dispose();
-                    this[2].Dispose();
-                    this[3].Dispose();
+                    LedArray[0].Dispose();
+                    LedArray[1].Dispose();
+                    LedArray[2].Dispose();
+                    LedArray[3].Dispose();
                 }
 
                 disposedValue = true;
             }
         }
 
+        /// <summary>
+        /// Disposes the <see cref="Lights"/> instance
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
