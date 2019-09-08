@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ExplorerHat.LightingSample
+namespace ExplorerHat.BasicSample
 {
     class Program
     {
