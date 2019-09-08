@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 
 namespace Iot.Device.ExplorerHat.Motorization
@@ -82,6 +83,8 @@ namespace Iot.Device.ExplorerHat.Motorization
                 new Motor(1, MOTOR1_SPDPIN, MOTOR1_DIRPIN),
                 new Motor(2, MOTOR2_SPDPIN, MOTOR2_DIRPIN)
             };
+            var featureName = "Motorization";
+            Log.Information("{featureName} initialized", featureName);
         }
 
         #region IDisposable Support
@@ -95,8 +98,11 @@ namespace Iot.Device.ExplorerHat.Motorization
             {
                 if (disposing)
                 {
+                    var featureName = "Motorization";
+                    Log.Debug("Disposing {featureName} features", featureName);
                     MotorArray[0].Dispose();
                     MotorArray[1].Dispose();
+                    Log.Information("{featureName} features disposed", featureName);
                 }
 
                 disposedValue = true;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -103,6 +104,8 @@ namespace Iot.Device.ExplorerHat.Lighting
                 new Led(3, "red", LED3_PIN),
                 new Led(4, "green", LED4_PIN)
             };
+            var featureName = "Lighting";
+            Log.Information("{featureName} initialized", featureName);
         }
 
         #region IDisposable Support
@@ -116,10 +119,13 @@ namespace Iot.Device.ExplorerHat.Lighting
             {
                 if (disposing)
                 {
+                    var featureName = "Lighting";
+                    Log.Debug("Disposing {featureName} features", featureName);
                     LedArray[0].Dispose();
                     LedArray[1].Dispose();
                     LedArray[2].Dispose();
                     LedArray[3].Dispose();
+                    Log.Information("{featureName} features disposed", featureName);
                 }
 
                 disposedValue = true;

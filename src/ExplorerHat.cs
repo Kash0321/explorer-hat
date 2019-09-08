@@ -1,6 +1,7 @@
 using Iot.Device.ExplorerHat.Gpio;
 using Iot.Device.ExplorerHat.Lighting;
 using Iot.Device.ExplorerHat.Motorization;
+using Serilog;
 using System;
 
 namespace Iot.Device.ExplorerHat
@@ -40,9 +41,15 @@ namespace Iot.Device.ExplorerHat
             {
                 if (disposing)
                 {
+                    var featureName = "Explorer HAT resources";
+                    var gpioFeatureName = "Managed GpioController resources";
+                    Log.Debug("Disposing {featureName}", featureName);
                     Lights.Dispose();
                     Motors.Dispose();
+                    Log.Debug("Disposing {featureName}", gpioFeatureName);
                     GpioController.Current.Dispose();
+                    Log.Debug("{featureName} disposed", gpioFeatureName);
+                    Log.Information("{featureName} features disposed", featureName);
                 }
 
                 disposedValue = true;
