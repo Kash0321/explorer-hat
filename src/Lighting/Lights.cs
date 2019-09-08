@@ -19,6 +19,38 @@ namespace Iot.Device.ExplorerHat.Lighting
         /// <summary>
         /// Blue led (number 1)
         /// </summary>
+        public Led One
+        {
+            get => LedArray[0];
+        }
+
+        /// <summary>
+        /// Yellow led (number 2)
+        /// </summary>
+        public Led Two
+        {
+            get => LedArray[1];
+        }
+
+        /// <summary>
+        /// Red led (number 3)
+        /// </summary>
+        public Led Three
+        {
+            get => LedArray[2];
+        }
+
+        /// <summary>
+        /// Green led (number 4)
+        /// </summary>
+        public Led Four
+        {
+            get => LedArray[3];
+        }
+
+        /// <summary>
+        /// Blue led (number 1)
+        /// </summary>
         public Led Blue
         {
             get => LedArray[0];
@@ -98,6 +130,7 @@ namespace Iot.Device.ExplorerHat.Lighting
         }
 
         #region IDisposable Support
+
         private bool disposedValue = false; // Para detectar llamadas redundantes
 
         protected virtual void Dispose(bool disposing)
@@ -106,10 +139,10 @@ namespace Iot.Device.ExplorerHat.Lighting
             {
                 if (disposing)
                 {
-                    this[0].Off();
-                    this[1].Off();
-                    this[2].Off();
-                    this[3].Off();
+                    this[0].Dispose();
+                    this[1].Dispose();
+                    this[2].Dispose();
+                    this[3].Dispose();
                 }
 
                 disposedValue = true;
@@ -120,6 +153,7 @@ namespace Iot.Device.ExplorerHat.Lighting
         {
             Dispose(true);
         }
+        
         #endregion
     }
 }

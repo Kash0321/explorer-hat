@@ -1,11 +1,12 @@
 ﻿using Iot.Device.ExplorerHat.Gpio;
+using System;
 
 namespace Iot.Device.ExplorerHat.Lighting
 {
     /// <summary>
     /// Represents a led light
     /// </summary>
-    public class Led
+    public class Led : IDisposable
     {
         /// <summary>
         /// GPIO pin to which led is attached
@@ -67,5 +68,29 @@ namespace Iot.Device.ExplorerHat.Lighting
                 IsOn = false;
             }
         }
+
+        #region IDisposable Support
+
+        private bool disposedValue = false; // Para detectar llamadas redundantes
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Off();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        #endregion
     }
 }

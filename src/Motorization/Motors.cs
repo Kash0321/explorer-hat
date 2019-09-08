@@ -26,6 +26,30 @@ namespace Iot.Device.ExplorerHat.Motorization
             }
         }
 
+        /// <summary>
+        /// Motor #1
+        /// </summary>
+        /// <value></value>
+        public Motor One 
+        { 
+            get
+            {
+                return this[0];
+            } 
+        }
+
+        /// <summary>
+        /// Motor #2
+        /// </summary>
+        /// <value></value>
+        public Motor Two 
+        { 
+            get
+            {
+                return this[1];
+            } 
+        }
+
         public void Forwards(double speed = 1)
         {
             this[0].Forwards(speed);
@@ -62,7 +86,8 @@ namespace Iot.Device.ExplorerHat.Motorization
             {
                 if (disposing)
                 {
-                    Stop();
+                    this[0].Dispose();
+                    this[1].Dispose();
                 }
 
                 disposedValue = true;

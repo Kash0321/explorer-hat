@@ -4,7 +4,7 @@ using System;
 namespace Iot.Device.ExplorerHat.Motorization
 {
     /// <summary>
-    /// Represent one of the motors on Explorer Hat
+    /// Represent one of the onboard motors
     /// </summary>
     public class Motor : IDisposable
     {
@@ -98,6 +98,7 @@ namespace Iot.Device.ExplorerHat.Motorization
         }
 
         #region IDisposable Support
+        
         private bool disposedValue = false; // Para detectar llamadas redundantes
 
         protected virtual void Dispose(bool disposing)
@@ -106,6 +107,7 @@ namespace Iot.Device.ExplorerHat.Motorization
             {
                 if (disposing)
                 {
+                    Stop();
                     InnerMotor.Dispose();
                 }
 
