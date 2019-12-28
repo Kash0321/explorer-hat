@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A8A9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExplorerHat.BasicSample", "samples\ExplorerHat.BasicSample\ExplorerHat.BasicSample.csproj", "{0182584C-A2CF-42CB-A8C3-9364B9D25A70}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExplorerHat.ObstacleAvoidance", "samples\ExplorerHat.ObstacleAvoidance\ExplorerHat.ObstacleAvoidance.csproj", "{76304D0D-7ADD-47D1-9060-3DF20B45251E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +25,17 @@ Global
 		{0182584C-A2CF-42CB-A8C3-9364B9D25A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0182584C-A2CF-42CB-A8C3-9364B9D25A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0182584C-A2CF-42CB-A8C3-9364B9D25A70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76304D0D-7ADD-47D1-9060-3DF20B45251E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76304D0D-7ADD-47D1-9060-3DF20B45251E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76304D0D-7ADD-47D1-9060-3DF20B45251E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76304D0D-7ADD-47D1-9060-3DF20B45251E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0182584C-A2CF-42CB-A8C3-9364B9D25A70} = {A8A979C4-D20B-472B-9064-356196DA9EA3}
+		{76304D0D-7ADD-47D1-9060-3DF20B45251E} = {A8A979C4-D20B-472B-9064-356196DA9EA3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F4EB6617-7833-4CF0-9582-E6253CD963E9}
