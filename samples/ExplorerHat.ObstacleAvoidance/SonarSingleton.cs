@@ -58,7 +58,7 @@ namespace ExplorerHat.ObstacleAvoidance
 
             Distance = Sonar.Distance;
 
-            Log.Information("Medición de distancia actualizada");
+            Log.Information($"Medición de distancia actualizada ({Distance} cm.)");
         }
     }
 }
