@@ -108,6 +108,28 @@ namespace Iot.Device.ExplorerHat.Lighting
             Log.Information("{featureName} initialized", featureName);
         }
 
+        /// <summary>
+        /// Switch on all led lights
+        /// </summary>
+        public void On()
+        {
+            LedArray[0].On();
+            LedArray[1].On();
+            LedArray[2].On();
+            LedArray[3].On();
+        }
+
+        /// <summary>
+        /// Switch off all led lights
+        /// </summary>
+        public void Off()
+        {
+            LedArray[0].Off();
+            LedArray[1].Off();
+            LedArray[2].Off();
+            LedArray[3].Off();
+        }
+
         #region IDisposable Support
 
         private bool disposedValue = false; // Para detectar llamadas redundantes
