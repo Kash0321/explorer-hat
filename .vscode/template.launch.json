@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "publish",
             "program": "/home/pi/dotnet/dotnet",
-            "args": ["/home/pi/Work/dotnet/explorerhat/ExplorerHat.LightingSample.dll"], //Ruta remota a la dll que arranca el código que vamos a depurar
+            "args": ["/home/pi/Work/dotnet/explorerhat/ExplorerHat.BasicSample.dll"], //Ruta remota a la dll que arranca el código que vamos a depurar
             "cwd": "/home/pi/Work/dotnet/explorerhat", //Ruta en la Raspberry Pi al directorio de ejecución
             "stopAtEntry": false,
             "console": "internalConsole",
@@ -31,7 +31,7 @@
             "request": "launch",
             "preLaunchTask": "republish",
             "program": "/home/pi/dotnet/dotnet",
-            "args": ["/home/pi/Work/dotnet/explorerhat/ExplorerHat.LightingSample.dll"], 
+            "args": ["/home/pi/Work/dotnet/explorerhat/ExplorerHat.BasicSample.dll"], 
             "cwd": "/home/pi/Work/dotnet/explorerhat",
             "stopAtEntry": false,
             "console": "internalConsole",

@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Iot.Device.ExplorerHat;
+using Serilog;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;

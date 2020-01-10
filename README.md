@@ -1,2 +1,2 @@
 # explorer-hat
-dotnet core library for Explorer HAT
+Robotics experiments with RPi, Pimoroni Explorer Hat Pro & dotnet/iot

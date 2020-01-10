@@ -9,7 +9,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}\\samples\\ExplorerHat.LightingSample\\ExplorerHat.LightingSample.csproj"
+                "${workspaceFolder}\\samples\\ExplorerHat.LightingSample\\ExplorerHat.BasicSample.csproj"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -22,10 +22,10 @@
                 "panel": "new"
             },
             "options": {
-                "cwd": "${workspaceFolder}\\samples\\ExplorerHat.LightingSample"
+                "cwd": "${workspaceFolder}\\src\\ExplorerHat.BasicSample"
             },
             "windows": {
-                "command": "${cwd}\\samples\\ExplorerHat.LightingSample\\publish.bat"
+                "command": "${cwd}\\.vscode\\publish.bat"
             },
             "problemMatcher": []
         },
@@ -38,10 +38,10 @@
                 "panel": "new"
             },
             "options": {
-                "cwd": "${workspaceFolder}\\samples\\ExplorerHat.LightingSample"
+                "cwd": "${workspaceFolder}\\src\\ExplorerHat.BasicSample"
             },
             "windows": {
-                "command": "${cwd}\\samples\\ExplorerHat.LightingSample\\republish.bat"
+                "command": "${cwd}\\.vscode\\republish.bat"
             },
             "problemMatcher": []
         }
