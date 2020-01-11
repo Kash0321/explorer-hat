@@ -9,7 +9,7 @@ namespace ExplorerHat.ObstacleAvoidance
     {
         static void Main(string[] args)
         {
-            //Logging configuration
+            // Logging configuration
             Log.Logger = new LoggerConfiguration()
                .MinimumLevel.Verbose()
                .WriteTo.Console()
@@ -23,29 +23,14 @@ namespace ExplorerHat.ObstacleAvoidance
             Log.Information("    CPU Arch: {processArchitecture}", RuntimeInformation.ProcessArchitecture);
             Log.Information("**************************************************************************************");
 
-            Sonar.InitializeResources();
-
-            Console.Write("Hit any key to enter in [ObstacleAvoiding] mode");
+            Console.WriteLine("Hit any key to enter in [ObstacleAvoiding] mode");
             Console.ReadKey();
             Console.WriteLine();
 
-            Task.Run(async () => await Runner.RunAsync());
+            //Task.Run(async () => await Runner.RunAsync());
+            var task = Runner.RunAsync();
 
-            Console.Write("Hit any key again to stop");
-            Console.ReadKey();
-            Console.WriteLine();
-
-            Runner.Stop();
-
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.Write("Hit any key to enter in [ObstacleAvoiding] mode");
-            Console.ReadKey();
-            Console.WriteLine();
-
-            Task.Run(async () => await Runner.RunAsync());
-
-            Console.Write("Hit any key to stop");
+            Console.WriteLine("Hit any key again to stop");
             Console.ReadKey();
             Console.WriteLine();
 
