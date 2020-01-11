@@ -1,13 +1,15 @@
-﻿using Iot.Device.ExplorerHat;
-using Serilog;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Iot.Device.ExplorerHat;
+using Serilog;
 
 namespace ExplorerHat.ObstacleAvoidance
 {
     class Program
     {
+        const string LOG_PWR_MSG = "Motores al {pwr}%";
+
         static void Main(string[] args)
         {
             //Logging configuration
@@ -16,25 +18,25 @@ namespace ExplorerHat.ObstacleAvoidance
                .WriteTo.Console()
                .CreateLogger();
 
-            // Priting OS INFO
-            Console.WriteLine("**************************************************************************************");
-            Console.WriteLine($"   Framework: {RuntimeInformation.FrameworkDescription}");
-            Console.WriteLine($"          OS: {RuntimeInformation.OSDescription}");
-            Console.WriteLine($"     OS Arch: {RuntimeInformation.OSArchitecture}");
-            Console.WriteLine($"    CPU Arch: {RuntimeInformation.ProcessArchitecture}");
-            Console.WriteLine("**************************************************************************************");
+            // Logging OS INFO
+            Log.Information("**************************************************************************************");
+            Log.Information("   Framework: {frameworkDescription}", RuntimeInformation.FrameworkDescription);
+            Log.Information("          OS: {osDescription}", RuntimeInformation.OSDescription);
+            Log.Information("     OS Arch: {osArchitecture}", RuntimeInformation.OSArchitecture);
+            Log.Information("    CPU Arch: {processArchitecture}", RuntimeInformation.ProcessArchitecture);
+            Log.Information("**************************************************************************************");
 
             using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())
             {
                 var distance = SonarSingleton.Distance;
 
-                Log.Information("Medición de distancia en progreso...");
-
-                Log.Information("Arrancamos! Motores al 80%");
+                Log.Information("Arrancamos!");
+                Log.Information(LOG_PWR_MSG, 80);
                 hat.Motors.Forwards(0.8);
                 while (true)
                 {
                     distance = SonarSingleton.Distance;
+                    Log.Information("Distancia al obstáculo más cercano: {distance} cm.", Math.Round(distance, 4, MidpointRounding.AwayFromZero));
 
                     if (distance < 20d)
                     {
@@ -55,12 +57,12 @@ namespace ExplorerHat.ObstacleAvoidance
                         hat.Motors.Two.Backwards(1);
                         Thread.Sleep(TimeSpan.FromSeconds(0.35));
                         Log.Information("Giro completado");
-                        Log.Information("Motores al 80%");
+                        Log.Information(LOG_PWR_MSG, 80);
                         hat.Motors.Forwards(0.8);
                     }
                     else if (distance < 50d)
                     {
-                        Log.Information("Motores al 30%");
+                        Log.Information(LOG_PWR_MSG, 30);
                         hat.Motors.Forwards(0.3);
                         hat.Lights.One.On();
                         hat.Lights.Two.On();
@@ -69,7 +71,7 @@ namespace ExplorerHat.ObstacleAvoidance
                     }
                     else if (distance < 80d)
                     {
-                        Log.Information("Motores al 40%");
+                        Log.Information(LOG_PWR_MSG, 40);
                         hat.Motors.Forwards(0.4);
                         hat.Lights.One.On();
                         hat.Lights.Two.On();
@@ -78,7 +80,7 @@ namespace ExplorerHat.ObstacleAvoidance
                     }
                     else if (distance < 110d)
                     {
-                        Log.Information("Motores al 60%");
+                        Log.Information(LOG_PWR_MSG, 60);
                         hat.Motors.Forwards(0.6);
                         hat.Lights.One.On();
                         hat.Lights.Two.Off();
@@ -87,7 +89,7 @@ namespace ExplorerHat.ObstacleAvoidance
                     }
                     else
                     {
-                        Log.Information("Motores al 80%");
+                        Log.Information(LOG_PWR_MSG, 80);
                         hat.Motors.Forwards(0.80);
                         hat.Lights.One.Off();
                         hat.Lights.Two.Off();
@@ -95,7 +97,6 @@ namespace ExplorerHat.ObstacleAvoidance
                         hat.Lights.Four.Off();
                     }
 
-                    Log.Information($"Distancia al obstáculo más cercano: {distance} cm.");
                     Thread.Sleep(TimeSpan.FromSeconds(0.2));
                 }
             }

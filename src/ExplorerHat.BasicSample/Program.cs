@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Serilog;
 using System.Runtime.InteropServices;
 
@@ -8,7 +7,7 @@ namespace ExplorerHat.BasicSample
 {
     class Program
     {
-        const int MOTOR_TIME = 2000;
+        const int MOTOR_TIME = 500;
 
         static void Main(string[] args)
         {
@@ -18,13 +17,13 @@ namespace ExplorerHat.BasicSample
                 .WriteTo.Console()
                 .CreateLogger();
 
-            // Priting OS INFO
-            Console.WriteLine( "**************************************************************************************");
-            Console.WriteLine($"   Framework: {RuntimeInformation.FrameworkDescription}");
-            Console.WriteLine($"          OS: {RuntimeInformation.OSDescription}");
-            Console.WriteLine($"     OS Arch: {RuntimeInformation.OSArchitecture}");
-            Console.WriteLine($"    CPU Arch: {RuntimeInformation.ProcessArchitecture}");
-            Console.WriteLine( "**************************************************************************************");
+            // Logging OS INFO
+            Log.Information("**************************************************************************************");
+            Log.Information("   Framework: {frameworkDescription}", RuntimeInformation.FrameworkDescription);
+            Log.Information("          OS: {osDescription}", RuntimeInformation.OSDescription);
+            Log.Information("     OS Arch: {osArchitecture}", RuntimeInformation.OSArchitecture);
+            Log.Information("    CPU Arch: {processArchitecture}", RuntimeInformation.ProcessArchitecture);
+            Log.Information("**************************************************************************************");
 
             using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())
             {

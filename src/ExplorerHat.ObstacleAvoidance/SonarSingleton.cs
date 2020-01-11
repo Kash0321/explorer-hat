@@ -1,5 +1,7 @@
-using Serilog;
+using System;
 using System.Timers;
+using Iot.Device.Hcsr04;
+using Serilog;
 
 namespace ExplorerHat.ObstacleAvoidance
 {
@@ -19,7 +21,7 @@ namespace ExplorerHat.ObstacleAvoidance
 
         static Timer MeasurementTimer { get; set; }
 
-        static Hcsr04Sonar Sonar { get; set; } = null;
+        static Hcsr04 Sonar { get; set; } = null;
 
         static SonarSingleton()
         {
@@ -38,7 +40,7 @@ namespace ExplorerHat.ObstacleAvoidance
 
             Distance = 0;
 
-            Sonar = new Hcsr04Sonar(TRIG, ECHO);
+            Sonar = new Hcsr04(TRIG, ECHO);
 
             Log.Information("SonarSingleton inicializado");
         }
@@ -58,7 +60,7 @@ namespace ExplorerHat.ObstacleAvoidance
 
             Distance = Sonar.Distance;
 
-            Log.Information($"Medición de distancia actualizada ({Distance} cm.)");
+            Log.Information("Medición de distancia actualizada ({distance} cm.)", Math.Round(Distance, 4, MidpointRounding.AwayFromZero));
         }
     }
 }
