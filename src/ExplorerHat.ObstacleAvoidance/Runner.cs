@@ -1,5 +1,4 @@
 using System;
-using System.Device.Gpio;
 using System.Threading;
 using System.Threading.Tasks;
 using Iot.Device.ExplorerHat;
@@ -21,6 +20,10 @@ namespace ExplorerHat.ObstacleAvoidance
             _running = false;
         }
 
+        /// <summary>
+        /// Executes the task managed by the runner, asynchronously
+        /// </summary>
+        /// <returns>Task managed</returns>
         public static async Task RunAsync()
         {
             await Task.Run(() => { 
@@ -115,6 +118,9 @@ namespace ExplorerHat.ObstacleAvoidance
             });
         }
 
+        /// <summary>
+        /// Stops runner
+        /// </summary>
         public static void Stop()
         {
             _running = false;

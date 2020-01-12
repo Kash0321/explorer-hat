@@ -6,7 +6,7 @@ using Serilog;
 namespace ExplorerHat.ObstacleAvoidance
 {
     /// <summary>
-    /// Sonar services
+    /// Sonar services. Manages internally a <see cref="Hcsr04">HC-SR04 sonar device</see> to update <see cref="Distance"/> property asynchronously
     /// </summary>
     public class Sonar : IDisposable
     {
@@ -20,7 +20,7 @@ namespace ExplorerHat.ObstacleAvoidance
         private double _distance;
 
         /// <summary>
-        /// Distance measured
+        /// Distance measured by sonar
         /// </summary>
         public double Distance 
         { 
@@ -41,9 +41,9 @@ namespace ExplorerHat.ObstacleAvoidance
             }
         }
 
-    /// <summary>
-    /// Initializes a <see cref="Sonar"/> instance
-    /// </summary>
+        /// <summary>
+        /// Initializes a <see cref="Sonar"/> instance
+        /// </summary>
         public Sonar()
         {
             Log.Debug("Initializing sonar hardware and services...");

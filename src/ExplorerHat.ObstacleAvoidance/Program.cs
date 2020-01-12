@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Serilog;
 
 namespace ExplorerHat.ObstacleAvoidance
@@ -11,7 +10,7 @@ namespace ExplorerHat.ObstacleAvoidance
         {
             // Logging configuration
             Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Verbose()
+               .MinimumLevel.Information()
                .WriteTo.Console()
                .CreateLogger();
 
