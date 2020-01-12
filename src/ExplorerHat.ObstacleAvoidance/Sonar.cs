@@ -17,10 +17,29 @@ namespace ExplorerHat.ObstacleAvoidance
 
         private Hcsr04 SonarDevice { get; set; } = null;
 
+        private double _distance;
+
         /// <summary>
         /// Distance measured
         /// </summary>
-        public double Distance { get; private set; }
+        public double Distance 
+        { 
+            get
+            {
+                if (SonarDevice is null)
+                {
+                    var exception = new Exception("Sonar hardware and services not initialized");
+                    Log.Error(exception.Message);
+                    throw exception;
+                }
+
+                return _distance;
+            } 
+            private set
+            {
+                _distance = value;
+            }
+        }
 
     /// <summary>
     /// Initializes a <see cref="Sonar"/> instance
@@ -44,11 +63,14 @@ namespace ExplorerHat.ObstacleAvoidance
 
         private void MeasurementTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Log.Debug("Updating distance measurement...");
+            if (!(SonarDevice is null))
+            {
+                Log.Debug("Updating distance measurement...");
 
-            Distance = SonarDevice.Distance;
+                Distance = SonarDevice.Distance;
 
-            Log.Debug("Distance measuremente updated ({distance} cm.)", Math.Round(Distance, 4, MidpointRounding.AwayFromZero));
+                Log.Debug("Distance measuremente updated ({distance} cm.)", Math.Round(Distance, 4, MidpointRounding.AwayFromZero));
+            }
         }
 
         #region IDisposable Support

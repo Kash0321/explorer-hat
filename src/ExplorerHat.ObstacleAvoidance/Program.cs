@@ -27,7 +27,6 @@ namespace ExplorerHat.ObstacleAvoidance
             Console.ReadKey();
             Console.WriteLine();
 
-            //Task.Run(async () => await Runner.RunAsync());
             var task = Runner.RunAsync();
 
             Console.WriteLine("Hit any key again to stop");

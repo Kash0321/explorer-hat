@@ -26,12 +26,13 @@ namespace ExplorerHat.ObstacleAvoidance
             await Task.Run(() => { 
                 try
                 {
+                    var rand = new Random(DateTime.Now.Millisecond);
                     _running = true;
-                    using (var hat = new Iot.Device.ExplorerHat.ExplorerHat(new GpioController(PinNumberingScheme.Logical)))
+                    using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())
                     {
                         using (var sonar = new Sonar())
                         {
-                            Log.Debug("Time to settle sonar and motors!");
+                            Log.Debug("Settling sonar and motors!");
                             Thread.Sleep(1000);
                             Log.Debug("GO!");
                             Log.Debug(LOG_PWR_MSG, 80);
@@ -48,18 +49,18 @@ namespace ExplorerHat.ObstacleAvoidance
                                     hat.Lights.Three.On();
                                     hat.Lights.Four.On();
 
-                                    //Maniobras para evitar un obstáculo
                                     Log.Debug("Obstacle detected. Maneuvering to avoid it...");
                                     hat.Motors.Stop();
                                     Log.Debug("Motors stopped");
                                     hat.Motors.Backwards(1);
                                     Log.Debug("Backwards...");
                                     Thread.Sleep(TimeSpan.FromSeconds(0.25));
-                                    Log.Debug("Detouring...");
-                                    hat.Motors.One.Forwards(1);
-                                    hat.Motors.Two.Backwards(1);
+                                    Log.Debug("Turning to avoid the obstacle ...");
+                                    var rnd = rand.Next(0, 2);
+                                    hat.Motors.One.Forwards(rnd == 0 ? -1 : 1);
+                                    hat.Motors.Two.Forwards(rnd == 1 ? -1 : 1);
                                     Thread.Sleep(TimeSpan.FromSeconds(0.35));
-                                    Log.Debug("Detour completed");
+                                    Log.Debug("Turn completed");
                                     Log.Debug(LOG_PWR_MSG, 80);
                                     hat.Motors.Forwards(0.8);
                                 }
