@@ -35,14 +35,14 @@ namespace ExplorerHat.ObstacleAvoidance
                     {
                         using (var sonar = new Sonar())
                         {
-                            Log.Debug("Settling sonar and motors!");
+                            Log.Debug("Settling sonar devices and motors!");
                             Thread.Sleep(1000);
                             Log.Debug("GO!");
                             Log.Debug(LOG_PWR_MSG, 80);
                             hat.Motors.Forwards(0.8);
                             while (_running)
                             {
-                                var distance = sonar.Distance;
+                                var distance = sonar.CenterDistance;
                                 Log.Information("Distance to the nearest obstacle: {distance} cm.", Math.Round(distance, 4, MidpointRounding.AwayFromZero));
 
                                 if (distance < 20d)
