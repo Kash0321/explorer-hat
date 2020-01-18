@@ -10,7 +10,7 @@ namespace ExplorerHat.ObstacleAvoidance
         {
             // Logging configuration
             Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Verbose()
+               .MinimumLevel.Information()
                .WriteTo.Console()
                .CreateLogger();
 
@@ -20,7 +20,6 @@ namespace ExplorerHat.ObstacleAvoidance
             Log.Information("          OS: {osDescription}", RuntimeInformation.OSDescription);
             Log.Information("     OS Arch: {osArchitecture}", RuntimeInformation.OSArchitecture);
             Log.Information("    CPU Arch: {processArchitecture}", RuntimeInformation.ProcessArchitecture);
-            Log.Information("Developed on: {devOS}", "Ubuntu 18.04 Linux");
             Log.Information("**************************************************************************************");
 
             Console.WriteLine("Hit any key to enter in [ObstacleAvoiding] mode");
