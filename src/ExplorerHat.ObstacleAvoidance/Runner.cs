@@ -47,7 +47,7 @@ namespace ExplorerHat.ObstacleAvoidance
                                     distance.CenterDistance,
                                     distance.RightDistance);
 
-                                if (distance.MinimumDistance.Value < 20d)
+                                if (distance.MinimumDistance.Value < 40d)
                                 {
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
@@ -75,15 +75,14 @@ namespace ExplorerHat.ObstacleAvoidance
                                     
                                     Thread.Sleep(TimeSpan.FromSeconds(0.35));
 
-
                                     Log.Debug("Turn completed");
-                                    Log.Debug(LOG_PWR_MSG, 80);
-                                    hat.Motors.Forwards(0.8);
+                                    Log.Debug(LOG_PWR_MSG, 100);
+                                    hat.Motors.Forwards(1);
                                 }
                                 else if (distance.MinimumDistance.Value < 50d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 30);
-                                    hat.Motors.Forwards(0.3);
+                                    Log.Debug(LOG_PWR_MSG, 100);
+                                    hat.Motors.Forwards(1);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
                                     hat.Lights.Three.On();
@@ -91,8 +90,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else if (distance.MinimumDistance.Value < 80d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 40);
-                                    hat.Motors.Forwards(0.4);
+                                    Log.Debug(LOG_PWR_MSG, 100);
+                                    hat.Motors.Forwards(1);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
                                     hat.Lights.Three.Off();
@@ -100,8 +99,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else if (distance.MinimumDistance.Value < 110d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 60);
-                                    hat.Motors.Forwards(0.6);
+                                    Log.Debug(LOG_PWR_MSG, 100);
+                                    hat.Motors.Forwards(1);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.Off();
                                     hat.Lights.Three.Off();
@@ -109,15 +108,15 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 80);
-                                    hat.Motors.Forwards(0.80);
+                                    Log.Debug(LOG_PWR_MSG, 100);
+                                    hat.Motors.Forwards(1);
                                     hat.Lights.One.Off();
                                     hat.Lights.Two.Off();
                                     hat.Lights.Three.Off();
                                     hat.Lights.Four.Off();
                                 }
 
-                                Thread.Sleep(TimeSpan.FromSeconds(0.2));
+                                Thread.Sleep(TimeSpan.FromSeconds(0.1));
                             }
                         }
                     }
