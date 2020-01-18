@@ -29,13 +29,12 @@ namespace ExplorerHat.ObstacleAvoidance
             await Task.Run(() => { 
                 try
                 {
-                    var rand = new Random(DateTime.Now.Millisecond);
                     _running = true;
                     using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())
                     {
                         using (var sonar = new Sonar())
                         {
-                            Log.Debug("Settling sonar and motors!");
+                            Log.Debug("Settling sonar devices and motors!");
                             Thread.Sleep(1000);
                             Log.Debug("GO!");
                             Log.Debug(LOG_PWR_MSG, 80);
@@ -43,9 +42,12 @@ namespace ExplorerHat.ObstacleAvoidance
                             while (_running)
                             {
                                 var distance = sonar.Distance;
-                                Log.Information("Distance to the nearest obstacle: {distance} cm.", Math.Round(distance, 4, MidpointRounding.AwayFromZero));
+                                Log.Information("Distance to the nearest obstacle: Left {leftDistance} cm. Center {centerDistance} cm. Right {rightDistance} cm.", 
+                                    distance.LeftDistance,
+                                    distance.CenterDistance,
+                                    distance.RightDistance);
 
-                                if (distance < 20d)
+                                if (distance.MinimumDistance.Value < 20d)
                                 {
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
@@ -59,15 +61,26 @@ namespace ExplorerHat.ObstacleAvoidance
                                     Log.Debug("Backwards...");
                                     Thread.Sleep(TimeSpan.FromSeconds(0.25));
                                     Log.Debug("Turning to avoid the obstacle ...");
-                                    var rnd = rand.Next(0, 2);
-                                    hat.Motors.One.Forwards(rnd == 0 ? -1 : 1);
-                                    hat.Motors.Two.Forwards(rnd == 1 ? -1 : 1);
+
+                                    if (distance.LeftDistance <= distance.RightDistance)
+                                    {
+                                        hat.Motors.One.Forwards(1);
+                                        hat.Motors.Two.Backwards(1);
+                                    }
+                                    else
+                                    {
+                                        hat.Motors.One.Backwards(1);
+                                        hat.Motors.Two.Forwards(1);
+                                    }
+                                    
                                     Thread.Sleep(TimeSpan.FromSeconds(0.35));
+
+
                                     Log.Debug("Turn completed");
                                     Log.Debug(LOG_PWR_MSG, 80);
                                     hat.Motors.Forwards(0.8);
                                 }
-                                else if (distance < 50d)
+                                else if (distance.MinimumDistance.Value < 50d)
                                 {
                                     Log.Debug(LOG_PWR_MSG, 30);
                                     hat.Motors.Forwards(0.3);
@@ -76,7 +89,7 @@ namespace ExplorerHat.ObstacleAvoidance
                                     hat.Lights.Three.On();
                                     hat.Lights.Four.Off();
                                 }
-                                else if (distance < 80d)
+                                else if (distance.MinimumDistance.Value < 80d)
                                 {
                                     Log.Debug(LOG_PWR_MSG, 40);
                                     hat.Motors.Forwards(0.4);
@@ -85,7 +98,7 @@ namespace ExplorerHat.ObstacleAvoidance
                                     hat.Lights.Three.Off();
                                     hat.Lights.Four.Off();
                                 }
-                                else if (distance < 110d)
+                                else if (distance.MinimumDistance.Value < 110d)
                                 {
                                     Log.Debug(LOG_PWR_MSG, 60);
                                     hat.Motors.Forwards(0.6);

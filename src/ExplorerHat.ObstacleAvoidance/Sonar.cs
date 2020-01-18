@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Timers;
 using Iot.Device.Hcsr04;
 using Serilog;
@@ -6,40 +7,28 @@ using Serilog;
 namespace ExplorerHat.ObstacleAvoidance
 {
     /// <summary>
-    /// Sonar services. Manages internally a <see cref="Hcsr04">HC-SR04 sonar device</see> to update <see cref="Distance"/> property asynchronously
-    /// </summary>
+    /// Sonar services. Manages internally a group of <see cref="Hcsr04">HC-SR04 sonar devices</see> 
+    /// to update <see cref="CenterDistance"/>, <see cref="LeftDistance"/> and <see cref="RightDistance"/>
+    /// properties asynchronously
+    /// </summary>, >
     public class Sonar : IDisposable
     {
-        const int TRIG = 6;
-        const int ECHO = 23;
+        private static object _lock = new object();
 
-        private Timer MeasurementTimer { get; set; }
+        const int CENTER_TRIG = 6;
+        const int LEFT_TRIG = 13;
+        const int RIGHT_TRIG = 12;
+        const int CENTER_ECHO = 23;
+        const int LEFT_ECHO = 24;
+        const int RIGHT_ECHO = 22;
 
-        private Hcsr04 SonarDevice { get; set; } = null;
+        private System.Timers.Timer MeasurementTimer { get; set; }
 
-        private double _distance;
+        private Hcsr04 CenterSonarDevice { get; set; } = null;
+        private Hcsr04 LeftSonarDevice { get; set; } = null;
+        private Hcsr04 RightSonarDevice { get; set; } = null;
 
-        /// <summary>
-        /// Distance measured by sonar
-        /// </summary>
-        public double Distance 
-        { 
-            get
-            {
-                if (SonarDevice is null)
-                {
-                    var exception = new Exception("Sonar hardware and services not initialized");
-                    Log.Error(exception.Message);
-                    throw exception;
-                }
-
-                return _distance;
-            } 
-            private set
-            {
-                _distance = value;
-            }
-        }
+        public DistanceTuple Distance { get; private set; }
 
         /// <summary>
         /// Initializes a <see cref="Sonar"/> instance
@@ -48,29 +37,51 @@ namespace ExplorerHat.ObstacleAvoidance
         {
             Log.Debug("Initializing sonar hardware and services...");
 
-            MeasurementTimer = new Timer(250);
+            Distance = new DistanceTuple(0, 0, 0);
 
+            CenterSonarDevice = new Hcsr04(CENTER_TRIG, CENTER_ECHO);
+            LeftSonarDevice = new Hcsr04(LEFT_TRIG, LEFT_ECHO);
+            RightSonarDevice = new Hcsr04(RIGHT_TRIG, RIGHT_ECHO);
+
+            Log.Debug("Sonar hardware and services initialized");
+            
+            MeasurementTimer = new System.Timers.Timer(250);
             MeasurementTimer.Elapsed += MeasurementTimer_Elapsed;
             MeasurementTimer.AutoReset = true;
             MeasurementTimer.Enabled = true;
-
-            Distance = 0;
-
-            SonarDevice = new Hcsr04(TRIG, ECHO);
-
-            Log.Debug("Sonar hardware and services initialized");
         }
 
         private void MeasurementTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (!(SonarDevice is null))
-            {
-                Log.Debug("Updating distance measurement...");
+            // lock (_lock)
+            // {
+                if (!(CenterSonarDevice is null))
+                {
+                    try
+                    {
+                        Log.Debug($"Updating distance measurements...");
 
-                Distance = SonarDevice.Distance;
+                        var centerDistance = CenterSonarDevice.Distance;
+                        Log.Debug("Center distance measuremente updated ({distance} cm.)", Math.Round(centerDistance, 4, MidpointRounding.AwayFromZero));
+                        Thread.Sleep(60);
 
-                Log.Debug("Distance measuremente updated ({distance} cm.)", Math.Round(Distance, 4, MidpointRounding.AwayFromZero));
-            }
+                        var leftDistance = LeftSonarDevice.Distance;
+                        Log.Debug("Left distance measuremente updated ({distance} cm.)", Math.Round(leftDistance, 4, MidpointRounding.AwayFromZero));
+                        Thread.Sleep(60);
+
+                        var rightDistance = RightSonarDevice.Distance;
+                        Log.Debug("Right distance measuremente updated ({distance} cm.)", Math.Round(rightDistance, 4, MidpointRounding.AwayFromZero));
+                        Thread.Sleep(60);
+
+                        Distance = new DistanceTuple(leftDistance, centerDistance, rightDistance);
+                    }
+                    catch(Exception ex)
+                    {
+                        Log.Error(ex.Message);
+                    }
+
+                }
+            // }
         }
 
         #region IDisposable Support
@@ -80,15 +91,19 @@ namespace ExplorerHat.ObstacleAvoidance
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (SonarDevice != null)
+            if (CenterSonarDevice != null)
             {
                 if (disposing)
                 {
                     MeasurementTimer.Stop();
                     MeasurementTimer.Enabled = false;
 
-                    SonarDevice.Dispose();
-                    SonarDevice = null;
+                    CenterSonarDevice.Dispose();
+                    CenterSonarDevice = null;
+                    LeftSonarDevice.Dispose();
+                    LeftSonarDevice = null;
+                    RightSonarDevice.Dispose();
+                    RightSonarDevice = null;
                     Log.Debug("Sonar disposed");
                 }
             }
