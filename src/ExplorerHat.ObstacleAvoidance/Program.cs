@@ -10,7 +10,7 @@ namespace ExplorerHat.ObstacleAvoidance
         {
             // Logging configuration
             Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Information()
+               .MinimumLevel.Verbose()
                .WriteTo.Console()
                .CreateLogger();
 
