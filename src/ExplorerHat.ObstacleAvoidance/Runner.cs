@@ -85,10 +85,10 @@ namespace ExplorerHat.ObstacleAvoidance
                                     Log.Debug(LOG_PWR_MSG, 80);
                                     hat.Motors.Forwards(0.8);
                                 }
-                                else if (sonar.Distance.MinimumDistance.Value < 40d)
+                                else if (sonar.Distance.MinimumDistance.Value < 50d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 80);
-                                    hat.Motors.Forwards(0.8);
+                                    Log.Debug(LOG_PWR_MSG, 30);
+                                    hat.Motors.Forwards(0.3);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
                                     hat.Lights.Three.On();
@@ -96,8 +96,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else if (sonar.Distance.MinimumDistance.Value < 80d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 80);
-                                    hat.Motors.Forwards(0.8);
+                                    Log.Debug(LOG_PWR_MSG, 40);
+                                    hat.Motors.Forwards(0.4);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
                                     hat.Lights.Three.Off();
@@ -105,8 +105,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else if (sonar.Distance.MinimumDistance.Value < 110d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 80);
-                                    hat.Motors.Forwards(0.8);
+                                    Log.Debug(LOG_PWR_MSG, 60);
+                                    hat.Motors.Forwards(0.6);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.Off();
                                     hat.Lights.Three.Off();
@@ -125,8 +125,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 Thread.Sleep(TimeSpan.FromSeconds(0.2));
                             }
                         }
+                        Log.Debug("Sonar disposed");
                     }
-
                     Log.Debug("Hat disposed");
                 }
                 catch (Exception ex)
