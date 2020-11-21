@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6BE01EDC-CC5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExplorerHat.ObstacleAvoidance", "src\ExplorerHat.ObstacleAvoidance\ExplorerHat.ObstacleAvoidance.csproj", "{756213B4-1937-45F8-B6C9-77FA71FB40B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExplorerHat.BasicSample", "src\ExplorerHat.BasicSample\ExplorerHat.BasicSample.csproj", "{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,8 +34,21 @@ Global
 		{756213B4-1937-45F8-B6C9-77FA71FB40B4}.Release|x64.Build.0 = Release|Any CPU
 		{756213B4-1937-45F8-B6C9-77FA71FB40B4}.Release|x86.ActiveCfg = Release|Any CPU
 		{756213B4-1937-45F8-B6C9-77FA71FB40B4}.Release|x86.Build.0 = Release|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Debug|x64.Build.0 = Debug|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Debug|x86.Build.0 = Debug|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|x64.ActiveCfg = Release|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|x64.Build.0 = Release|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|x86.ActiveCfg = Release|Any CPU
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{756213B4-1937-45F8-B6C9-77FA71FB40B4} = {6BE01EDC-CC54-4823-8B85-02A2850E1B20}
+		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8} = {6BE01EDC-CC54-4823-8B85-02A2850E1B20}
 	EndGlobalSection
 EndGlobal

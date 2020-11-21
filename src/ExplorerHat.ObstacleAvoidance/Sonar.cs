@@ -61,15 +61,15 @@ namespace ExplorerHat.ObstacleAvoidance
                     {
                         Log.Debug($"Updating distance measurements...");
 
-                        var centerDistance = CenterSonarDevice.Distance;
+                        var centerDistance = CenterSonarDevice.Distance.Centimeters;
                         Log.Debug("Center distance measuremente updated ({distance} cm.)", Math.Round(centerDistance, 4, MidpointRounding.AwayFromZero));
                         Thread.Sleep(60);
 
-                        var leftDistance = LeftSonarDevice.Distance;
+                        var leftDistance = LeftSonarDevice.Distance.Centimeters;
                         Log.Debug("Left distance measuremente updated ({distance} cm.)", Math.Round(leftDistance, 4, MidpointRounding.AwayFromZero));
                         Thread.Sleep(60);
 
-                        var rightDistance = RightSonarDevice.Distance;
+                        var rightDistance = RightSonarDevice.Distance.Centimeters;
                         Log.Debug("Right distance measuremente updated ({distance} cm.)", Math.Round(rightDistance, 4, MidpointRounding.AwayFromZero));
                         Thread.Sleep(60);
 
