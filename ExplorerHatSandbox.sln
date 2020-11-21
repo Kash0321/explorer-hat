@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExplorerHat.ObstacleAvoidan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExplorerHat.BasicSample", "src\ExplorerHat.BasicSample\ExplorerHat.BasicSample.csproj", "{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExplorerHat.LineTracker", "src\ExplorerHat.LineTracker\ExplorerHat.LineTracker.csproj", "{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,9 +48,22 @@ Global
 		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|x64.Build.0 = Release|Any CPU
 		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|x86.ActiveCfg = Release|Any CPU
 		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8}.Release|x86.Build.0 = Release|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Debug|x64.Build.0 = Debug|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Debug|x86.Build.0 = Debug|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Release|x64.ActiveCfg = Release|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Release|x64.Build.0 = Release|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Release|x86.ActiveCfg = Release|Any CPU
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{756213B4-1937-45F8-B6C9-77FA71FB40B4} = {6BE01EDC-CC54-4823-8B85-02A2850E1B20}
 		{EA765F7D-87A3-41E6-814A-2EF04A2D22D8} = {6BE01EDC-CC54-4823-8B85-02A2850E1B20}
+		{ECA4EDE5-B86C-4A7D-9C67-3B4DA20111AB} = {6BE01EDC-CC54-4823-8B85-02A2850E1B20}
 	EndGlobalSection
 EndGlobal
