@@ -22,7 +22,7 @@ namespace ExplorerHat.LineTracker
             Log.Information("    CPU Arch: {processArchitecture}", RuntimeInformation.ProcessArchitecture);
             Log.Information("**************************************************************************************");
 
-            Console.WriteLine("Hit any key to enter in [ObstacleAvoiding] mode");
+            Console.WriteLine("Hit any key to enter in [LineTracking] mode");
             Console.ReadKey();
             Console.WriteLine();
 
