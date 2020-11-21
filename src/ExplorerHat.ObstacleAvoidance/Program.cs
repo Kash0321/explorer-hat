@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Serilog;
 
 namespace ExplorerHat.ObstacleAvoidance
@@ -10,7 +11,7 @@ namespace ExplorerHat.ObstacleAvoidance
         {
             // Logging configuration
             Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.Verbose()
+               .MinimumLevel.Information()
                .WriteTo.Console()
                .CreateLogger();
 
@@ -27,6 +28,8 @@ namespace ExplorerHat.ObstacleAvoidance
             Console.WriteLine();
 
             var task = Runner.RunAsync();
+
+            //Thread.Sleep(30000);
 
             Console.WriteLine("Hit any key again to stop");
             Console.ReadKey();
