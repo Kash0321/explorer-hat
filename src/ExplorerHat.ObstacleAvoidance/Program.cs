@@ -29,7 +29,7 @@ namespace ExplorerHat.ObstacleAvoidance
 
             var task = Runner.RunAsync();
 
-            //Thread.Sleep(30000);
+            //Thread.Sleep(3000);
 
             Console.WriteLine("Hit any key again to stop");
             Console.ReadKey();
