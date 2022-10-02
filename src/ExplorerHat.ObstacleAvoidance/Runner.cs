@@ -12,6 +12,12 @@ namespace ExplorerHat.ObstacleAvoidance
     public class Runner
     {
         const string LOG_PWR_MSG = "Motors at {pwr}%";
+        const double FULL_POWER = 1;
+        const double HGH_POWER = 0.99;
+        const double MED_POWER = 0.98;
+        const double MLW_POWER = 0.97;
+        const double LOW_POWER = 0.96;
+
 
         static bool _running;
 
@@ -56,7 +62,7 @@ namespace ExplorerHat.ObstacleAvoidance
                                     Log.Debug("Obstacle detected. Maneuvering to avoid it...");
                                     hat.Motors.Stop();
                                     Log.Debug("Motors stopped");
-                                    hat.Motors.Backwards(0.6);
+                                    hat.Motors.Backwards(MED_POWER);
                                     Log.Debug("Backwards...");
                                     Thread.Sleep(TimeSpan.FromSeconds(0.25));
                                     Log.Debug("Turning to avoid the obstacle ...");
@@ -65,8 +71,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                     {
                                         while (sonar.Distance.LeftDistance <= 20d)
                                         {
-                                            hat.Motors.One.Forwards(0.6);
-                                            hat.Motors.Two.Backwards(0.6);
+                                            hat.Motors.One.Forwards(MED_POWER);
+                                            hat.Motors.Two.Backwards(MED_POWER);
                                             Thread.Sleep(TimeSpan.FromSeconds(0.2));
                                         }
                                     }
@@ -74,21 +80,21 @@ namespace ExplorerHat.ObstacleAvoidance
                                     {
                                         while (sonar.Distance.RightDistance <= 20d)
                                         {
-                                            hat.Motors.One.Backwards(0.6);
-                                            hat.Motors.Two.Forwards(0.6);
+                                            hat.Motors.One.Backwards(MED_POWER);
+                                            hat.Motors.Two.Forwards(MED_POWER);
                                             Thread.Sleep(TimeSpan.FromSeconds(0.2));
                                         }
                                     }
 
 
                                     Log.Debug("Turn completed");
-                                    Log.Debug(LOG_PWR_MSG, 80);
-                                    hat.Motors.Forwards(0.8);
+                                    Log.Debug(LOG_PWR_MSG, FULL_POWER * 100);
+                                    hat.Motors.Forwards(FULL_POWER);
                                 }
                                 else if (sonar.Distance.MinimumDistance.Value < 50d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 30);
-                                    hat.Motors.Forwards(0.3);
+                                    Log.Debug(LOG_PWR_MSG, LOW_POWER * 100);
+                                    hat.Motors.Forwards(LOW_POWER);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
                                     hat.Lights.Three.On();
@@ -96,8 +102,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else if (sonar.Distance.MinimumDistance.Value < 80d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 40);
-                                    hat.Motors.Forwards(0.4);
+                                    Log.Debug(LOG_PWR_MSG, MLW_POWER * 100);
+                                    hat.Motors.Forwards(MLW_POWER);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
                                     hat.Lights.Three.Off();
@@ -105,8 +111,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else if (sonar.Distance.MinimumDistance.Value < 110d)
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 60);
-                                    hat.Motors.Forwards(0.6);
+                                    Log.Debug(LOG_PWR_MSG, MED_POWER * 100);
+                                    hat.Motors.Forwards(MED_POWER);
                                     hat.Lights.One.On();
                                     hat.Lights.Two.Off();
                                     hat.Lights.Three.Off();
@@ -114,8 +120,8 @@ namespace ExplorerHat.ObstacleAvoidance
                                 }
                                 else
                                 {
-                                    Log.Debug(LOG_PWR_MSG, 80);
-                                    hat.Motors.Forwards(0.8);
+                                    Log.Debug(LOG_PWR_MSG, FULL_POWER * 100);
+                                    hat.Motors.Forwards(FULL_POWER);
                                     hat.Lights.One.Off();
                                     hat.Lights.Two.Off();
                                     hat.Lights.Three.Off();
