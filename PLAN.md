@@ -15,12 +15,19 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - [x] Confirmar (commit) el README.md reescrito, el AGENTS.md nuevo y este PLAN.md.
 
 ## Fase 1: Migración a .NET 10
-- [ ] `Directory.Build.props` común: `net10.0`, `Nullable`, `ImplicitUsings`, `LangVersion` por defecto.
-- [ ] Actualizar paquetes: `Iot.Device.Bindings` y `System.Device.Gpio` 4.2.0, Serilog 4.x
-      (BasicSample está en `netcoreapp3.1` + Iot 1.1.0; ObstacleAvoidance en `net6.0` + Iot 2.2.0).
-- [ ] Corregir cambios de API (p. ej. `Hcsr04.Distance` → `TryGetDistance`).
+- [x] `Directory.Build.props` común: `net10.0`, `ImplicitUsings`, `Nullable`.
+- [x] Actualizar paquetes: `Iot.Device.Bindings` y `System.Device.Gpio` 4.2.0, Serilog 4.4.0,
+      Serilog.Sinks.Console 6.1.1.
+- [x] Cambios de API: no hubo que tocar nada (`Hcsr04.Distance` sigue existiendo y lanza excepción si no
+      hay eco; `DCMotor` controla bien el DRV8833 marcha atrás). Solo avisos de nulabilidad, corregidos.
+- [x] Compila en la Pi: 0 errores, 0 avisos (primera compilación ~3 min, siguientes ~20 s).
+- [x] Prueba de LEDs en hardware como usuario `pi` (sin `root`): funciona.
+- [x] **Fallo al liberar el HAT** (ver Fase 6): `ExplorerHat.Dispose()` hace que el proceso muera con
+      `InvalidOperationException: Can not write to pin 19 because it is not open` desde `SoftwarePwmChannel.Run()`.
+      Solución provisional: proyecto `src/ExplorerHat.Common` con `SafeExplorerHat` (para motores, apaga luces
+      y libera los pines en orden). Los dos ejemplos lo usan. Retirarla cuando se publique el arreglo en dotnet/iot.
+- [ ] Probar motores con las ruedas en el aire.
 - [ ] Valorar migrar `ExplorerHatSandbox.sln` a `.slnx`.
-- [ ] Compilar en la Pi y probar en hardware con las ruedas en el aire.
 
 ## Fase 2: Seguridad física del robot (parada de emergencia)
 - [ ] Ctrl+C (`Console.CancelKeyPress`) y excepciones deben dejar los dos motores a `Speed = 0` y liberar pines.
@@ -78,6 +85,10 @@ solo cubre motores y las 4 luces. Falta:
 - [ ] 4 salidas de colector abierto (GPIO 6, 12, 13, 16).
 - [ ] 4 entradas analógicas (ADS1015, I2C 0x48). Comprobar si sirve el binding `Ads1115` existente.
 - [ ] 8 pads táctiles capacitivos (CAP1208, I2C 0x28). No hay binding CAP1xxx en dotnet/iot.
-- [ ] Revisar posibles fallos: `Motors`, `Lights` y `Led` reciben el `GpioController` compartido con
-      `shouldDispose = true` y lo liberan varias veces; comprobar el control del DRV8833 marcha atrás.
+- [ ] **Prioritario, confirmado en 4.2.0:** `ExplorerHat` pasa su `GpioController` a `Motors`, `Lights`, cada
+      `Led` y cada `DCMotor` con `shouldDispose = true` (valor por defecto), así que el primero que se libera
+      cierra todos los pines. Los hilos de `SoftwarePwmChannel` de los motores siguen escribiendo y el
+      proceso muere. Arreglo: pasar `shouldDispose: false` a los hijos, liberar los motores antes que las
+      luces y el controlador el último. Comprobar también que al liberar un motor que iba marcha atrás no quede el pin de dirección en alto.
+- [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
 - [ ] Preparar PR(s) a dotnet/iot.

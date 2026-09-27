@@ -2,6 +2,7 @@
 using System.Threading;
 using Serilog;
 using System.Runtime.InteropServices;
+using ExplorerHat.Common;
 
 namespace ExplorerHat.BasicSample
 {
@@ -25,7 +26,7 @@ namespace ExplorerHat.BasicSample
             Log.Information("    CPU Arch: {processArchitecture}", RuntimeInformation.ProcessArchitecture);
             Log.Information("**************************************************************************************");
 
-            using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())
+            using (var hat = new SafeExplorerHat())
             {
                 hat.Lights.Blue.On();
                 hat.Lights.Yellow.On();

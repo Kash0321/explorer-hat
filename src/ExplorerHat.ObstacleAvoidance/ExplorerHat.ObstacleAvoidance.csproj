@@ -11,4 +11,8 @@
     <PackageReference Include="System.Device.Gpio" Version="4.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ExplorerHat.Common\ExplorerHat.Common.csproj" />
+  </ItemGroup>
+
 </Project>
