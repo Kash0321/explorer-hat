@@ -26,8 +26,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       `InvalidOperationException: Can not write to pin 19 because it is not open` desde `SoftwarePwmChannel.Run()`.
       Solución provisional: proyecto `src/ExplorerHat.Common` con `SafeExplorerHat` (para motores, apaga luces
       y libera los pines en orden). Los dos ejemplos lo usan. Retirarla cuando se publique el arreglo en dotnet/iot.
-- [ ] Probar motores con las ruedas en el aire.
-- [ ] Valorar migrar `ExplorerHatSandbox.sln` a `.slnx`.
+- [x] Probar motores con las ruedas en el aire (BasicSample): sentidos, parada final y salida limpia correctos.
+- [x] Migrar `ExplorerHatSandbox.sln` a `ExplorerHatSandbox.slnx` (formato XML simple, .NET 10 / VS 2022 17.13+).
 
 ## Fase 2: Seguridad física del robot (parada de emergencia)
 - [ ] Ctrl+C (`Console.CancelKeyPress`) y excepciones deben dejar los dos motores a `Speed = 0` y liberar pines.

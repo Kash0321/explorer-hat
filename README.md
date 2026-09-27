@@ -20,6 +20,7 @@
 El entorno está organizado en soluciones independientes según el nivel de aprendizaje:
 
 * 🟢 **`ExplorerHat.BasicSample/`**: El laboratorio de inicio. Ideal para enseñar bucles, hilos con `Thread.Sleep`, encendido de luces LED secuenciales y movimientos básicos de los dos motores (Adelante, Atrás, Giros).
+* ⚙️ **`ExplorerHat.Common/`**: Código compartido por los ejemplos. `SafeExplorerHat` se usa igual que `ExplorerHat`, pero al terminar para los motores, apaga las luces y libera los pines sin errores.
 * 🔵 **`ExplorerHat.ObstacleAvoidance/`**: El robot autónomo. Integra lecturas de sensores de distancia por ultrasonidos (HC-SR04) para calcular proximidad y tomar decisiones de esquiva en tiempo real.
 
 ---
@@ -30,7 +31,7 @@ Para compilar o ejecutar los proyectos directamente desde la terminal remota de 
 
 ### Compilar la solución completa:
 ```bash
-dotnet build ExplorerHatSandbox.sln
+dotnet build ExplorerHatSandbox.slnx
 ```
 
 ### Ejecutar el laboratorio básico:
