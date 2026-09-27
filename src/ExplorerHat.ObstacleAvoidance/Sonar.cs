@@ -24,9 +24,9 @@ namespace ExplorerHat.ObstacleAvoidance
 
         private System.Timers.Timer MeasurementTimer { get; set; }
 
-        private Hcsr04 CenterSonarDevice { get; set; } = null;
-        private Hcsr04 LeftSonarDevice { get; set; } = null;
-        private Hcsr04 RightSonarDevice { get; set; } = null;
+        private Hcsr04? CenterSonarDevice { get; set; } = null;
+        private Hcsr04? LeftSonarDevice { get; set; } = null;
+        private Hcsr04? RightSonarDevice { get; set; } = null;
 
         public DistanceTuple Distance { get; private set; }
 
@@ -51,11 +51,11 @@ namespace ExplorerHat.ObstacleAvoidance
             MeasurementTimer.Enabled = true;
         }
 
-        private void MeasurementTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void MeasurementTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             // lock (_lock)
             // {
-                if (!(CenterSonarDevice is null))
+                if (!(CenterSonarDevice is null) && !(LeftSonarDevice is null) && !(RightSonarDevice is null))
                 {
                     try
                     {
@@ -100,9 +100,9 @@ namespace ExplorerHat.ObstacleAvoidance
 
                     CenterSonarDevice.Dispose();
                     CenterSonarDevice = null;
-                    LeftSonarDevice.Dispose();
+                    LeftSonarDevice?.Dispose();
                     LeftSonarDevice = null;
-                    RightSonarDevice.Dispose();
+                    RightSonarDevice?.Dispose();
                     RightSonarDevice = null;
                     Log.Debug("Sonar disposed");
                 }

@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />
+    <Project Path="src/ExplorerHat.Common/ExplorerHat.Common.csproj" />
+    <Project Path="src/ExplorerHat.ObstacleAvoidance/ExplorerHat.ObstacleAvoidance.csproj" />
+  </Folder>
+</Solution>

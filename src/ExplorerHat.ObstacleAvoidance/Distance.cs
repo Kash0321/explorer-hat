@@ -29,11 +29,11 @@ namespace ExplorerHat.ObstacleAvoidance
         }
 
         /// <inheritdoc />
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (obj == null) return 1;
             
-            Distance other = obj as Distance;
+            Distance? other = obj as Distance;
 
             if (other != null)
             {

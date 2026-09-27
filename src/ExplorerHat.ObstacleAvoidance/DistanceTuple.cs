@@ -54,7 +54,7 @@ namespace ExplorerHat.ObstacleAvoidance
         {
             get
             {
-                var result = _tuple.Values.Min(d => d);
+                var result = _tuple.Values.Min(d => d)!;
                 return result;
             }
         }

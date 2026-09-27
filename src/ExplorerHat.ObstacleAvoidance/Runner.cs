@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ExplorerHat.Common;
 using Iot.Device.ExplorerHat;
 using Serilog;
 
@@ -34,7 +35,7 @@ namespace ExplorerHat.ObstacleAvoidance
                 try
                 {
                     _running = true;
-                    using (var hat = new Iot.Device.ExplorerHat.ExplorerHat())
+                    using (var hat = new SafeExplorerHat())
                     {
                         using (var sonar = new Sonar())
                         {
