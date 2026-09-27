@@ -30,11 +30,17 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - [x] Migrar `ExplorerHatSandbox.sln` a `ExplorerHatSandbox.slnx` (formato XML simple, .NET 10 / VS 2022 17.13+).
 
 ## Fase 2: Seguridad física del robot (parada de emergencia)
-- [ ] Ctrl+C (`Console.CancelKeyPress`) y excepciones deben dejar los dos motores a `Speed = 0` y liberar pines.
-- [ ] ObstacleAvoidance: `Main` termina sin esperar a la tarea del `Runner`, así que el `using` del HAT
-      puede no llegar a ejecutarse y los motores quedar encendidos. Esperar a la tarea antes de salir.
-- [ ] ObstacleAvoidance: los bucles de giro (`while (... <= 20d)`) ignoran la orden de parada y pueden no terminar.
-- [ ] Sonar: las lecturas del temporizador se pueden solapar (el `lock` está comentado) y `_running` no es `volatile`.
+- [x] Comprobado en .NET 10: ante Ctrl+C (SIGINT), `kill` (SIGTERM) o cierre de SSH (SIGHUP) el proceso termina
+      **sin ejecutar `using` ni `finally`**, y los pines se quedan como estaban (prueba de control con el
+      `ExplorerHat` original: LEDs encendidos tras Ctrl+C). Con una excepción no capturada el `using` sí se ejecuta.
+- [x] `SafeExplorerHat` registra esas señales (y SIGQUIT) con `PosixSignalRegistration` y se libera antes de terminar:
+      motores a `Speed = 0`, luces apagadas y pines liberados. Probado con LEDs y `pinctrl`: todos los pines a nivel bajo.
+- [x] ObstacleAvoidance: `Main` espera a la tarea del `Runner` antes de salir.
+- [x] ObstacleAvoidance: los bucles de giro atienden la orden de parada y no vuelve a avanzar tras ella.
+- [x] Sonar: una medición cada vez (`AutoReset = false` + `lock`), `Dispose` protegido y `_running` es `volatile`.
+- [x] AGENTS.md: la regla de liberación de pines pide usar `SafeExplorerHat`.
+- [ ] Probar parada de emergencia con motores girando (ruedas en el aire), incluida la marcha atrás.
+- [ ] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04.
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el
@@ -77,9 +83,9 @@ Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legi
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
 - [ ] 09 Robot autónomo: versión simplificada de ObstacleAvoidance.
-- [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. En GitHub existe la rama `features/line-tracker`
-      (2020–2022) con solo el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado de un
-      tutorial. Retomar la idea desde cero en lugar de fusionar la rama (arrastra los scripts `.vscode` antiguos).
+- [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
+      ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
+      de un tutorial. Hacerlo desde cero.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero

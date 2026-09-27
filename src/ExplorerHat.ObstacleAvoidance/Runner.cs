@@ -18,7 +18,7 @@ namespace ExplorerHat.ObstacleAvoidance
         const double MDM_POWER = 0.85;
         const double LOW_POWER = 0.80;
 
-        static bool _running;
+        static volatile bool _running;
 
         static Runner()
         {
@@ -69,7 +69,7 @@ namespace ExplorerHat.ObstacleAvoidance
 
                                     if (sonar.Distance.LeftDistance <= sonar.Distance.RightDistance)
                                     {
-                                        while (sonar.Distance.LeftDistance <= 20d)
+                                        while (_running && sonar.Distance.LeftDistance <= 20d)
                                         {
                                             hat.Motors.One.Forwards(MDM_POWER);
                                             hat.Motors.Two.Backwards(MDM_POWER);
@@ -78,7 +78,7 @@ namespace ExplorerHat.ObstacleAvoidance
                                     }
                                     else
                                     {
-                                        while (sonar.Distance.RightDistance <= 20d)
+                                        while (_running && sonar.Distance.RightDistance <= 20d)
                                         {
                                             hat.Motors.One.Backwards(MDM_POWER);
                                             hat.Motors.Two.Forwards(MDM_POWER);
@@ -86,6 +86,12 @@ namespace ExplorerHat.ObstacleAvoidance
                                         }
                                     }
 
+
+                                    if (!_running)
+                                    {
+                                        // Stopped while turning: don't go forwards again
+                                        break;
+                                    }
 
                                     Log.Debug("Turn completed");
                                     Log.Debug(LOG_PWR_MSG, FLL_POWER * 100);

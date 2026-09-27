@@ -29,13 +29,13 @@ namespace ExplorerHat.ObstacleAvoidance
 
             var task = Runner.RunAsync();
 
-            //Thread.Sleep(3000);
-
             Console.WriteLine("Hit any key again to stop");
             Console.ReadKey();
             Console.WriteLine();
 
             Runner.Stop();
+            // Wait for the runner to stop the motors and release the hat before exiting
+            task.Wait();
         }
     }
 }
