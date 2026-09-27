@@ -44,7 +44,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       Prueba de estrés con LEDs (30 paradas aleatorias): sin arreglo 30/30 pines en alto; con arreglo 0/30.
 - [x] Parada de emergencia con motores girando (ruedas en el aire, motor 2 marcha atrás) con SIGINT, SIGTERM
       y SIGHUP: pines de motores y LEDs a nivel bajo en los tres casos.
-- [ ] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04.
+- [x] Nuevo ejemplo `ExplorerHat.SonarDashboard`: panel de consola (Spectre.Console) con la distancia de cada
+      sensor, sin motores. Montaje verificado: los tres sensores responden (Izquierda 20/20, Centro 17/20, Derecha 20/20).
+- [ ] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04 (robot sin cables, con batería y wifi).
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el

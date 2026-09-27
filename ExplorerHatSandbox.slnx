@@ -3,5 +3,6 @@
     <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />
     <Project Path="src/ExplorerHat.Common/ExplorerHat.Common.csproj" />
     <Project Path="src/ExplorerHat.ObstacleAvoidance/ExplorerHat.ObstacleAvoidance.csproj" />
+    <Project Path="src/ExplorerHat.SonarDashboard/ExplorerHat.SonarDashboard.csproj" />
   </Folder>
 </Solution>
