@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Iot.Device.Bindings" Version="4.2.0" />
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
+    <PackageReference Include="System.Device.Gpio" Version="4.2.0" />
+  </ItemGroup>
+
+</Project>

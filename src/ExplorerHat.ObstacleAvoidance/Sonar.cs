@@ -13,7 +13,7 @@ namespace ExplorerHat.ObstacleAvoidance
     /// </summary>, >
     public class Sonar : IDisposable
     {
-        private static object _lock = new object();
+        private readonly object _lock = new object();
 
         const int CENTER_TRIG = 6;
         const int LEFT_TRIG = 13;
@@ -45,16 +45,18 @@ namespace ExplorerHat.ObstacleAvoidance
 
             Log.Debug("Sonar hardware and services initialized");
             
-            MeasurementTimer = new System.Timers.Timer(250);
+            // Short wait between measurements, so the robot notices obstacles quickly
+            MeasurementTimer = new System.Timers.Timer(60);
             MeasurementTimer.Elapsed += MeasurementTimer_Elapsed;
-            MeasurementTimer.AutoReset = true;
+            // One measurement at a time: the timer is restarted when the previous one ends
+            MeasurementTimer.AutoReset = false;
             MeasurementTimer.Enabled = true;
         }
 
         private void MeasurementTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
-            // lock (_lock)
-            // {
+            lock (_lock)
+            {
                 if (!(CenterSonarDevice is null) && !(LeftSonarDevice is null) && !(RightSonarDevice is null))
                 {
                     try
@@ -80,8 +82,9 @@ namespace ExplorerHat.ObstacleAvoidance
                         Log.Error(ex.Message);
                     }
 
+                    MeasurementTimer.Start();
                 }
-            // }
+            }
         }
 
         #region IDisposable Support
@@ -91,12 +94,13 @@ namespace ExplorerHat.ObstacleAvoidance
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (CenterSonarDevice != null)
+            lock (_lock)
             {
-                if (disposing)
+                if (CenterSonarDevice != null && disposing)
                 {
                     MeasurementTimer.Stop();
                     MeasurementTimer.Enabled = false;
+                    MeasurementTimer.Dispose();
 
                     CenterSonarDevice.Dispose();
                     CenterSonarDevice = null;

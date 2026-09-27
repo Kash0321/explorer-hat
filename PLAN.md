@@ -30,11 +30,34 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - [x] Migrar `ExplorerHatSandbox.sln` a `ExplorerHatSandbox.slnx` (formato XML simple, .NET 10 / VS 2022 17.13+).
 
 ## Fase 2: Seguridad física del robot (parada de emergencia)
-- [ ] Ctrl+C (`Console.CancelKeyPress`) y excepciones deben dejar los dos motores a `Speed = 0` y liberar pines.
-- [ ] ObstacleAvoidance: `Main` termina sin esperar a la tarea del `Runner`, así que el `using` del HAT
-      puede no llegar a ejecutarse y los motores quedar encendidos. Esperar a la tarea antes de salir.
-- [ ] ObstacleAvoidance: los bucles de giro (`while (... <= 20d)`) ignoran la orden de parada y pueden no terminar.
-- [ ] Sonar: las lecturas del temporizador se pueden solapar (el `lock` está comentado) y `_running` no es `volatile`.
+- [x] Comprobado en .NET 10: ante Ctrl+C (SIGINT), `kill` (SIGTERM) o cierre de SSH (SIGHUP) el proceso termina
+      **sin ejecutar `using` ni `finally`**, y los pines se quedan como estaban (prueba de control con el
+      `ExplorerHat` original: LEDs encendidos tras Ctrl+C). Con una excepción no capturada el `using` sí se ejecuta.
+- [x] `SafeExplorerHat` registra esas señales (y SIGQUIT) con `PosixSignalRegistration` y se libera antes de terminar:
+      motores a `Speed = 0`, luces apagadas y pines liberados. Probado con LEDs y `pinctrl`: todos los pines a nivel bajo.
+- [x] ObstacleAvoidance: `Main` espera a la tarea del `Runner` antes de salir.
+- [x] ObstacleAvoidance: los bucles de giro atienden la orden de parada y no vuelve a avanzar tras ella.
+- [x] Sonar: una medición cada vez (`AutoReset = false` + `lock`), `Dispose` protegido y `_running` es `volatile`.
+- [x] AGENTS.md: la regla de liberación de pines pide usar `SafeExplorerHat`.
+- [x] Condición de carrera: el programa sigue ejecutándose durante la parada y puede volver a escribir un pin
+      justo antes de liberarlo. Arreglo: tras liberar, `SafeExplorerHat` fuerza a nivel bajo los 8 pines de salida.
+      Prueba de estrés con LEDs (30 paradas aleatorias): sin arreglo 30/30 pines en alto; con arreglo 0/30.
+- [x] Parada de emergencia con motores girando (ruedas en el aire, motor 2 marcha atrás) con SIGINT, SIGTERM
+      y SIGHUP: pines de motores y LEDs a nivel bajo en los tres casos.
+- [x] Nuevo ejemplo `ExplorerHat.SonarDashboard`: panel de consola (Spectre.Console) con la distancia de cada
+      sensor, sin motores. Montaje verificado: los tres sensores responden (Izquierda 20/20, Centro 17/20, Derecha 20/20).
+- [x] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04 (robot sin cables, con batería y wifi).
+      Arranca, esquiva y para bien, pero choca con algunos obstáculos. Con batería hay bajadas de tensión
+      (`Undervoltage detected`, ~12 s en la prueba) al mover los motores; la wifi aguanta (2/86 pings perdidos).
+- [ ] Mejorar la alimentación (separar la de la Pi y la de los motores o batería de más amperios).
+- [x] Revisar por qué ObstacleAvoidance choca a veces. Causa: con el obstáculo delante no giraba (solo giraba
+      mientras el sensor del lado elegido estuviera cerca), retrocedía y volvía a chocar. Arreglado: gira mientras
+      haya algo delante o en ese lado, límite de 20 a 30 cm, sonar cada ~0,27 s en vez de ~0,5 s y pausas de
+      100 ms antes de cambiar el sentido de los motores. En el suelo giraba hacia el lado del obstáculo
+      (el motor One es la rueda derecha): invertidos los giros y giro mínimo de 300 ms. Probado en el suelo:
+      esquiva de forma aceptable, aunque a veces duda cuando las medidas no se actualizan a tiempo.
+- [ ] Mejorar la estabilidad de ObstacleAvoidance: filtrar lecturas falsas del HC-SR04 (saltos a ~277/361 cm)
+      y decidir con medidas tomadas después de cada maniobra.
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el
@@ -77,9 +100,9 @@ Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legi
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
 - [ ] 09 Robot autónomo: versión simplificada de ObstacleAvoidance.
-- [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. En GitHub existe la rama `features/line-tracker`
-      (2020–2022) con solo el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado de un
-      tutorial. Retomar la idea desde cero en lugar de fusionar la rama (arrastra los scripts `.vscode` antiguos).
+- [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
+      ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
+      de un tutorial. Hacerlo desde cero.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
