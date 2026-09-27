@@ -39,7 +39,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - [x] ObstacleAvoidance: los bucles de giro atienden la orden de parada y no vuelve a avanzar tras ella.
 - [x] Sonar: una medición cada vez (`AutoReset = false` + `lock`), `Dispose` protegido y `_running` es `volatile`.
 - [x] AGENTS.md: la regla de liberación de pines pide usar `SafeExplorerHat`.
-- [ ] Probar parada de emergencia con motores girando (ruedas en el aire), incluida la marcha atrás.
+- [x] Condición de carrera: el programa sigue ejecutándose durante la parada y puede volver a escribir un pin
+      justo antes de liberarlo. Arreglo: tras liberar, `SafeExplorerHat` fuerza a nivel bajo los 8 pines de salida.
+      Prueba de estrés con LEDs (30 paradas aleatorias): sin arreglo 30/30 pines en alto; con arreglo 0/30.
+- [x] Parada de emergencia con motores girando (ruedas en el aire, motor 2 marcha atrás) con SIGINT, SIGTERM
+      y SIGHUP: pines de motores y LEDs a nivel bajo en los tres casos.
 - [ ] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04.
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)

@@ -1,3 +1,4 @@
+using System.Device.Gpio;
 using System.Runtime.InteropServices;
 using Iot.Device.ExplorerHat;
 
@@ -18,6 +19,9 @@ namespace ExplorerHat.Common
     /// </remarks>
     public class SafeExplorerHat : IDisposable
     {
+        // Explorer HAT output pins: motor 1 (19, 20), motor 2 (21, 26) and lights (4, 17, 27, 5)
+        private static readonly int[] OutputPins = { 19, 20, 21, 26, 4, 17, 27, 5 };
+
         private readonly object _lock = new object();
         private readonly List<PosixSignalRegistration> _signalRegistrations = new List<PosixSignalRegistration>();
         private SharedGpioController? _controller;
@@ -83,6 +87,16 @@ namespace ExplorerHat.Common
 
                 _controller.Release();
                 _controller = null;
+
+                // The program may still be running (e.g. on an emergency stop) and could have written a pin
+                // right before it was released, so force every output low. Later writes fail: pins are closed.
+                using (var gpio = new GpioController())
+                {
+                    foreach (var pin in OutputPins)
+                    {
+                        gpio.OpenPin(pin, PinMode.Output, PinValue.Low);
+                    }
+                }
             }
         }
     }
