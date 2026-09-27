@@ -77,6 +77,9 @@ Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legi
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
 - [ ] 09 Robot autónomo: versión simplificada de ObstacleAvoidance.
+- [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. En GitHub existe la rama `features/line-tracker`
+      (2020–2022) con solo el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado de un
+      tutorial. Retomar la idea desde cero en lugar de fusionar la rama (arrastra los scripts `.vscode` antiguos).
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
