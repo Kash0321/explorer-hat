@@ -17,6 +17,12 @@ namespace ExplorerHat.ObstacleAvoidance
         const double HGH_POWER = 0.90;
         const double MDM_POWER = 0.85;
         const double LOW_POWER = 0.80;
+        // Closer than this (in centimeters) is an obstacle: stop, go backwards and turn
+        const double OBSTACLE_DISTANCE = 30d;
+        // Short pause before changing the direction of the motors, so they don't draw so much current
+        const int PAUSE_TIME = 100;
+        // The robot always turns at least this long (in milliseconds), so the sensors see the new direction
+        const int MIN_TURN_TIME = 300;
 
         static volatile bool _running;
 
@@ -52,7 +58,7 @@ namespace ExplorerHat.ObstacleAvoidance
                                     sonar.Distance.CenterDistance,
                                     sonar.Distance.RightDistance);
 
-                                if (sonar.Distance.MinimumDistance.Value < 20d)
+                                if (sonar.Distance.MinimumDistance.Value < OBSTACLE_DISTANCE)
                                 {
                                     hat.Lights.One.On();
                                     hat.Lights.Two.On();
@@ -62,29 +68,44 @@ namespace ExplorerHat.ObstacleAvoidance
                                     Log.Debug("Obstacle detected. Maneuvering to avoid it...");
                                     hat.Motors.Stop();
                                     Log.Debug("Motors stopped");
+                                    Thread.Sleep(PAUSE_TIME);
                                     hat.Motors.Backwards(MDM_POWER);
                                     Log.Debug("Backwards...");
                                     Thread.Sleep(TimeSpan.FromSeconds(0.25));
+                                    hat.Motors.Stop();
+                                    Thread.Sleep(PAUSE_TIME);
                                     Log.Debug("Turning to avoid the obstacle ...");
 
+                                    // Turn to the side with more room, while there is something in front
+                                    // or on the side the robot is turning away from.
+                                    // Motor One is the right wheel and motor Two is the left wheel.
                                     if (sonar.Distance.LeftDistance <= sonar.Distance.RightDistance)
                                     {
-                                        while (_running && sonar.Distance.LeftDistance <= 20d)
+                                        // Obstacle on the left: turn right
+                                        hat.Motors.One.Backwards(MDM_POWER);
+                                        hat.Motors.Two.Forwards(MDM_POWER);
+                                        Thread.Sleep(MIN_TURN_TIME);
+
+                                        while (_running && (sonar.Distance.CenterDistance < OBSTACLE_DISTANCE || sonar.Distance.LeftDistance < OBSTACLE_DISTANCE))
                                         {
-                                            hat.Motors.One.Forwards(MDM_POWER);
-                                            hat.Motors.Two.Backwards(MDM_POWER);
                                             Thread.Sleep(TimeSpan.FromSeconds(0.2));
                                         }
                                     }
                                     else
                                     {
-                                        while (_running && sonar.Distance.RightDistance <= 20d)
+                                        // Obstacle on the right: turn left
+                                        hat.Motors.One.Forwards(MDM_POWER);
+                                        hat.Motors.Two.Backwards(MDM_POWER);
+                                        Thread.Sleep(MIN_TURN_TIME);
+
+                                        while (_running && (sonar.Distance.CenterDistance < OBSTACLE_DISTANCE || sonar.Distance.RightDistance < OBSTACLE_DISTANCE))
                                         {
-                                            hat.Motors.One.Backwards(MDM_POWER);
-                                            hat.Motors.Two.Forwards(MDM_POWER);
                                             Thread.Sleep(TimeSpan.FromSeconds(0.2));
                                         }
                                     }
+
+                                    hat.Motors.Stop();
+                                    Thread.Sleep(PAUSE_TIME);
 
 
                                     if (!_running)

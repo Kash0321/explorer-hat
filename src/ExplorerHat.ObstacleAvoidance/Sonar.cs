@@ -45,7 +45,8 @@ namespace ExplorerHat.ObstacleAvoidance
 
             Log.Debug("Sonar hardware and services initialized");
             
-            MeasurementTimer = new System.Timers.Timer(250);
+            // Short wait between measurements, so the robot notices obstacles quickly
+            MeasurementTimer = new System.Timers.Timer(60);
             MeasurementTimer.Elapsed += MeasurementTimer_Elapsed;
             // One measurement at a time: the timer is restarted when the previous one ends
             MeasurementTimer.AutoReset = false;

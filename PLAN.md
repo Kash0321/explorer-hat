@@ -46,7 +46,18 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       y SIGHUP: pines de motores y LEDs a nivel bajo en los tres casos.
 - [x] Nuevo ejemplo `ExplorerHat.SonarDashboard`: panel de consola (Spectre.Console) con la distancia de cada
       sensor, sin motores. Montaje verificado: los tres sensores responden (Izquierda 20/20, Centro 17/20, Derecha 20/20).
-- [ ] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04 (robot sin cables, con batería y wifi).
+- [x] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04 (robot sin cables, con batería y wifi).
+      Arranca, esquiva y para bien, pero choca con algunos obstáculos. Con batería hay bajadas de tensión
+      (`Undervoltage detected`, ~12 s en la prueba) al mover los motores; la wifi aguanta (2/86 pings perdidos).
+- [ ] Mejorar la alimentación (separar la de la Pi y la de los motores o batería de más amperios).
+- [x] Revisar por qué ObstacleAvoidance choca a veces. Causa: con el obstáculo delante no giraba (solo giraba
+      mientras el sensor del lado elegido estuviera cerca), retrocedía y volvía a chocar. Arreglado: gira mientras
+      haya algo delante o en ese lado, límite de 20 a 30 cm, sonar cada ~0,27 s en vez de ~0,5 s y pausas de
+      100 ms antes de cambiar el sentido de los motores. En el suelo giraba hacia el lado del obstáculo
+      (el motor One es la rueda derecha): invertidos los giros y giro mínimo de 300 ms. Probado en el suelo:
+      esquiva de forma aceptable, aunque a veces duda cuando las medidas no se actualizan a tiempo.
+- [ ] Mejorar la estabilidad de ObstacleAvoidance: filtrar lecturas falsas del HC-SR04 (saltos a ~277/361 cm)
+      y decidir con medidas tomadas después de cada maniobra.
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el
