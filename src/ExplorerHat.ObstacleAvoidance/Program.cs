@@ -23,11 +23,21 @@ namespace ExplorerHat.ObstacleAvoidance
             Log.Information("    CPU Arch: {processArchitecture}", RuntimeInformation.ProcessArchitecture);
             Log.Information("**************************************************************************************");
 
-            Console.WriteLine("Hit any key to enter in [ObstacleAvoiding] mode");
-            Console.ReadKey();
-            Console.WriteLine();
+            Console.WriteLine("Hit a key to enter in [ObstacleAvoiding] mode:");
+            Console.WriteLine("  [N] Normal start: the motors start at full speed at once");
+            Console.WriteLine("  [S] Smooth start: the motors start little by little");
 
-            var task = Runner.RunAsync();
+            // Wait until N or S is pressed
+            ConsoleKey key = Console.ReadKey(true).Key;
+            while (key != ConsoleKey.N && key != ConsoleKey.S)
+            {
+                key = Console.ReadKey(true).Key;
+            }
+
+            bool smoothStart = key == ConsoleKey.S;
+            Log.Information("Smooth start: {smoothStart}", smoothStart);
+
+            var task = Runner.RunAsync(smoothStart);
 
             Console.WriteLine("Hit any key again to stop");
             Console.ReadKey();

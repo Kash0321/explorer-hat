@@ -50,6 +50,19 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       Arranca, esquiva y para bien, pero choca con algunos obstáculos. Con batería hay bajadas de tensión
       (`Undervoltage detected`, ~12 s en la prueba) al mover los motores; la wifi aguanta (2/86 pings perdidos).
 - [ ] Mejorar la alimentación (separar la de la Pi y la de los motores o batería de más amperios).
+      Con cargador (5 V, 3 A) la causa de las bajadas de tensión eran los cables micro-USB: con tres
+      combinaciones de cargador y cable había `Undervoltage` constante, incluso sin el HAT. Con un cable bueno:
+      `throttled=0x0` en reposo, con la CPU al 100 % y con los motores en marcha (BasicSample, ruedas en el aire).
+      El LED rojo PWR fijo indica que la tensión es correcta. Falta revisar la batería (bajadas al mover los motores).
+      Pruebas con ObstacleAvoidance (ruedas en el aire, tensión cada 0,2 s), arranque de golpe (N) / progresivo (S):
+      - Placa de 2×18650 en paralelo con elevador (DIY MORE V8): bajadas de tensión incluso sin motores
+        (arranque de la Pi); con motores, tensión baja el 98 % (N) / 92 % (S) del tiempo.
+      - Batería externa Redmi 10000 mAh (5,1 V 2,4 A): sin avisos en reposo ni compilando; con motores 68 % (N) /
+        54 % (S), 6 caídas en ambos casos, una por cada salida o maniobra (marcha atrás y giro).
+      - El arranque progresivo no evita las caídas; se queda como opción (tecla S al iniciar) por estética.
+      - Propuesta: Waveshare UPS HAT (B) (2×18650 en serie + reductor, 5 V hasta 5 A, contactos por debajo de la
+        Pi sin usar el GPIO, INA219 en I2C 0x42). Las Samsung 25R (64,9 mm) caben (límite 67 mm).
+        Descartadas: UPS HAT original (2,5 A) y Geekworm X728 (usa los GPIO 5, 6, 12, 16 y 20 del Explorer HAT).
 - [x] Revisar por qué ObstacleAvoidance choca a veces. Causa: con el obstáculo delante no giraba (solo giraba
       mientras el sensor del lado elegido estuviera cerca), retrocedía y volvía a chocar. Arreglado: gira mientras
       haya algo delante o en ese lado, límite de 20 a 30 cm, sonar cada ~0,27 s en vez de ~0,5 s y pausas de
@@ -103,6 +116,9 @@ Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legi
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero.
+- [ ] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
+      ópticos de horquilla (p. ej. LM393, no incluidos) en las entradas digitales del HAT (requiere Fase 6).
+      Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
