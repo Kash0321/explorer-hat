@@ -1,0 +1,5 @@
+{
+    // Name of the Raspberry Pi in the SSH configuration of the PC (~/.ssh/config).
+    // tasks.json and launch.json use it as ${config:explorerHat.host}.
+    "explorerHat.host": "harlequin"
+}

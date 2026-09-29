@@ -1,0 +1,43 @@
+{
+    // Debugging on the Raspberry Pi from the PC, with the debugger (vsdbg) installed in ~/vsdbg on the Pi.
+    // The name of the Pi is in .vscode/settings.json.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Deploys BasicSample, runs it on the Pi with the debugger and stops the robot at the end
+            "name": "Depurar BasicSample en la Pi",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Desplegar BasicSample",
+            "postDebugTask": "Parar el robot",
+            "program": "~/.dotnet/dotnet",
+            "args": ["~/apps/ExplorerHat.BasicSample/ExplorerHat.BasicSample.dll"],
+            "cwd": "~/apps/ExplorerHat.BasicSample",
+            "justMyCode": false,
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "ssh",
+                "pipeArgs": ["-T", "${config:explorerHat.host}"],
+                "debuggerPath": "~/vsdbg/vsdbg"
+            }
+        },
+        {
+            // For programs that read the keyboard (like ObstacleAvoidance): first run them with the
+            // task "Ejecutar en la Pi", then attach the debugger and choose the "dotnet" process.
+            // Stopping the debugger only detaches it: the program keeps running until Ctrl+C.
+            "name": "Adjuntar a un programa en la Pi",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickRemoteProcess}",
+            "justMyCode": false,
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "ssh",
+                "pipeArgs": ["-T", "${config:explorerHat.host}"],
+                "debuggerPath": "~/vsdbg/vsdbg"
+            }
+        }
+    ]
+}
