@@ -11,11 +11,16 @@
             "preLaunchTask": "Desplegar BasicSample",
             "postDebugTask": "Parar el robot",
             "program": "~/.dotnet/dotnet",
-            "args": ["~/apps/ExplorerHat.BasicSample/ExplorerHat.BasicSample.dll"],
+            // Relative to cwd: vsdbg expands "~" in program and cwd, but not in args
+            "args": ["ExplorerHat.BasicSample.dll"],
             "cwd": "~/apps/ExplorerHat.BasicSample",
             "justMyCode": false,
             "stopAtEntry": false,
             "console": "internalConsole",
+            // Don't fill the debug console with a line for every library loaded
+            "logging": {
+                "moduleLoad": false
+            },
             "pipeTransport": {
                 "pipeCwd": "${workspaceFolder}",
                 "pipeProgram": "ssh",
@@ -32,6 +37,9 @@
             "request": "attach",
             "processId": "${command:pickRemoteProcess}",
             "justMyCode": false,
+            "logging": {
+                "moduleLoad": false
+            },
             "pipeTransport": {
                 "pipeCwd": "${workspaceFolder}",
                 "pipeProgram": "ssh",
