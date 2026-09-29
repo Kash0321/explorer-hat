@@ -83,20 +83,35 @@ y solo servía en Windows.
 Propuesta, dos formas de trabajar:
 - **En la propia Pi** (teclado/pantalla o terminal SSH): `dotnet run --project ...`. La más sencilla para el taller.
 - **Desde el PC con VS Code** (Windows, macOS o Linux), usando el OpenSSH que ya traen los tres sistemas:
-  - [~] Autenticación SSH con clave (`ssh-keygen` + copiar la clave pública a la Pi); nada de contraseñas.
-        Pasos en el README; nombre de host `harlequin` en `~/.ssh/config` del PC. Falta hacerlo en el PC.
+  - [x] Autenticación SSH con clave (`ssh-keygen` + copiar la clave pública a la Pi); nada de contraseñas.
+        Pasos en el README; nombre de host `harlequin` en `~/.ssh/config` del PC. Hecho en el PC (Windows, clave ED25519).
   - [~] `tasks.json`: `dotnet publish -r linux-arm64 --self-contained false` en el PC → `scp` a `~/apps/<Proyecto>`
         → `ssh -t pi@<host> dotnet ~/apps/<Proyecto>/<Proyecto>.dll`. El nombre del host, configurable (sin datos personales).
         Hecho: tareas *Desplegar en la Pi*, *Ejecutar en la Pi* (eligen el programa) y *Parar el robot*; el host está
-        en `.vscode/settings.json`. Probado en la Pi: publicar, copiar a `~/apps`, ejecutar y parar. Falta probarlo desde el PC.
+        en `.vscode/settings.json`. Probado desde el PC: *Ejecutar en la Pi* con SonarDashboard funciona.
+        Arreglos: `nuget.config` solo con nuget.org (el PC tenía feeds de empresa que pedían login) y `chmod -R go-w`
+        tras copiar (scp desde Windows crea las carpetas con escritura para todos).
   - [~] `launch.json` para depurar con F5: `pipeTransport` con `ssh` y `vsdbg` instalado en `~/vsdbg` de la Pi.
         `vsdbg` instalado. *Depurar BasicSample en la Pi* (F5) y *Adjuntar a un programa en la Pi* (para los que leen
-        el teclado, como ObstacleAvoidance: con el depurador no hay teclado). Falta probarlo desde el PC.
+        el teclado, como ObstacleAvoidance: con el depurador no hay teclado). Desde el PC, F5 despliega y ejecuta
+        BasicSample (los motores giran), pero **no se detiene en los puntos de interrupción** aunque los símbolos se cargan
+        ("Símbolos cargados" con `logging.moduleLoad: true`). Arreglado ya: vsdbg no traduce `~` en `args` (ruta del .dll
+        relativa a `cwd`).
+        **Siguiente paso:** hipótesis de mayúsculas en la letra de unidad (el PDB guarda `C:\work\...` y VS Code envía
+        `c:\work\...`; en Linux no coinciden). Prueba pendiente en el `launch.json` local del PC:
+        `"sourceFileMap": { "C:\\work\\explorer-hat": "${workspaceFolder}" }`. Si funciona, solución sin rutas del PC en el
+        repositorio (p. ej. `PathMap` en `Directory.Build.props` a `/_/` + `sourceFileMap` de `/_/` a `${workspaceFolder}`).
   - [x] Ejecutar como `pi`, no como `root` (el usuario ya está en los grupos `gpio` e `i2c`).
   - [~] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
         Sin `-t`, cerrar el terminal puede dejar el programa corriendo en la Pi con los motores en marcha.
         Parar el depurador mata el programa (SIGKILL) sin parar los motores: `postDebugTask` *Parar el robot*
-        (`pkill -INT` + `pinctrl set ... op dl`). Falta probar con los motores en marcha desde el PC.
+        (`pkill -INT` + `pinctrl set ... op dl`). Se ejecuta bien al terminar la depuración. Falta probarlo parando el
+        depurador con los motores en marcha (detenido en el punto de interrupción de la línea 35 de BasicSample).
+  - [ ] Cada conexión SSH desde el PC tarda ~5 s (el despliegue abre 3 o 4). Probablemente la resolución de
+        `harlequin.local` en Windows; probar `HostName` con la IP o `AddressFamily inet` en `~/.ssh/config`.
+  - [ ] Seguridad ante cortes de wifi: `ClientAliveInterval 5` / `ClientAliveCountMax 3` en el sshd de la Pi (requiere
+        sudo) para que cierre la sesión caída y el programa reciba SIGHUP (parada de emergencia) en ~15 s.
+  - [ ] Cambiar la contraseña de `pi` si sigue siendo la de los scripts antiguos (quedó en el historial público de git).
   - [x] Versionar `launch.json`/`tasks.json` directamente (quitarlos de `.gitignore`) y borrar los scripts y plantillas antiguos.
         Los scripts antiguos tenían la contraseña de `pi` en claro y siguen en el historial de git (repositorio público).
 - Descartado como opción principal: VS Code Remote-SSH ejecutándose en la Pi (1 GB de RAM se queda corto
