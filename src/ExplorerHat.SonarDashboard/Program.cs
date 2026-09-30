@@ -6,6 +6,7 @@ namespace ExplorerHat.SonarDashboard
     /// <summary>
     /// Console dashboard with the distance measured by every HC-SR04 sensor. Motors are not used.
     /// Useful to check which sensors are wired correctly.
+    /// The F key turns on and off the filter for wrong readings (the same one ExplorerHat.ObstacleAvoidance uses).
     /// With "--registro <file> [seconds]" there is no dashboard: every reading is saved to a CSV file,
     /// to study failed or wrong readings.
     /// </summary>
@@ -23,6 +24,8 @@ namespace ExplorerHat.SonarDashboard
         const double WORKS_RATIO = 0.75;
 
         static volatile bool _running = true;
+        // Whether the dashboard shows the filtered distance (F key)
+        static bool _filterOn = true;
 
         static void Main(string[] args)
         {
@@ -61,6 +64,15 @@ namespace ExplorerHat.SonarDashboard
                             Thread.Sleep(60);
                         }
 
+                        // F turns the filter on and off
+                        while (Console.KeyAvailable)
+                        {
+                            if (Console.ReadKey(true).Key == ConsoleKey.F)
+                            {
+                                _filterOn = !_filterOn;
+                            }
+                        }
+
                         context.UpdateTarget(BuildDashboard(sensors));
                     }
                 });
@@ -86,7 +98,7 @@ namespace ExplorerHat.SonarDashboard
 
             using (var writer = new StreamWriter(path))
             {
-                writer.WriteLine("hora;sensor;ok;cm;ms");
+                writer.WriteLine("hora;sensor;ok;cm;filtrada;ms");
                 var end = DateTime.Now.AddSeconds(seconds);
 
                 while (_running && DateTime.Now < end)
@@ -95,7 +107,7 @@ namespace ExplorerHat.SonarDashboard
                     {
                         sensor.Measure();
                         var centimeters = sensor.LastReadingOk ? $"{sensor.LastDistance:0.0}" : "";
-                        writer.WriteLine($"{DateTime.Now:HH:mm:ss.fff};{sensor.Name};{sensor.LastReadingOk};{centimeters};{sensor.LastReadingTime:0.0}");
+                        writer.WriteLine($"{DateTime.Now:HH:mm:ss.fff};{sensor.Name};{sensor.LastReadingOk};{centimeters};{sensor.FilteredDistance:0.0};{sensor.LastReadingTime:0.0}");
                         // Wait for the echoes to fade away before using the next sensor
                         Thread.Sleep(60);
                     }
@@ -111,7 +123,7 @@ namespace ExplorerHat.SonarDashboard
                 .Border(TableBorder.Rounded)
                 .BorderColor(Color.Grey)
                 .Title("[bold]Sensores de distancia HC-SR04[/]")
-                .Caption($"[grey]{DateTime.Now:HH:mm:ss} · Ctrl+C para salir[/]");
+                .Caption($"[grey]{DateTime.Now:HH:mm:ss} · Filtro {FilterText()} (F para cambiar) · Ctrl+C para salir[/]");
 
             table.AddColumn("Sensor");
             table.AddColumn("TRIG → ECHO");
@@ -138,6 +150,35 @@ namespace ExplorerHat.SonarDashboard
             return new Rows(table, legend);
         }
 
+        static string FilterText()
+        {
+            if (_filterOn)
+            {
+                return "[green]activado[/]";
+            }
+
+            return "[yellow]desactivado[/]";
+        }
+
+        /// <summary>
+        /// Distance shown for the sensor: the filtered one when the filter is on, the latest reading when it is off
+        /// </summary>
+        static double? ShownDistance(SonarSensor sensor)
+        {
+            if (_filterOn)
+            {
+                return sensor.FilteredDistance;
+            }
+
+            if (sensor.LastReadingOk)
+            {
+                return sensor.LastDistance;
+            }
+
+            // The latest reading failed
+            return null;
+        }
+
         static string DistanceColor(double centimeters)
         {
             if (centimeters < NEAR_CM)
@@ -156,32 +197,33 @@ namespace ExplorerHat.SonarDashboard
 
         static string DistanceText(SonarSensor sensor)
         {
-            if (sensor.LastDistance is null)
+            var distance = ShownDistance(sensor);
+
+            if (distance is null)
             {
-                return "[grey]—[/]";
+                if (sensor.LastDistance is null)
+                {
+                    return "[grey]—[/]";
+                }
+
+                // Old value in grey: the latest reading failed
+                return $"[grey]{sensor.LastDistance:0.0} cm[/]";
             }
 
-            var text = $"{sensor.LastDistance:0.0} cm";
-
-            if (sensor.LastReadingOk)
-            {
-                return $"[{DistanceColor(sensor.LastDistance.Value)}]{text}[/]";
-            }
-
-            // Old value in grey: the latest reading failed
-            return $"[grey]{text}[/]";
+            return $"[{DistanceColor(distance.Value)}]{distance:0.0} cm[/]";
         }
 
         static string DistanceBar(SonarSensor sensor)
         {
-            if (sensor.LastDistance is null || !sensor.LastReadingOk)
+            var distance = ShownDistance(sensor);
+
+            if (distance is null)
             {
                 return $"[grey]{new string('░', BAR_WIDTH)}[/]";
             }
 
-            var distance = Math.Min(sensor.LastDistance.Value, BAR_MAX_CM);
-            var filled = (int)Math.Round(distance / BAR_MAX_CM * BAR_WIDTH);
-            var color = DistanceColor(sensor.LastDistance.Value);
+            var filled = (int)Math.Round(Math.Min(distance.Value, BAR_MAX_CM) / BAR_MAX_CM * BAR_WIDTH);
+            var color = DistanceColor(distance.Value);
 
             return $"[{color}]{new string('█', filled)}[/][grey]{new string('░', BAR_WIDTH - filled)}[/]";
         }

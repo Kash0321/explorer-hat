@@ -10,6 +10,10 @@ namespace ExplorerHat.SonarDashboard
     public class SonarSensor : IDisposable
     {
         const int HISTORY_SIZE = 20;
+        // For the filtered distance, no echo means there is nothing in front of the sensor (it measures up to 400 cm)
+        const double NO_ECHO_DISTANCE = 400d;
+
+        private double? _previousReading = null;
 
         private readonly Hcsr04 _device;
         private readonly Queue<bool> _history = new Queue<bool>();
@@ -48,6 +52,12 @@ namespace ExplorerHat.SonarDashboard
         /// Whether the latest reading worked
         /// </summary>
         public bool LastReadingOk { get; private set; }
+
+        /// <summary>
+        /// Nearest of the last two readings, in centimeters, counting no echo as 400 cm (null when there is none yet).
+        /// Same filter as ExplorerHat.ObstacleAvoidance: a single wrong reading, much farther than the real one, is ignored.
+        /// </summary>
+        public double? FilteredDistance { get; private set; }
 
         /// <summary>
         /// How long the latest reading took, in milliseconds
@@ -95,6 +105,17 @@ namespace ExplorerHat.SonarDashboard
             {
                 LastDistance = distance.Centimeters;
             }
+
+            double reading = LastReadingOk ? distance.Centimeters : NO_ECHO_DISTANCE;
+            if (_previousReading is null)
+            {
+                FilteredDistance = reading;
+            }
+            else
+            {
+                FilteredDistance = Math.Min(reading, _previousReading.Value);
+            }
+            _previousReading = reading;
 
             _history.Enqueue(LastReadingOk);
             if (_history.Count > HISTORY_SIZE)

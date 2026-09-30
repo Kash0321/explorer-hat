@@ -106,6 +106,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
         seguía el obstáculo tras el giro y repitió la maniobra. El usuario lo ve "más listo", con salidas y frenadas
         más elegantes. Pines a nivel bajo al terminar. Tensión baja el 91 % del tiempo (20 caídas): la batería ya
         llevaba un rato en uso y el giro a pasos arranca los motores más veces. Lo resolverá la UPS HAT (B).
+      - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
+        filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
+        temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
       - Pendiente: sujetar la batería y la Pi al chasis. En campo libre, a veces no avanza en línea recta (los dos
         motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
