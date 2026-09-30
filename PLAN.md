@@ -6,6 +6,16 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
+## Estado actual (30/09/2026)
+- **Cerradas:** fases 0, 1 y 2 (la 2 con el PR #9: filtro del HC-SR04, giro a pasos y frenada suave). La Fase 3
+  está casi cerrada (PR #7).
+- **Esperando hardware:** la Waveshare UPS HAT (B) (comprada) y sujetar la batería y la Pi al chasis.
+  Ya están los 10 sensores LM393 para la lección 11.
+- **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
+  `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o el arreglo de `Dispose` del
+  binding (Fase 6).
+- Actualiza esta sección al final de cada sesión de trabajo.
+
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
 - [x] Habilitar I2C (`dtparam=i2c_arm=on` en `/boot/firmware/config.txt`; ahora existe `/dev/i2c-1`).
       Hace falta para los pads táctiles (CAP1208) y las entradas analógicas (ADS1015) del HAT.
