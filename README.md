@@ -83,6 +83,14 @@ curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
 
 Si tu Raspberry Pi tiene otro nombre, cámbialo en `.vscode/settings.json` (`explorerHat.host`).
 
+**Parar el robot si se corta la wifi** (en la Raspberry Pi, una sola vez). Si se pierde la conexión SSH, la Pi tarda mucho en darse cuenta y el programa sigue con los motores en marcha. Con esto cierra la sesión en unos 15–30 s y el programa para los motores:
+```bash
+printf 'ClientAliveInterval 5\nClientAliveCountMax 3\n' | sudo tee /etc/ssh/sshd_config.d/10-explorerhat.conf
+sudo systemctl reload ssh
+printf 'net.ipv4.tcp_retries2 = 6\n' | sudo tee /etc/sysctl.d/90-explorerhat.conf
+sudo sysctl --system
+```
+
 ### Ejecutar y depurar
 
 * **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige el programa. Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir.
