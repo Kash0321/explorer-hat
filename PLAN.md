@@ -59,6 +59,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
         (arranque de la Pi); con motores, tensión baja el 98 % (N) / 92 % (S) del tiempo.
       - Batería externa Redmi 10000 mAh (5,1 V 2,4 A): sin avisos en reposo ni compilando; con motores 68 % (N) /
         54 % (S), 6 caídas en ambos casos, una por cada salida o maniobra (marcha atrás y giro).
+      - Batería externa Xiaomi Mi Power Bank 2 PLM10ZM (5000 mAh, 5,1 V 2,1 A), con poca carga (~3 h de uso):
+        caídas sueltas incluso en reposo (4 en 4 min); con motores 97 % (N) / 91 % (S). Descartada para motores
+        salvo que con carga completa mejore mucho (pendiente repetir). Para trabajar, de momento, la Redmi.
       - El arranque progresivo no evita las caídas; se queda como opción (tecla S al iniciar) por estética.
       - Propuesta: Waveshare UPS HAT (B) (2×18650 en serie + reductor, 5 V hasta 5 A, contactos por debajo de la
         Pi sin usar el GPIO, INA219 en I2C 0x42). Las Samsung 25R (64,9 mm) caben (límite 67 mm).
