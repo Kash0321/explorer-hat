@@ -79,6 +79,7 @@ curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
        User pi
    ```
 4. Comprueba que `ssh harlequin` entra sin pedir contraseña.
+5. *(Opcional, recomendado)* Si cada conexión tarda varios segundos, es Windows buscando `harlequin.local` en la red. Reserva una IP fija para la Raspberry Pi en el router (reserva DHCP para la MAC de su wifi) y pon esa IP en `HostName`. En nuestra prueba, cada conexión pasó de 4,6 s a 0,5 s. Si llevas la Pi a otra red, vuelve a `harlequin.local`.
 
 Si tu Raspberry Pi tiene otro nombre, cámbialo en `.vscode/settings.json` (`explorerHat.host`).
 
