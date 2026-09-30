@@ -75,7 +75,7 @@ namespace ExplorerHat.ObstacleAvoidance
                         using (var sonar = new Sonar())
                         {
                             Log.Debug("Settling sonar devices and motors!");
-                            Thread.Sleep(1000);
+                            sonar.WaitForNewReadings();
                             Log.Debug("GO!");
                             Log.Debug(LOG_PWR_MSG, FLL_POWER * 100);
                             SpeedUp(hat, FLL_POWER, FLL_POWER);
@@ -103,6 +103,14 @@ namespace ExplorerHat.ObstacleAvoidance
                                     Thread.Sleep(TimeSpan.FromSeconds(0.25));
                                     hat.Motors.Stop();
                                     Thread.Sleep(PAUSE_TIME);
+
+                                    // Choose the side with readings taken after going backwards
+                                    Log.Debug("Waiting for new readings...");
+                                    sonar.WaitForNewReadings();
+                                    Log.Information("Distance to the nearest obstacle: Left {leftDistance} cm. Center {centerDistance} cm. Right {rightDistance} cm.",
+                                        sonar.Distance.LeftDistance,
+                                        sonar.Distance.CenterDistance,
+                                        sonar.Distance.RightDistance);
                                     Log.Debug("Turning to avoid the obstacle ...");
 
                                     // Turn to the side with more room, while there is something in front
@@ -142,6 +150,17 @@ namespace ExplorerHat.ObstacleAvoidance
                                     }
 
                                     Log.Debug("Turn completed");
+
+                                    // Look again before going forwards, with readings taken after the turn
+                                    Log.Debug("Waiting for new readings...");
+                                    sonar.WaitForNewReadings();
+                                    if (sonar.Distance.MinimumDistance.Value < OBSTACLE_DISTANCE)
+                                    {
+                                        // There is still an obstacle: the next loop avoids it again
+                                        Log.Debug("There is still an obstacle");
+                                        continue;
+                                    }
+
                                     Log.Debug(LOG_PWR_MSG, FLL_POWER * 100);
                                     SpeedUp(hat, FLL_POWER, FLL_POWER);
                                 }

@@ -3,7 +3,7 @@
 #   bash tools/vigilar-tension.sh <log file> [seconds, default 600]
 # Each line: time and the value of "vcgencmd get_throttled". Summarize it with tools/comparar-tension.sh.
 # Run it detached so it survives a lost SSH session:
-#   setsid nohup bash tools/vigilar-tension.sh /tmp/tension.log 1800 > /dev/null 2>&1 < /dev/null &
+#   setsid -f bash tools/vigilar-tension.sh /tmp/tension.log 1800 > /dev/null 2>&1 < /dev/null
 LOG="$1"
 END=$((SECONDS + ${2:-600}))
 : > "$LOG"

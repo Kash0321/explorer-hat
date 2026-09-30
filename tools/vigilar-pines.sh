@@ -4,7 +4,7 @@
 # Motor 1 = GPIO 19 (speed) / 20 (direction), motor 2 = GPIO 21 (speed) / 26 (direction).
 # A speed pin stuck "hi" while no program is running (procs=0) means a motor left at full speed.
 # Run it detached so it survives a lost SSH session:
-#   setsid nohup bash tools/vigilar-pines.sh /tmp/pines.log 1800 > /dev/null 2>&1 < /dev/null &
+#   setsid -f bash tools/vigilar-pines.sh /tmp/pines.log 1800 > /dev/null 2>&1 < /dev/null
 LOG="$1"
 END=$((SECONDS + ${2:-1200}))
 : > "$LOG"

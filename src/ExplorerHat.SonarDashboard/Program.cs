@@ -6,6 +6,8 @@ namespace ExplorerHat.SonarDashboard
     /// <summary>
     /// Console dashboard with the distance measured by every HC-SR04 sensor. Motors are not used.
     /// Useful to check which sensors are wired correctly.
+    /// With "--registro <file> [seconds]" there is no dashboard: every reading is saved to a CSV file,
+    /// to study failed or wrong readings.
     /// </summary>
     class Program
     {
@@ -41,6 +43,13 @@ namespace ExplorerHat.SonarDashboard
 
             try
             {
+                if (args.Length >= 2 && args[0] == "--registro")
+                {
+                    int seconds = args.Length >= 3 ? int.Parse(args[2]) : 60;
+                    Record(sensors, args[1], seconds);
+                    return;
+                }
+
                 AnsiConsole.Live(BuildDashboard(sensors)).Start(context =>
                 {
                     while (_running)
@@ -65,6 +74,35 @@ namespace ExplorerHat.SonarDashboard
             }
 
             AnsiConsole.MarkupLine("[grey]Sensores liberados. ¡Hasta luego![/]");
+        }
+
+        /// <summary>
+        /// Measures like the dashboard does, but saves every reading to a CSV file:
+        /// time, sensor, whether it worked, distance in centimeters and how long it took in milliseconds
+        /// </summary>
+        static void Record(List<SonarSensor> sensors, string path, int seconds)
+        {
+            Console.WriteLine($"Registrando {seconds} s en {path} (Ctrl+C para terminar antes)...");
+
+            using (var writer = new StreamWriter(path))
+            {
+                writer.WriteLine("hora;sensor;ok;cm;ms");
+                var end = DateTime.Now.AddSeconds(seconds);
+
+                while (_running && DateTime.Now < end)
+                {
+                    foreach (var sensor in sensors)
+                    {
+                        sensor.Measure();
+                        var centimeters = sensor.LastReadingOk ? $"{sensor.LastDistance:0.0}" : "";
+                        writer.WriteLine($"{DateTime.Now:HH:mm:ss.fff};{sensor.Name};{sensor.LastReadingOk};{centimeters};{sensor.LastReadingTime:0.0}");
+                        // Wait for the echoes to fade away before using the next sensor
+                        Thread.Sleep(60);
+                    }
+                }
+            }
+
+            Console.WriteLine("Registro terminado.");
         }
 
         static IRenderable BuildDashboard(List<SonarSensor> sensors)

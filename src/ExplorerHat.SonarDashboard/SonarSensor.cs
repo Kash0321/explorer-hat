@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Iot.Device.Hcsr04;
 using UnitsNet;
 
@@ -49,6 +50,11 @@ namespace ExplorerHat.SonarDashboard
         public bool LastReadingOk { get; private set; }
 
         /// <summary>
+        /// How long the latest reading took, in milliseconds
+        /// </summary>
+        public double LastReadingTime { get; private set; }
+
+        /// <summary>
         /// Number of readings done so far (up to <see cref="HistorySize"/>)
         /// </summary>
         public int Readings => _history.Count;
@@ -81,7 +87,9 @@ namespace ExplorerHat.SonarDashboard
         /// </summary>
         public void Measure()
         {
+            var stopwatch = Stopwatch.StartNew();
             LastReadingOk = _device.TryGetDistance(out Length distance);
+            LastReadingTime = stopwatch.Elapsed.TotalMilliseconds;
 
             if (LastReadingOk)
             {
