@@ -329,7 +329,5 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
-# Ficheros de configuración de tareas y depuración para Visual Studio Code
-.vscode/launch.json
-.vscode/tasks.json
+# Visual Studio Code: launch.json, tasks.json y settings.json sí se versionan
 .vscode/solution-explorer/

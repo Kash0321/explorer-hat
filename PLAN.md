@@ -59,6 +59,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
         (arranque de la Pi); con motores, tensión baja el 98 % (N) / 92 % (S) del tiempo.
       - Batería externa Redmi 10000 mAh (5,1 V 2,4 A): sin avisos en reposo ni compilando; con motores 68 % (N) /
         54 % (S), 6 caídas en ambos casos, una por cada salida o maniobra (marcha atrás y giro).
+      - Batería externa Xiaomi Mi Power Bank 2 PLM10ZM (5000 mAh, 5,1 V 2,1 A), con poca carga (~3 h de uso):
+        caídas sueltas incluso en reposo (4 en 4 min); con motores 97 % (N) / 91 % (S). Descartada para motores
+        salvo que con carga completa mejore mucho (pendiente repetir). Para trabajar, de momento, la Redmi.
       - El arranque progresivo no evita las caídas; se queda como opción (tecla S al iniciar) por estética.
       - Propuesta: Waveshare UPS HAT (B) (2×18650 en serie + reductor, 5 V hasta 5 A, contactos por debajo de la
         Pi sin usar el GPIO, INA219 en I2C 0x42). Las Samsung 25R (64,9 mm) caben (límite 67 mm).
@@ -83,14 +86,48 @@ y solo servía en Windows.
 Propuesta, dos formas de trabajar:
 - **En la propia Pi** (teclado/pantalla o terminal SSH): `dotnet run --project ...`. La más sencilla para el taller.
 - **Desde el PC con VS Code** (Windows, macOS o Linux), usando el OpenSSH que ya traen los tres sistemas:
-  - [ ] Autenticación SSH con clave (`ssh-keygen` + copiar la clave pública a la Pi); nada de contraseñas.
-  - [ ] `tasks.json`: `dotnet publish -r linux-arm64 --self-contained false` en el PC → `scp` a `~/apps/<Proyecto>`
+  - [x] Autenticación SSH con clave (`ssh-keygen` + copiar la clave pública a la Pi); nada de contraseñas.
+        Pasos en el README; nombre de host `harlequin` en `~/.ssh/config` del PC. Hecho en el PC (Windows, clave ED25519).
+  - [~] `tasks.json`: `dotnet publish -r linux-arm64 --self-contained false` en el PC → `scp` a `~/apps/<Proyecto>`
         → `ssh -t pi@<host> dotnet ~/apps/<Proyecto>/<Proyecto>.dll`. El nombre del host, configurable (sin datos personales).
-  - [ ] `launch.json` para depurar con F5: `pipeTransport` con `ssh` y `vsdbg` instalado en `~/vsdbg` de la Pi.
-  - [ ] Ejecutar como `pi`, no como `root` (el usuario ya está en los grupos `gpio` e `i2c`).
-  - [ ] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
+        Hecho: tareas *Desplegar en la Pi*, *Ejecutar en la Pi* (eligen el programa) y *Parar el robot*; el host está
+        en `.vscode/settings.json`. Probado desde el PC: *Ejecutar en la Pi* con SonarDashboard funciona.
+        Arreglos: `nuget.config` solo con nuget.org (el PC tenía feeds de empresa que pedían login) y `chmod -R go-w`
+        tras copiar (scp desde Windows crea las carpetas con escritura para todos).
+  - [x] `launch.json` para depurar con F5: `pipeTransport` con `ssh` y `vsdbg` instalado en `~/vsdbg` de la Pi.
+        `vsdbg` instalado. *Depurar BasicSample en la Pi* (F5) y *Adjuntar a un programa en la Pi* (para los que leen
+        el teclado, como ObstacleAvoidance: con el depurador no hay teclado). Funciona desde el PC: se detiene en los
+        puntos de interrupción. Problemas resueltos: vsdbg no traduce `~` en `args` (ruta del .dll relativa a `cwd`);
+        la extensión de C# 2.160.x envía checksums SHA384/SHA512 que vsdbg rechaza ("Formato de solicitud de punto de
+        interrupción incorrecto", dotnet/vscode-csharp#9802) → usar la 2.140.9 sin actualización automática (en el README).
+        `PathMap` a `/_/` + `sourceFileMap` para que los símbolos no dependan de la carpeta del PC.
+        Aviso: un punto de interrupción congela el PWM por software y cada motor queda parado o a toda velocidad.
+  - [x] Ejecutar como `pi`, no como `root` (el usuario ya está en los grupos `gpio` e `i2c`).
+  - [~] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
         Sin `-t`, cerrar el terminal puede dejar el programa corriendo en la Pi con los motores en marcha.
-  - [ ] Versionar `launch.json`/`tasks.json` directamente (quitarlos de `.gitignore`) y borrar los scripts y plantillas antiguos.
+        Parar el depurador mata el programa (SIGKILL) sin parar los motores: `postDebugTask` *Parar el robot*
+        (`pkill -INT` + `pinctrl set ... op dl`). Probado desde el PC: detenido en un punto de interrupción y Shift+F5,
+        no queda ni el programa ni vsdbg en la Pi y todos los pines a nivel bajo. (Esa vez el PWM se congeló con los
+        motores parados; falta el caso de motores congelados a toda velocidad.)
+  - [x] Cada conexión SSH desde el PC tardaba ~5 s (el despliegue abre 3 o 4). Medido en Windows: por nombre 4,6 s,
+        con `AddressFamily inet` 2,95 s, por IP 0,48 s (`Resolve-DnsName harlequin.local` ~1,1 s). Solución: reserva DHCP
+        en el router (MAC wifi `b8:27:eb:0b:5b:db` → 192.168.0.236) y `HostName` con la IP en `~/.ssh/config` del PC. Hecho: 0,52 s por conexión.
+  - [x] Seguridad ante cortes de wifi (probado desconectando el portátil con ObstacleAvoidance en marcha):
+        - `/etc/ssh/sshd_config.d/10-explorerhat.conf`: `ClientAliveInterval 5`, `ClientAliveCountMax 3`. No basta: sshd
+          solo comprueba al cliente cuando la sesión está en silencio, y ObstacleAvoidance escribe sin parar.
+        - `/etc/sysctl.d/90-explorerhat.conf`: `net.ipv4.tcp_retries2 = 6` (por defecto 15, ~15 min). La Pi da la
+          conexión por muerta en ~20 s, sshd cierra la sesión y el programa recibe SIGHUP.
+        - **Fallo encontrado en `SafeExplorerHat`:** al recibir SIGHUP escribía en la consola antes de parar los motores;
+          con el terminal perdido la escritura fallaba, el programa terminaba y los motores se quedaban **al 100 %**
+          (pines de PWM fijos en alto). Corregido: primero parar, después escribir (ignorando errores). Añadido también
+          parar los motores ante cualquier excepción no controlada. Reproducido con luces y un terminal cerrado de golpe:
+          antes 3/3 luces encendidas, después 3/3 apagadas.
+        - Prueba real con la corrección: corte ~19:36:09, sesiones en silencio cerradas a los 15 s (ClientAlive), la
+          del robot a las 19:36:38 (tcp_retries2), programa terminado y motores a nivel bajo a las 19:36:40 (~30 s).
+        - Si la Pi se reinstala, hay que volver a crear los dos archivos (en el README).
+  - [ ] Cambiar la contraseña de `pi` si sigue siendo la de los scripts antiguos (quedó en el historial público de git).
+  - [x] Versionar `launch.json`/`tasks.json` directamente (quitarlos de `.gitignore`) y borrar los scripts y plantillas antiguos.
+        Los scripts antiguos tenían la contraseña de `pi` en claro y siguen en el historial de git (repositorio público).
 - Descartado como opción principal: VS Code Remote-SSH ejecutándose en la Pi (1 GB de RAM se queda corto
   con la extensión de C#).
 - [ ] Guía de compilación ligera para 1 GB de RAM y ~3,5 GB libres en la microSD.
@@ -99,8 +136,9 @@ Propuesta, dos formas de trabajar:
 - [ ] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
       habilitar I2C, normas de seguridad en el taller.
 - [ ] README propio de cada ejemplo (el de BasicSample está vacío).
-- [ ] Corregir AGENTS.md (espacio libre real, desarrollo en la propia Pi, requisito de I2C).
-- [ ] Decidir si hace falta CLAUDE.md (Claude Code ya lee AGENTS.md).
+- [x] Corregir AGENTS.md (espacio libre real, desarrollo en la propia Pi, requisito de I2C). Ampliado como memoria del
+      proyecto para los asistentes: entorno, hardware, seguridad, cómo trabajar desde el PC por SSH y flujo de ramas.
+- [x] Decidir si hace falta CLAUDE.md: una línea `@AGENTS.md`, para que cualquier instalación de Claude Code lo cargue.
 
 ## Fase 5: Itinerario didáctico (nuevos ejemplos graduados)
 Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legible por niños.

@@ -51,14 +51,36 @@ namespace ExplorerHat.Common
             {
                 _signalRegistrations.Add(PosixSignalRegistration.Create(signal, OnSignal));
             }
+
+            // An unexpected error in any thread ends the program without running using/finally blocks
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         }
 
         private void OnSignal(PosixSignalContext context)
         {
-            // The process keeps its default behavior afterwards (it ends), but with the motors stopped
-            Console.WriteLine();
-            Console.WriteLine($"Parada de emergencia ({context.Signal}): motores parados");
+            // Stop the motors first: when the SSH session is lost (SIGHUP) the terminal no longer exists
+            // and writing to the console fails. The process ends afterwards (default behavior).
             Dispose();
+            TryWriteLine($"Parada de emergencia ({context.Signal}): motores parados");
+        }
+
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Dispose();
+            TryWriteLine("Error inesperado: motores parados");
+        }
+
+        private static void TryWriteLine(string message)
+        {
+            try
+            {
+                Console.WriteLine();
+                Console.WriteLine(message);
+            }
+            catch (IOException)
+            {
+                // The terminal is gone: nobody can read the message anyway
+            }
         }
 
         /// <summary>
@@ -77,6 +99,7 @@ namespace ExplorerHat.Common
                 {
                     registration.Dispose();
                 }
+                AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
 
                 Motors.One.Speed = 0.0;
                 Motors.Two.Speed = 0.0;

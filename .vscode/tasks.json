@@ -1,0 +1,65 @@
+{
+    // Tasks to work from the PC: the program is compiled on the PC, copied to ~/apps on the
+    // Raspberry Pi and run there through SSH. The name of the Pi is in .vscode/settings.json.
+    "version": "2.0.0",
+    "windows": {
+        // cmd.exe so that "&&" stops the chain when a step fails
+        "options": {
+            "shell": {
+                "executable": "cmd.exe",
+                "args": ["/d", "/c"]
+            }
+        }
+    },
+    "tasks": [
+        {
+            "label": "Desplegar en la Pi",
+            "detail": "Compila el programa en el PC y lo copia a ~/apps en la Raspberry Pi",
+            "type": "shell",
+            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program}\"",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Ejecutar en la Pi",
+            "detail": "Despliega el programa y lo ejecuta en la Raspberry Pi (Ctrl+C para pararlo)",
+            "type": "shell",
+            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program} && dotnet ~/apps/${input:program}/${input:program}.dll\"",
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated",
+                "clear": true
+            }
+        },
+        {
+            "label": "Desplegar BasicSample",
+            "detail": "Usada por la configuración de depuración de BasicSample",
+            "type": "shell",
+            "command": "dotnet publish src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj -c Debug -r linux-arm64 --self-contained false -o publish/ExplorerHat.BasicSample && ssh ${config:explorerHat.host} \"rm -rf ~/apps/ExplorerHat.BasicSample && mkdir -p ~/apps\" && scp -r -q publish/ExplorerHat.BasicSample ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/ExplorerHat.BasicSample\"",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            // Emergency stop: asks the programs to stop (like Ctrl+C) and then forces every motor
+            // and light pin low. It runs by itself when a debug session ends, because stopping
+            // the debugger kills the program without letting it stop the motors.
+            "label": "Parar el robot",
+            "detail": "Para los programas del robot en la Raspberry Pi y pone a nivel bajo los pines de motores y luces",
+            "type": "shell",
+            "command": "ssh ${config:explorerHat.host} \"pkill -INT -f '[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)'; sleep 1; pinctrl set 19,20,21,26,4,17,27,5 op dl\"",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "program",
+            "type": "pickString",
+            "description": "¿Qué programa?",
+            "options": [
+                "ExplorerHat.BasicSample",
+                "ExplorerHat.ObstacleAvoidance",
+                "ExplorerHat.SonarDashboard"
+            ],
+            "default": "ExplorerHat.BasicSample"
+        }
+    ]
+}

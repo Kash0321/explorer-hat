@@ -1,0 +1,59 @@
+{
+    // Debugging on the Raspberry Pi from the PC, with the debugger (vsdbg) installed in ~/vsdbg on the Pi.
+    // The name of the Pi is in .vscode/settings.json.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Deploys BasicSample, runs it on the Pi with the debugger and stops the robot at the end
+            "name": "Depurar BasicSample en la Pi",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Desplegar BasicSample",
+            "postDebugTask": "Parar el robot",
+            "program": "~/.dotnet/dotnet",
+            // Relative to cwd: vsdbg expands "~" in program and cwd, but not in args
+            "args": ["ExplorerHat.BasicSample.dll"],
+            "cwd": "~/apps/ExplorerHat.BasicSample",
+            "justMyCode": false,
+            // The debug symbols use "/_/" for the repository folder (PathMap in Directory.Build.props)
+            "sourceFileMap": {
+                "/_/": "${workspaceFolder}/"
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            // Don't fill the debug console with a line for every library loaded
+            "logging": {
+                "moduleLoad": false
+            },
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "ssh",
+                "pipeArgs": ["-T", "${config:explorerHat.host}"],
+                "debuggerPath": "~/vsdbg/vsdbg"
+            }
+        },
+        {
+            // For programs that read the keyboard (like ObstacleAvoidance): first run them with the
+            // task "Ejecutar en la Pi", then attach the debugger and choose the "dotnet" process.
+            // Stopping the debugger only detaches it: the program keeps running until Ctrl+C.
+            "name": "Adjuntar a un programa en la Pi",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickRemoteProcess}",
+            "justMyCode": false,
+            // The debug symbols use "/_/" for the repository folder (PathMap in Directory.Build.props)
+            "sourceFileMap": {
+                "/_/": "${workspaceFolder}/"
+            },
+            "logging": {
+                "moduleLoad": false
+            },
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "ssh",
+                "pipeArgs": ["-T", "${config:explorerHat.host}"],
+                "debuggerPath": "~/vsdbg/vsdbg"
+            }
+        }
+    ]
+}
