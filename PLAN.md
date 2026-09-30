@@ -94,22 +94,21 @@ Propuesta, dos formas de trabajar:
         en `.vscode/settings.json`. Probado desde el PC: *Ejecutar en la Pi* con SonarDashboard funciona.
         Arreglos: `nuget.config` solo con nuget.org (el PC tenía feeds de empresa que pedían login) y `chmod -R go-w`
         tras copiar (scp desde Windows crea las carpetas con escritura para todos).
-  - [~] `launch.json` para depurar con F5: `pipeTransport` con `ssh` y `vsdbg` instalado en `~/vsdbg` de la Pi.
+  - [x] `launch.json` para depurar con F5: `pipeTransport` con `ssh` y `vsdbg` instalado en `~/vsdbg` de la Pi.
         `vsdbg` instalado. *Depurar BasicSample en la Pi* (F5) y *Adjuntar a un programa en la Pi* (para los que leen
-        el teclado, como ObstacleAvoidance: con el depurador no hay teclado). Desde el PC, F5 despliega y ejecuta
-        BasicSample (los motores giran), pero **no se detiene en los puntos de interrupción** aunque los símbolos se cargan
-        ("Símbolos cargados" con `logging.moduleLoad: true`). Arreglado ya: vsdbg no traduce `~` en `args` (ruta del .dll
-        relativa a `cwd`).
-        **Siguiente paso:** hipótesis de mayúsculas en la letra de unidad (el PDB guarda `C:\work\...` y VS Code envía
-        `c:\work\...`; en Linux no coinciden). Prueba pendiente en el `launch.json` local del PC:
-        `"sourceFileMap": { "C:\\work\\explorer-hat": "${workspaceFolder}" }`. Si funciona, solución sin rutas del PC en el
-        repositorio (p. ej. `PathMap` en `Directory.Build.props` a `/_/` + `sourceFileMap` de `/_/` a `${workspaceFolder}`).
+        el teclado, como ObstacleAvoidance: con el depurador no hay teclado). Funciona desde el PC: se detiene en los
+        puntos de interrupción. Problemas resueltos: vsdbg no traduce `~` en `args` (ruta del .dll relativa a `cwd`);
+        la extensión de C# 2.160.x envía checksums SHA384/SHA512 que vsdbg rechaza ("Formato de solicitud de punto de
+        interrupción incorrecto", dotnet/vscode-csharp#9802) → usar la 2.140.9 sin actualización automática (en el README).
+        `PathMap` a `/_/` + `sourceFileMap` para que los símbolos no dependan de la carpeta del PC.
+        Aviso: un punto de interrupción congela el PWM por software y cada motor queda parado o a toda velocidad.
   - [x] Ejecutar como `pi`, no como `root` (el usuario ya está en los grupos `gpio` e `i2c`).
   - [~] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
         Sin `-t`, cerrar el terminal puede dejar el programa corriendo en la Pi con los motores en marcha.
         Parar el depurador mata el programa (SIGKILL) sin parar los motores: `postDebugTask` *Parar el robot*
-        (`pkill -INT` + `pinctrl set ... op dl`). Se ejecuta bien al terminar la depuración. Falta probarlo parando el
-        depurador con los motores en marcha (detenido en el punto de interrupción de la línea 35 de BasicSample).
+        (`pkill -INT` + `pinctrl set ... op dl`). Probado desde el PC: detenido en un punto de interrupción y Shift+F5,
+        no queda ni el programa ni vsdbg en la Pi y todos los pines a nivel bajo. (Esa vez el PWM se congeló con los
+        motores parados; falta el caso de motores congelados a toda velocidad.)
   - [ ] Cada conexión SSH desde el PC tarda ~5 s (el despliegue abre 3 o 4). Probablemente la resolución de
         `harlequin.local` en Windows; probar `HostName` con la IP o `AddressFamily inet` en `~/.ssh/config`.
   - [ ] Seguridad ante cortes de wifi: `ClientAliveInterval 5` / `ClientAliveCountMax 3` en el sshd de la Pi (requiere

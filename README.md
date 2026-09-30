@@ -55,6 +55,8 @@ El programa se compila en el PC, se copia a `~/apps` en la Raspberry Pi y se eje
 
 **En el PC:** VS Code con la extensión de C# y el SDK de .NET 10.
 
+> ⚠️ **Versión de la extensión de C#:** desde la 2.160 la extensión envía al depurador de la Raspberry Pi comprobaciones de archivo (SHA384/SHA512) que este no admite, y los puntos de interrupción no funcionan aunque se vean en rojo ([dotnet/vscode-csharp#9802](https://github.com/dotnet/vscode-csharp/issues/9802)). Instala la **2.140.9** (en Extensiones, rueda ⚙ de *C#* → *Descargar VSIX de versión específica*, o desde las [versiones del repositorio](https://github.com/dotnet/vscode-csharp/releases), archivo `csharp-win32-x64-2.140.9.vsix`; después *Instalar desde VSIX...*), desactiva su actualización automática y reinicia las extensiones cuando VS Code lo pida.
+
 **En la Raspberry Pi:** el depurador de Visual Studio en `~/vsdbg`:
 ```bash
 curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
@@ -86,5 +88,7 @@ Si tu Raspberry Pi tiene otro nombre, cámbialo en `.vscode/settings.json` (`exp
 * **Depurar BasicSample:** pestaña *Run and Debug*, configuración **Depurar BasicSample en la Pi** y F5.
 * **Depurar programas que leen el teclado** (como ObstacleAvoidance): primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
 * **Parar el robot:** la tarea **Parar el robot** para los programas del robot y pone a nivel bajo los pines de motores y luces.
+
+> ⚠️ **Puntos de interrupción y motores:** la velocidad de los motores se controla desde el propio programa (PWM por software). Cuando el depurador se detiene en un punto de interrupción congela todo el programa, y cada motor se queda como estuviera en ese instante: **parado o a toda velocidad**. Depura siempre con las ruedas en el aire.
 
 > ⚠️ **Seguridad:** el botón de parar del depurador cierra el programa de golpe, sin que pueda parar los motores. Por eso, al terminar cada depuración se ejecuta sola la tarea *Parar el robot*. Aun así, prueba siempre los programas nuevos con las ruedas en el aire.
