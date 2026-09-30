@@ -1,37 +1,35 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
-using System.Timers;
-using Iot.Device.Hcsr04;
 using Serilog;
 
 namespace ExplorerHat.ObstacleAvoidance
 {
     /// <summary>
-    /// Sonar services. Manages internally a group of <see cref="Hcsr04">HC-SR04 sonar devices</see> 
-    /// to update <see cref="CenterDistance"/>, <see cref="LeftDistance"/> and <see cref="RightDistance"/>
-    /// properties asynchronously
-    /// </summary>, >
+    /// Sonar services. Measures with three <see cref="DistanceSensor">HC-SR04 sensors</see>, one after the other,
+    /// in a background thread, and keeps <see cref="Distance"/> updated
+    /// </summary>
     public class Sonar : IDisposable
     {
-        private readonly object _lock = new object();
+        // Wait between two sensors (in milliseconds), so the echoes of one sensor don't reach the next one
+        const int ECHO_FADE_TIME = 60;
+        // Longest wait for new readings (in milliseconds), in case a sensor doesn't answer
+        const int MAX_WAIT_TIME = 2000;
 
-        const int CENTER_TRIG = 6;
-        const int LEFT_TRIG = 13;
-        const int RIGHT_TRIG = 12;
-        const int CENTER_ECHO = 23;
-        const int LEFT_ECHO = 24;
-        const int RIGHT_ECHO = 22;
+        private readonly DistanceSensor _leftSensor;
+        private readonly DistanceSensor _centerSensor;
+        private readonly DistanceSensor _rightSensor;
+        private readonly Thread _measurementThread;
+        private volatile bool _running;
+        private bool _disposed;
 
-        private System.Timers.Timer MeasurementTimer { get; set; }
-
-        private Hcsr04? CenterSonarDevice { get; set; } = null;
-        private Hcsr04? LeftSonarDevice { get; set; } = null;
-        private Hcsr04? RightSonarDevice { get; set; } = null;
-
+        /// <summary>
+        /// Latest distances of the three sensors
+        /// </summary>
         public DistanceTuple Distance { get; private set; }
 
         /// <summary>
-        /// Initializes a <see cref="Sonar"/> instance
+        /// Initializes a <see cref="Sonar"/> instance and starts measuring
         /// </summary>
         public Sonar()
         {
@@ -39,51 +37,61 @@ namespace ExplorerHat.ObstacleAvoidance
 
             Distance = new DistanceTuple(0, 0, 0);
 
-            CenterSonarDevice = new Hcsr04(CENTER_TRIG, CENTER_ECHO);
-            LeftSonarDevice = new Hcsr04(LEFT_TRIG, LEFT_ECHO);
-            RightSonarDevice = new Hcsr04(RIGHT_TRIG, RIGHT_ECHO);
+            _leftSensor = new DistanceSensor("Left", triggerPin: 13, echoPin: 24);
+            _centerSensor = new DistanceSensor("Center", triggerPin: 6, echoPin: 23);
+            _rightSensor = new DistanceSensor("Right", triggerPin: 12, echoPin: 22);
+
+            _running = true;
+            _measurementThread = new Thread(MeasureAll);
+            _measurementThread.IsBackground = true;
+            _measurementThread.Start();
 
             Log.Debug("Sonar hardware and services initialized");
-            
-            // Short wait between measurements, so the robot notices obstacles quickly
-            MeasurementTimer = new System.Timers.Timer(60);
-            MeasurementTimer.Elapsed += MeasurementTimer_Elapsed;
-            // One measurement at a time: the timer is restarted when the previous one ends
-            MeasurementTimer.AutoReset = false;
-            MeasurementTimer.Enabled = true;
         }
 
-        private void MeasurementTimer_Elapsed(object? sender, ElapsedEventArgs e)
+        /// <summary>
+        /// Measures with each sensor in turn, until the sonar is disposed
+        /// </summary>
+        private void MeasureAll()
         {
-            lock (_lock)
+            while (_running)
             {
-                if (!(CenterSonarDevice is null) && !(LeftSonarDevice is null) && !(RightSonarDevice is null))
-                {
-                    try
-                    {
-                        Log.Debug($"Updating distance measurements...");
+                MeasureWith(_centerSensor);
+                MeasureWith(_leftSensor);
+                MeasureWith(_rightSensor);
+            }
+        }
 
-                        var centerDistance = CenterSonarDevice.Distance.Centimeters;
-                        Log.Debug("Center distance measuremente updated ({distance} cm.)", Math.Round(centerDistance, 4, MidpointRounding.AwayFromZero));
-                        Thread.Sleep(60);
+        private void MeasureWith(DistanceSensor sensor)
+        {
+            try
+            {
+                sensor.Measure();
+                Distance = new DistanceTuple(_leftSensor.Distance, _centerSensor.Distance, _rightSensor.Distance);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
 
-                        var leftDistance = LeftSonarDevice.Distance.Centimeters;
-                        Log.Debug("Left distance measuremente updated ({distance} cm.)", Math.Round(leftDistance, 4, MidpointRounding.AwayFromZero));
-                        Thread.Sleep(60);
+            Thread.Sleep(ECHO_FADE_TIME);
+        }
 
-                        var rightDistance = RightSonarDevice.Distance.Centimeters;
-                        Log.Debug("Right distance measuremente updated ({distance} cm.)", Math.Round(rightDistance, 4, MidpointRounding.AwayFromZero));
-                        Thread.Sleep(60);
+        /// <summary>
+        /// Waits until every sensor has two new readings, so <see cref="Distance"/> only uses readings
+        /// taken after this call (for example, after a maneuver). Waits two seconds at most.
+        /// </summary>
+        public void WaitForNewReadings()
+        {
+            _leftSensor.StartNewReadings();
+            _centerSensor.StartNewReadings();
+            _rightSensor.StartNewReadings();
 
-                        Distance = new DistanceTuple(leftDistance, centerDistance, rightDistance);
-                    }
-                    catch(Exception ex)
-                    {
-                        Log.Error(ex.Message);
-                    }
-
-                    MeasurementTimer.Start();
-                }
+            var stopwatch = Stopwatch.StartNew();
+            while (_running && stopwatch.ElapsedMilliseconds < MAX_WAIT_TIME &&
+                (_leftSensor.NewReadings < 2 || _centerSensor.NewReadings < 2 || _rightSensor.NewReadings < 2))
+            {
+                Thread.Sleep(20);
             }
         }
 
@@ -94,22 +102,17 @@ namespace ExplorerHat.ObstacleAvoidance
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            lock (_lock)
+            if (!_disposed && disposing)
             {
-                if (CenterSonarDevice != null && disposing)
-                {
-                    MeasurementTimer.Stop();
-                    MeasurementTimer.Enabled = false;
-                    MeasurementTimer.Dispose();
+                // Stop measuring before releasing the sensor pins
+                _running = false;
+                _measurementThread.Join();
 
-                    CenterSonarDevice.Dispose();
-                    CenterSonarDevice = null;
-                    LeftSonarDevice?.Dispose();
-                    LeftSonarDevice = null;
-                    RightSonarDevice?.Dispose();
-                    RightSonarDevice = null;
-                    Log.Debug("Sonar disposed");
-                }
+                _leftSensor.Dispose();
+                _centerSensor.Dispose();
+                _rightSensor.Dispose();
+                _disposed = true;
+                Log.Debug("Sonar disposed");
             }
         }
 

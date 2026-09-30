@@ -21,9 +21,9 @@ namespace ExplorerHat.ObstacleAvoidance
         const double OBSTACLE_DISTANCE = 30d;
         // Short pause before changing the direction of the motors, so they don't draw so much current
         const int PAUSE_TIME = 100;
-        // The robot always turns at least this long (in milliseconds), so the sensors see the new direction
-        const int MIN_TURN_TIME = 300;
-        // With the smooth start, the motors start little by little in this number of steps...
+        // The robot turns in short steps of this long (in milliseconds), and looks again after each step
+        const int TURN_STEP_TIME = 150;
+        // With the smooth start, the motors start and stop little by little in this number of steps...
         const int SPEED_UP_STEPS = 4;
         // ...and this long each step (in milliseconds)
         const int SPEED_UP_STEP_TIME = 75;
@@ -58,6 +58,49 @@ namespace ExplorerHat.ObstacleAvoidance
         }
 
         /// <summary>
+        /// Stops both motors: at once, or little by little when the smooth start is on,
+        /// so the robot doesn't tip forwards when it brakes
+        /// </summary>
+        static void SlowDown(SafeExplorerHat hat)
+        {
+            if (_smoothStart)
+            {
+                double speedOne = hat.Motors.One.Speed;
+                double speedTwo = hat.Motors.Two.Speed;
+
+                for (int step = SPEED_UP_STEPS - 1; step >= 1; step--)
+                {
+                    hat.Motors.One.Speed = speedOne * step / SPEED_UP_STEPS;
+                    hat.Motors.Two.Speed = speedTwo * step / SPEED_UP_STEPS;
+                    Thread.Sleep(SPEED_UP_STEP_TIME);
+                }
+            }
+
+            hat.Motors.Stop();
+        }
+
+        /// <summary>
+        /// Whether the robot must keep turning: there is something in front, or on the side
+        /// it is turning away from (the left side when it turns right)
+        /// </summary>
+        static bool IsBlocked(DistanceTuple distance, bool turnRight)
+        {
+            if (distance.CenterDistance < OBSTACLE_DISTANCE)
+            {
+                return true;
+            }
+
+            if (turnRight)
+            {
+                return distance.LeftDistance < OBSTACLE_DISTANCE;
+            }
+            else
+            {
+                return distance.RightDistance < OBSTACLE_DISTANCE;
+            }
+        }
+
+        /// <summary>
         /// Executes the task managed by the runner, asynchronously
         /// </summary>
         /// <param name="smoothStart">Whether the motors start little by little</param>
@@ -75,7 +118,7 @@ namespace ExplorerHat.ObstacleAvoidance
                         using (var sonar = new Sonar())
                         {
                             Log.Debug("Settling sonar devices and motors!");
-                            Thread.Sleep(1000);
+                            sonar.WaitForNewReadings();
                             Log.Debug("GO!");
                             Log.Debug(LOG_PWR_MSG, FLL_POWER * 100);
                             SpeedUp(hat, FLL_POWER, FLL_POWER);
@@ -95,45 +138,52 @@ namespace ExplorerHat.ObstacleAvoidance
                                     hat.Lights.Four.On();
 
                                     Log.Debug("Obstacle detected. Maneuvering to avoid it...");
-                                    hat.Motors.Stop();
+                                    SlowDown(hat);
                                     Log.Debug("Motors stopped");
                                     Thread.Sleep(PAUSE_TIME);
                                     Log.Debug("Backwards...");
                                     SpeedUp(hat, -MDM_POWER, -MDM_POWER);
                                     Thread.Sleep(TimeSpan.FromSeconds(0.25));
-                                    hat.Motors.Stop();
+                                    SlowDown(hat);
                                     Thread.Sleep(PAUSE_TIME);
+
+                                    // Choose the side with readings taken after going backwards
+                                    Log.Debug("Waiting for new readings...");
+                                    sonar.WaitForNewReadings();
+                                    Log.Information("Distance to the nearest obstacle: Left {leftDistance} cm. Center {centerDistance} cm. Right {rightDistance} cm.",
+                                        sonar.Distance.LeftDistance,
+                                        sonar.Distance.CenterDistance,
+                                        sonar.Distance.RightDistance);
                                     Log.Debug("Turning to avoid the obstacle ...");
 
-                                    // Turn to the side with more room, while there is something in front
-                                    // or on the side the robot is turning away from.
-                                    // Motor One is the right wheel and motor Two is the left wheel.
-                                    if (sonar.Distance.LeftDistance <= sonar.Distance.RightDistance)
+                                    // Turn to the side with more room (obstacle on the left: turn right).
+                                    // The robot turns a little, stops and looks again, while there is something
+                                    // in front or on the side it is turning away from. The readings are taken
+                                    // with the robot stopped, so it doesn't turn too much.
+                                    bool turnRight = sonar.Distance.LeftDistance <= sonar.Distance.RightDistance;
+                                    int turnSteps = 0;
+
+                                    do
                                     {
-                                        // Obstacle on the left: turn right
-                                        SpeedUp(hat, -MDM_POWER, MDM_POWER);
-                                        Thread.Sleep(MIN_TURN_TIME);
-
-                                        while (_running && (sonar.Distance.CenterDistance < OBSTACLE_DISTANCE || sonar.Distance.LeftDistance < OBSTACLE_DISTANCE))
+                                        // Motor One is the right wheel and motor Two is the left wheel
+                                        if (turnRight)
                                         {
-                                            Thread.Sleep(TimeSpan.FromSeconds(0.2));
+                                            hat.Motors.One.Speed = -MDM_POWER;
+                                            hat.Motors.Two.Speed = MDM_POWER;
                                         }
-                                    }
-                                    else
-                                    {
-                                        // Obstacle on the right: turn left
-                                        SpeedUp(hat, MDM_POWER, -MDM_POWER);
-                                        Thread.Sleep(MIN_TURN_TIME);
-
-                                        while (_running && (sonar.Distance.CenterDistance < OBSTACLE_DISTANCE || sonar.Distance.RightDistance < OBSTACLE_DISTANCE))
+                                        else
                                         {
-                                            Thread.Sleep(TimeSpan.FromSeconds(0.2));
+                                            hat.Motors.One.Speed = MDM_POWER;
+                                            hat.Motors.Two.Speed = -MDM_POWER;
                                         }
+
+                                        Thread.Sleep(TURN_STEP_TIME);
+                                        hat.Motors.Stop();
+                                        Thread.Sleep(PAUSE_TIME);
+                                        sonar.WaitForNewReadings();
+                                        turnSteps++;
                                     }
-
-                                    hat.Motors.Stop();
-                                    Thread.Sleep(PAUSE_TIME);
-
+                                    while (_running && IsBlocked(sonar.Distance, turnRight));
 
                                     if (!_running)
                                     {
@@ -141,7 +191,15 @@ namespace ExplorerHat.ObstacleAvoidance
                                         break;
                                     }
 
-                                    Log.Debug("Turn completed");
+                                    Log.Debug("Turn completed in {turnSteps} steps", turnSteps);
+
+                                    if (sonar.Distance.MinimumDistance.Value < OBSTACLE_DISTANCE)
+                                    {
+                                        // There is still an obstacle: the next loop avoids it again
+                                        Log.Debug("There is still an obstacle");
+                                        continue;
+                                    }
+
                                     Log.Debug(LOG_PWR_MSG, FLL_POWER * 100);
                                     SpeedUp(hat, FLL_POWER, FLL_POWER);
                                 }

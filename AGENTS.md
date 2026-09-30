@@ -35,14 +35,14 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Antes de cualquier ejecución que mueva los motores, pide confirmación explícita de que el robot tiene las ruedas en el aire**, aunque el usuario ya haya dicho "adelante".
 * Comprueba el estado real de los pines en vez de suponerlo: `pinctrl get 19,20,21,26,4,17,27,5` (`lo` = apagado).
 * **Parada de emergencia:** `bash tools/parar-robot.sh` en la Pi, o `ssh harlequin 'bash -s' < tools/parar-robot.sh` desde el PC.
-* Para registrar pruebas usa `tools/vigilar-pines.sh` y `tools/vigilar-tension.sh` lanzados con `setsid nohup ... &`, para que sigan grabando aunque se corte la sesión.
+* Para registrar pruebas usa `tools/vigilar-pines.sh` y `tools/vigilar-tension.sh` lanzados con `setsid -f ... > /dev/null 2>&1 < /dev/null` (la línea exacta está al principio de cada script), para que sigan grabando aunque se corte la sesión. Con `setsid nohup ... &`, el `ssh` lanzado desde el PC no devuelve el control. Para pararlos por SSH, no uses `pkill -f` con un patrón que también aparezca en tu propio comando (por ejemplo, `vigilar-pines.sh`): mata la propia sesión.
 * Al sugerir algoritmos de movimiento, asegura siempre un bloque de cierre que asigne `Speed = 0.0` a ambos motores al finalizar o al capturar una excepción.
 * La Pi está configurada para cerrar las sesiones SSH perdidas (ClientAlive y `tcp_retries2`, ver README): si se corta la wifi, los motores se paran en unos 15–30 s.
 
 ## 🔧 Cómo trabaja un asistente en este proyecto
 * **Desde la propia Pi:** los comandos se ejecutan directamente.
 * **Desde el PC:** la Pi es accesible como `ssh harlequin` (clave SSH, sin contraseña). Ejecuta en la Pi con `ssh harlequin "cd ~/work/explorer-hat && ..."`. Prueba antes que el acceso no pide nada: `ssh -o BatchMode=yes harlequin true`. En Windows, si la clave tiene frase de paso guardada en el agente de Windows, usa su `ssh.exe` (`/c/Windows/System32/OpenSSH/ssh.exe`) si el `ssh` de Git Bash la pide.
-* **Lo que hace el usuario, no el asistente:** todo lo que requiere `sudo` (pide contraseña y no hay terminal) y los programas que esperan una tecla (`Console.ReadKey`, como ObstacleAvoidance): dale los comandos exactos para su terminal.
+* **Lo que hace el usuario, no el asistente:** todo lo que requiere `sudo` (pide contraseña y no hay terminal) y los programas que esperan una tecla (`Console.ReadKey`, como ObstacleAvoidance): dale los comandos exactos para su terminal. El usuario suele tener abierta una terminal SSH en la Pi: dale los comandos para ejecutarlos allí directamente, sin el prefijo `ssh harlequin`.
 * **Ramas y PR:** una rama por fase de `PLAN.md` (`fase-N-descripcion`) a partir de `main`, subida a GitHub y fusionada por PR (`gh` está autenticado en la Pi). El usuario hace el merge; después, comprueba que la rama no tiene commits fuera de `origin/main`, bórrala (local y remota) y actualiza `main`.
 * **Actualización de Dependencias:** Al añadir paquetes, usa la sintaxis explícita apuntando al archivo `.csproj` correspondiente: `dotnet add src/[Proyecto]/[Proyecto].csproj package [Nombre]`.
 * **Alimentación:** muchos cables micro-USB no dan la corriente suficiente. Si hay comportamientos raros, mira `vcgencmd get_throttled` (`0x0` = bien; bit 0 = tensión baja ahora). Resultados y método de las pruebas con baterías en `PLAN.md` (Fase 2).

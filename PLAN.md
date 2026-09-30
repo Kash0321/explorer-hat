@@ -49,7 +49,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - [x] Probar ObstacleAvoidance en hardware con los tres sensores HC-SR04 (robot sin cables, con batería y wifi).
       Arranca, esquiva y para bien, pero choca con algunos obstáculos. Con batería hay bajadas de tensión
       (`Undervoltage detected`, ~12 s en la prueba) al mover los motores; la wifi aguanta (2/86 pings perdidos).
-- [ ] Mejorar la alimentación (separar la de la Pi y la de los motores o batería de más amperios).
+- [x] Mejorar la alimentación (separar la de la Pi y la de los motores o batería de más amperios).
       Con cargador (5 V, 3 A) la causa de las bajadas de tensión eran los cables micro-USB: con tres
       combinaciones de cargador y cable había `Undervoltage` constante, incluso sin el HAT. Con un cable bueno:
       `throttled=0x0` en reposo, con la CPU al 100 % y con los motores en marcha (BasicSample, ruedas en el aire).
@@ -66,14 +66,51 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       - Propuesta: Waveshare UPS HAT (B) (2×18650 en serie + reductor, 5 V hasta 5 A, contactos por debajo de la
         Pi sin usar el GPIO, INA219 en I2C 0x42). Las Samsung 25R (64,9 mm) caben (límite 67 mm).
         Descartadas: UPS HAT original (2,5 A) y Geekworm X728 (usa los GPIO 5, 6, 12, 16 y 20 del Explorer HAT).
+      - **Decisión (30/09/2026):** comprar la Waveshare UPS HAT (B).
+- [ ] Probar la Waveshare UPS HAT (B) cuando llegue: montaje con el Explorer HAT encima, `i2cdetect -y 1`
+      (0x28, 0x42 y 0x48) y ObstacleAvoidance con `tools/vigilar-tension.sh`, como en las pruebas anteriores.
 - [x] Revisar por qué ObstacleAvoidance choca a veces. Causa: con el obstáculo delante no giraba (solo giraba
       mientras el sensor del lado elegido estuviera cerca), retrocedía y volvía a chocar. Arreglado: gira mientras
       haya algo delante o en ese lado, límite de 20 a 30 cm, sonar cada ~0,27 s en vez de ~0,5 s y pausas de
       100 ms antes de cambiar el sentido de los motores. En el suelo giraba hacia el lado del obstáculo
       (el motor One es la rueda derecha): invertidos los giros y giro mínimo de 300 ms. Probado en el suelo:
       esquiva de forma aceptable, aunque a veces duda cuando las medidas no se actualizan a tiempo.
-- [ ] Mejorar la estabilidad de ObstacleAvoidance: filtrar lecturas falsas del HC-SR04 (saltos a ~277/361 cm)
+- [x] Mejorar la estabilidad de ObstacleAvoidance: filtrar lecturas falsas del HC-SR04 (saltos a ~277/361 cm)
       y decidir con medidas tomadas después de cada maniobra.
+      - Diagnóstico con el robot quieto y sin motores (`SonarDashboard --registro`, 30 s, 142 lecturas por sensor):
+        Centro (objeto a ~115 cm) salta 7 veces a 283–310 cm (5 %); Izquierda (~280 cm) tiene 4 lecturas sin eco y
+        3 saltos (152, 255 y 362 cm); Derecha (~34 cm) es estable. Los saltos son aislados (nunca dos seguidos) y casi
+        siempre a más distancia: el sensor pierde el eco del objeto y mide la pared de detrás. Son los peligrosos,
+        porque el robot cree que el camino está libre.
+      - Además, `Hcsr04.Distance` reintenta hasta 10 veces en silencio (hasta 160 ms cada intento) y lanza una excepción
+        si todos fallan: por eso a veces las medidas no se actualizaban a tiempo.
+      - Arreglo: `DistanceSensor` hace una sola lectura con `TryGetDistance` (sin eco = 400 cm) y su distancia es
+        la más cercana de las dos últimas lecturas: ignora un salto aislado sin retraso cuando el obstáculo se acerca
+        (solo tarda una lectura más en dar el camino por libre). `Sonar` mide en un hilo continuo (ciclo de ~0,2 s)
+        y `WaitForNewReadings()` espera dos lecturas nuevas de cada sensor: el robot la usa al arrancar, antes de
+        elegir el lado del giro y antes de volver a avanzar (si aún hay obstáculo, repite la maniobra).
+      - Probado con las ruedas en el aire (mano delante del centro y de los lados, 6 maniobras, 218 lecturas por
+        sensor): retrocede, espera, gira mientras hay obstáculo y vuelve a avanzar; sin errores y todos los pines
+        a nivel bajo al terminar. Con los motores en marcha siguen los saltos (p. ej. Centro 282 cm con la mano a 6 cm)
+        y el filtro los ignora. Falta probarlo en el suelo.
+- [x] Probar ObstacleAvoidance con el filtro en el suelo (batería Redmi, 30/09/2026).
+      - Primera prueba (N): esquiva bien, pero los giros eran excesivos (a veces una vuelta entera). Causa: giraba sin
+        parar y miraba mientras giraba; tras ver el camino libre seguía ~0,4 s (una lectura más por el filtro y hasta
+        0,2 s de espera del bucle). Además, el giro mínimo de 300 ms ya era un giro grande.
+      - Arreglo: **giro a pasos**: gira 150 ms, se para, espera lecturas nuevas con el robot quieto y repite mientras
+        haya algo delante o en el lado del que se aleja. Quitado el giro mínimo.
+      - Frenadas bruscas: el robot levantaba la rueda trasera al frenar (la batería y la Pi no iban sujetas al chasis).
+        Nuevo método `SlowDown`: con el modo S, frena en 3 pasos de 75 ms al ver un obstáculo y tras la marcha atrás.
+        Los pasos del giro siempre arrancan y paran de golpe (son demasiado cortos).
+      - Segunda prueba (S, ~2,5 min): 41 maniobras sin errores; giros de 1 paso (30), 2 (7), 3 (2) y 4 (1); 7 veces
+        seguía el obstáculo tras el giro y repitió la maniobra. El usuario lo ve "más listo", con salidas y frenadas
+        más elegantes. Pines a nivel bajo al terminar. Tensión baja el 91 % del tiempo (20 caídas): la batería ya
+        llevaba un rato en uso y el giro a pasos arranca los motores más veces. Lo resolverá la UPS HAT (B).
+      - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
+        filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
+        temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
+      - Pendiente: sujetar la batería y la Pi al chasis. En campo libre, a veces no avanza en línea recta (los dos
+        motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el
@@ -125,7 +162,8 @@ Propuesta, dos formas de trabajar:
         - Prueba real con la corrección: corte ~19:36:09, sesiones en silencio cerradas a los 15 s (ClientAlive), la
           del robot a las 19:36:38 (tcp_retries2), programa terminado y motores a nivel bajo a las 19:36:40 (~30 s).
         - Si la Pi se reinstala, hay que volver a crear los dos archivos (en el README).
-  - [ ] Cambiar la contraseña de `pi` si sigue siendo la de los scripts antiguos (quedó en el historial público de git).
+  - [x] Cambiar la contraseña de `pi` si sigue siendo la de los scripts antiguos (quedó en el historial público de git).
+        Cambiada el 30/09/2026; el acceso por clave SSH desde el PC sigue funcionando.
   - [x] Versionar `launch.json`/`tasks.json` directamente (quitarlos de `.gitignore`) y borrar los scripts y plantillas antiguos.
         Los scripts antiguos tenían la contraseña de `pi` en claro y siguen en el historial de git (repositorio público).
 - Descartado como opción principal: VS Code Remote-SSH ejecutándose en la Pi (1 GB de RAM se queda corto
@@ -155,8 +193,16 @@ Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legi
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero.
 - [ ] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
-      ópticos de horquilla (p. ej. LM393, no incluidos) en las entradas digitales del HAT (requiere Fase 6).
+      ópticos de horquilla en las entradas digitales del HAT (requiere Fase 6).
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
+      - [x] Comprados 10 sensores de velocidad LM393 (horquilla óptica con salida digital) para probarlos.
+      - [ ] Probar un LM393 con un disco en IN4 (GPIO 25, la única entrada libre): pulsos por vuelta, velocidad
+            máxima que se puede contar desde C# y rebotes.
+      - [ ] **Decidir dónde conectar el segundo sensor:** los ECHO de los tres HC-SR04 ocupan IN1–IN3 (GPIO 23, 22
+            y 24). Opciones: quitar un HC-SR04 en esa lección, llevar un ECHO o un LM393 a un GPIO libre de la Pi
+            que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
+      - [ ] Corregir la desviación en línea recta (regular la velocidad de cada motor con los pulsos) y programar
+            movimientos precisos: avanzar N cm, girar N grados.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
