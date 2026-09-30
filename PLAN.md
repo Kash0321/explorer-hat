@@ -112,8 +112,17 @@ Propuesta, dos formas de trabajar:
   - [x] Cada conexión SSH desde el PC tardaba ~5 s (el despliegue abre 3 o 4). Medido en Windows: por nombre 4,6 s,
         con `AddressFamily inet` 2,95 s, por IP 0,48 s (`Resolve-DnsName harlequin.local` ~1,1 s). Solución: reserva DHCP
         en el router (MAC wifi `b8:27:eb:0b:5b:db` → 192.168.0.236) y `HostName` con la IP en `~/.ssh/config` del PC. Hecho: 0,52 s por conexión.
-  - [ ] Seguridad ante cortes de wifi: `ClientAliveInterval 5` / `ClientAliveCountMax 3` en el sshd de la Pi (requiere
-        sudo) para que cierre la sesión caída y el programa reciba SIGHUP (parada de emergencia) en ~15 s.
+  - [~] Seguridad ante cortes de wifi (probado desconectando el portátil con ObstacleAvoidance en marcha):
+        - `/etc/ssh/sshd_config.d/10-explorerhat.conf`: `ClientAliveInterval 5`, `ClientAliveCountMax 3`. No basta: sshd
+          solo comprueba al cliente cuando la sesión está en silencio, y ObstacleAvoidance escribe sin parar.
+        - `/etc/sysctl.d/90-explorerhat.conf`: `net.ipv4.tcp_retries2 = 6` (por defecto 15, ~15 min). La Pi da la
+          conexión por muerta en ~20 s, sshd cierra la sesión y el programa recibe SIGHUP.
+        - **Fallo encontrado en `SafeExplorerHat`:** al recibir SIGHUP escribía en la consola antes de parar los motores;
+          con el terminal perdido la escritura fallaba, el programa terminaba y los motores se quedaban **al 100 %**
+          (pines de PWM fijos en alto). Corregido: primero parar, después escribir (ignorando errores). Añadido también
+          parar los motores ante cualquier excepción no controlada. Reproducido con luces y un terminal cerrado de golpe:
+          antes 3/3 luces encendidas, después 3/3 apagadas.
+        - Pendiente: repetir la prueba real de corte de red con la corrección.
   - [ ] Cambiar la contraseña de `pi` si sigue siendo la de los scripts antiguos (quedó en el historial público de git).
   - [x] Versionar `launch.json`/`tasks.json` directamente (quitarlos de `.gitignore`) y borrar los scripts y plantillas antiguos.
         Los scripts antiguos tenían la contraseña de `pi` en claro y siguen en el historial de git (repositorio público).
