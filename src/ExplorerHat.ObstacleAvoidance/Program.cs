@@ -25,7 +25,7 @@ namespace ExplorerHat.ObstacleAvoidance
 
             Console.WriteLine("Hit a key to enter in [ObstacleAvoiding] mode:");
             Console.WriteLine("  [N] Normal start: the motors start at full speed at once");
-            Console.WriteLine("  [S] Smooth start: the motors start little by little");
+            Console.WriteLine("  [S] Smooth start: the motors start and brake little by little");
 
             // Wait until N or S is pressed
             ConsoleKey key = Console.ReadKey(true).Key;

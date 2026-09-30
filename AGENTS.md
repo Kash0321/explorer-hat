@@ -35,7 +35,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Antes de cualquier ejecución que mueva los motores, pide confirmación explícita de que el robot tiene las ruedas en el aire**, aunque el usuario ya haya dicho "adelante".
 * Comprueba el estado real de los pines en vez de suponerlo: `pinctrl get 19,20,21,26,4,17,27,5` (`lo` = apagado).
 * **Parada de emergencia:** `bash tools/parar-robot.sh` en la Pi, o `ssh harlequin 'bash -s' < tools/parar-robot.sh` desde el PC.
-* Para registrar pruebas usa `tools/vigilar-pines.sh` y `tools/vigilar-tension.sh` lanzados con `setsid -f ... > /dev/null 2>&1 < /dev/null` (la línea exacta está al principio de cada script), para que sigan grabando aunque se corte la sesión. Con `setsid nohup ... &`, el `ssh` lanzado desde el PC no devuelve el control.
+* Para registrar pruebas usa `tools/vigilar-pines.sh` y `tools/vigilar-tension.sh` lanzados con `setsid -f ... > /dev/null 2>&1 < /dev/null` (la línea exacta está al principio de cada script), para que sigan grabando aunque se corte la sesión. Con `setsid nohup ... &`, el `ssh` lanzado desde el PC no devuelve el control. Para pararlos por SSH, no uses `pkill -f` con un patrón que también aparezca en tu propio comando (por ejemplo, `vigilar-pines.sh`): mata la propia sesión.
 * Al sugerir algoritmos de movimiento, asegura siempre un bloque de cierre que asigne `Speed = 0.0` a ambos motores al finalizar o al capturar una excepción.
 * La Pi está configurada para cerrar las sesiones SSH perdidas (ClientAlive y `tcp_retries2`, ver README): si se corta la wifi, los motores se paran en unos 15–30 s.
 

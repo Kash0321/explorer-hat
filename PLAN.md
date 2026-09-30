@@ -93,7 +93,21 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
         sensor): retrocede, espera, gira mientras hay obstáculo y vuelve a avanzar; sin errores y todos los pines
         a nivel bajo al terminar. Con los motores en marcha siguen los saltos (p. ej. Centro 282 cm con la mano a 6 cm)
         y el filtro los ignora. Falta probarlo en el suelo.
-- [ ] Probar ObstacleAvoidance con el filtro en el suelo.
+- [x] Probar ObstacleAvoidance con el filtro en el suelo (batería Redmi, 30/09/2026).
+      - Primera prueba (N): esquiva bien, pero los giros eran excesivos (a veces una vuelta entera). Causa: giraba sin
+        parar y miraba mientras giraba; tras ver el camino libre seguía ~0,4 s (una lectura más por el filtro y hasta
+        0,2 s de espera del bucle). Además, el giro mínimo de 300 ms ya era un giro grande.
+      - Arreglo: **giro a pasos**: gira 150 ms, se para, espera lecturas nuevas con el robot quieto y repite mientras
+        haya algo delante o en el lado del que se aleja. Quitado el giro mínimo.
+      - Frenadas bruscas: el robot levantaba la rueda trasera al frenar (la batería y la Pi no iban sujetas al chasis).
+        Nuevo método `SlowDown`: con el modo S, frena en 3 pasos de 75 ms al ver un obstáculo y tras la marcha atrás.
+        Los pasos del giro siempre arrancan y paran de golpe (son demasiado cortos).
+      - Segunda prueba (S, ~2,5 min): 41 maniobras sin errores; giros de 1 paso (30), 2 (7), 3 (2) y 4 (1); 7 veces
+        seguía el obstáculo tras el giro y repitió la maniobra. El usuario lo ve "más listo", con salidas y frenadas
+        más elegantes. Pines a nivel bajo al terminar. Tensión baja el 91 % del tiempo (20 caídas): la batería ya
+        llevaba un rato en uso y el giro a pasos arranca los motores más veces. Lo resolverá la UPS HAT (B).
+      - Pendiente: sujetar la batería y la Pi al chasis. En campo libre, a veces no avanza en línea recta (los dos
+        motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el
@@ -176,8 +190,16 @@ Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legi
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero.
 - [ ] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
-      ópticos de horquilla (p. ej. LM393, no incluidos) en las entradas digitales del HAT (requiere Fase 6).
+      ópticos de horquilla en las entradas digitales del HAT (requiere Fase 6).
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
+      - [x] Comprados 10 sensores de velocidad LM393 (horquilla óptica con salida digital) para probarlos.
+      - [ ] Probar un LM393 con un disco en IN4 (GPIO 25, la única entrada libre): pulsos por vuelta, velocidad
+            máxima que se puede contar desde C# y rebotes.
+      - [ ] **Decidir dónde conectar el segundo sensor:** los ECHO de los tres HC-SR04 ocupan IN1–IN3 (GPIO 23, 22
+            y 24). Opciones: quitar un HC-SR04 en esa lección, llevar un ECHO o un LM393 a un GPIO libre de la Pi
+            que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
+      - [ ] Corregir la desviación en línea recta (regular la velocidad de cada motor con los pulsos) y programar
+            movimientos precisos: avanzar N cm, girar N grados.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
