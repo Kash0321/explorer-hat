@@ -5,6 +5,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- The debug symbols keep "/_/src/..." instead of the path of the computer that compiled
+         (e.g. C:\work\...), so the debugger on the Raspberry Pi matches the breakpoints set on the PC
+         (launch.json maps "/_/" back to the workspace folder with sourceFileMap) -->
+    <PathMap>$(MSBuildThisFileDirectory)=/_/</PathMap>
   </PropertyGroup>
 
 </Project>

@@ -15,6 +15,10 @@
             "args": ["ExplorerHat.BasicSample.dll"],
             "cwd": "~/apps/ExplorerHat.BasicSample",
             "justMyCode": false,
+            // The debug symbols use "/_/" for the repository folder (PathMap in Directory.Build.props)
+            "sourceFileMap": {
+                "/_/": "${workspaceFolder}/"
+            },
             "stopAtEntry": false,
             "console": "internalConsole",
             // Don't fill the debug console with a line for every library loaded
@@ -37,6 +41,10 @@
             "request": "attach",
             "processId": "${command:pickRemoteProcess}",
             "justMyCode": false,
+            // The debug symbols use "/_/" for the repository folder (PathMap in Directory.Build.props)
+            "sourceFileMap": {
+                "/_/": "${workspaceFolder}/"
+            },
             "logging": {
                 "moduleLoad": false
             },
