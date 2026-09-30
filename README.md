@@ -26,6 +26,12 @@ El entorno está organizado en soluciones independientes según el nivel de apre
 
 ---
 
+## 🧰 Herramientas (`tools/`)
+
+Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Cada script explica su uso al principio.
+
+---
+
 ## 🚀 Comandos Rápidos de Consola
 
 Para compilar o ejecutar los proyectos directamente desde la terminal remota de la Raspberry Pi:

@@ -136,8 +136,9 @@ Propuesta, dos formas de trabajar:
 - [ ] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
       habilitar I2C, normas de seguridad en el taller.
 - [ ] README propio de cada ejemplo (el de BasicSample está vacío).
-- [ ] Corregir AGENTS.md (espacio libre real, desarrollo en la propia Pi, requisito de I2C).
-- [ ] Decidir si hace falta CLAUDE.md (Claude Code ya lee AGENTS.md).
+- [x] Corregir AGENTS.md (espacio libre real, desarrollo en la propia Pi, requisito de I2C). Ampliado como memoria del
+      proyecto para los asistentes: entorno, hardware, seguridad, cómo trabajar desde el PC por SSH y flujo de ramas.
+- [x] Decidir si hace falta CLAUDE.md: una línea `@AGENTS.md`, para que cualquier instalación de Claude Code lo cargue.
 
 ## Fase 5: Itinerario didáctico (nuevos ejemplos graduados)
 Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legible por niños.
