@@ -109,9 +109,9 @@ Propuesta, dos formas de trabajar:
         (`pkill -INT` + `pinctrl set ... op dl`). Probado desde el PC: detenido en un punto de interrupción y Shift+F5,
         no queda ni el programa ni vsdbg en la Pi y todos los pines a nivel bajo. (Esa vez el PWM se congeló con los
         motores parados; falta el caso de motores congelados a toda velocidad.)
-  - [~] Cada conexión SSH desde el PC tarda ~5 s (el despliegue abre 3 o 4). Medido en Windows: por nombre 4,6 s,
+  - [x] Cada conexión SSH desde el PC tardaba ~5 s (el despliegue abre 3 o 4). Medido en Windows: por nombre 4,6 s,
         con `AddressFamily inet` 2,95 s, por IP 0,48 s (`Resolve-DnsName harlequin.local` ~1,1 s). Solución: reserva DHCP
-        en el router (MAC wifi `b8:27:eb:0b:5b:db` → 192.168.0.236) y `HostName` con la IP en `~/.ssh/config` del PC.
+        en el router (MAC wifi `b8:27:eb:0b:5b:db` → 192.168.0.236) y `HostName` con la IP en `~/.ssh/config` del PC. Hecho: 0,52 s por conexión.
   - [ ] Seguridad ante cortes de wifi: `ClientAliveInterval 5` / `ClientAliveCountMax 3` en el sshd de la Pi (requiere
         sudo) para que cierre la sesión caída y el programa reciba SIGHUP (parada de emergencia) en ~15 s.
   - [ ] Cambiar la contraseña de `pi` si sigue siendo la de los scripts antiguos (quedó en el historial público de git).
