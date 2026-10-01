@@ -7,15 +7,16 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (01/10/2026)
-- **Cerradas:** fases 0, 1 y 2 (la 2 con el PR #9: filtro del HC-SR04, giro a pasos y frenada suave). La Fase 3
-  está casi cerrada (PR #7).
+- **Cerradas:** fases 0 a 4. Solo queda abierta en la Fase 3 la guía de compilación ligera en la Pi (poco urgente:
+  se compila en el PC). *Ejecutar en la Pi* se usa a diario con todos los programas (probado ya en el PR #7).
 - **Alimentación resuelta (01/10/2026):** la Waveshare UPS HAT (B) está instalada y probada: ninguna caída de
   tensión, ni con los motores (comparativa de todas las fuentes en la Fase 2).
 - **Montaje terminado (01/10/2026):** la UPS y la Pi forman un bloque (con el montaje que trae la UPS) que encaja
   en el hueco del chasis entre los soportes de los motores y se atornilla en dos ranuras. Ya están los 10 sensores
   LM393 para la lección 11.
-- **En curso:** Fase 4 (documentación, rama `fase-4-documentacion`): faltan datos de montaje por confirmar.
-- **Depuración desde VS Code arreglada (01/10/2026):** hay que deshabilitar C# Dev Kit en este repositorio (Fase 3).
+- **Fase 4 cerrada (01/10/2026):** README de montaje, pinout, I2C y seguridad, y README de cada ejemplo.
+- **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
+  y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
 - **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
   `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o el arreglo de `Dispose` del
   binding (Fase 6).
@@ -179,7 +180,7 @@ Propuesta, dos formas de trabajar:
 - **Desde el PC con VS Code** (Windows, macOS o Linux), usando el OpenSSH que ya traen los tres sistemas:
   - [x] Autenticación SSH con clave (`ssh-keygen` + copiar la clave pública a la Pi); nada de contraseñas.
         Pasos en el README; nombre de host `harlequin` en `~/.ssh/config` del PC. Hecho en el PC (Windows, clave ED25519).
-  - [~] `tasks.json`: `dotnet publish -r linux-arm64 --self-contained false` en el PC → `scp` a `~/apps/<Proyecto>`
+  - [x] `tasks.json`: `dotnet publish -r linux-arm64 --self-contained false` en el PC → `scp` a `~/apps/<Proyecto>`
         → `ssh -t pi@<host> dotnet ~/apps/<Proyecto>/<Proyecto>.dll`. El nombre del host, configurable (sin datos personales).
         Hecho: tareas *Desplegar en la Pi*, *Ejecutar en la Pi* (eligen el programa) y *Parar el robot*; el host está
         en `.vscode/settings.json`. Probado desde el PC: *Ejecutar en la Pi* con SonarDashboard funciona.
@@ -236,9 +237,12 @@ Propuesta, dos formas de trabajar:
 - [ ] Guía de compilación ligera para 1 GB de RAM y ~3,5 GB libres en la microSD.
 
 ## Fase 4: Documentación
-- [~] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
-      habilitar I2C, normas de seguridad en el taller. Escrito; quedan datos de montaje por confirmar con el usuario
-      (marcadores `[POR CONFIRMAR]` en README.md).
+- [x] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
+      habilitar I2C, normas de seguridad en el taller. Datos confirmados con el usuario (01/10/2026): sensores
+      HC-SR04P, cada uno en su soporte; VCC al 5V del HAT y GND al GND del HAT; TRIG directo a OUT1–OUT3, sin
+      resistencia: como las salidas OUT son de colector abierto, la pull-up del TRIG debe estar en el módulo, y el
+      pulso de disparo llega invertido (bajo en vez de alto) y aun así funciona. UPS: interruptor deslizante OFF/ON
+      (en OFF al colocar las baterías) y pulsador *boot* para activar la protección (wiki de Waveshare).
 - [x] README propio de cada ejemplo: BasicSample (estaba vacío), Common (`SafeExplorerHat`), ObstacleAvoidance
       (cómo decide: filtro, lecturas nuevas, giro a pasos, modos N y S), SonarDashboard (tecla F y `--registro`)
       y UpsDashboard.

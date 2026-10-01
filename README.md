@@ -74,7 +74,7 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 | `0x42` | INA219 | Mide la tensión y la corriente de las baterías de la UPS HAT (B) |
 | `0x48` | ADS1015 | Entradas analógicas del Explorer HAT Pro |
 
-> ℹ️ Cada sensor HC-SR04 tiene cuatro cables: **VCC** (5 V), **TRIG**, **ECHO** y **GND**. TRIG va a una salida OUT del HAT y ECHO a una entrada IN. [POR CONFIRMAR: ¿de dónde se toman los 5 V (VCC) y la masa (GND) de los sensores: de los conectores de 5 V y GND del HAT, de los pines de la Pi o de otro sitio?]
+> ℹ️ Cada sensor HC-SR04 tiene cuatro cables: **VCC** (alimentación), **TRIG**, **ECHO** y **GND** (masa). **VCC va al pin 5V del HAT** y **GND al pin GND del HAT**. TRIG va a una salida OUT del HAT y ECHO a una entrada IN. Todos los GND (Pi, HAT y sensores) tienen que estar unidos: es la *masa común*, la referencia de 0 V con la que se miden todas las señales.
 
 > ⚠️ Los pines de la tabla ya tienen dueño. No conectes otro aparato a un pin que ya usa el robot.
 
@@ -88,7 +88,11 @@ Los pines GPIO de la Raspberry Pi solo aguantan **3,3 V**. Con 5 V se puede estr
 
 Las entradas **IN1 a IN4** del Explorer HAT Pro sí **admiten 5 V**: protegen al GPIO de la Pi. Por eso **ECHO va siempre a una entrada IN** del HAT y nunca a un GPIO suelto.
 
-El pin **TRIG** es al revés: la Pi envía el pulso al sensor. Va a una salida **OUT** del HAT. [POR CONFIRMAR: las salidas OUT del HAT son de colector abierto (así se dice en `PLAN.md`, Fase 6). ¿Los TRIG llevan una resistencia de pull-up a 5 V, o el sensor detecta el pulso sin ella?]
+El pin **TRIG** es al revés: la Pi envía el pulso al sensor. Va **directo** a una salida **OUT** del HAT, sin ningún componente en medio.
+
+Las salidas OUT del HAT son de **colector abierto**: dentro tienen un transistor que funciona como un interruptor a masa. Activa, la salida une el cable a 0 V. Inactiva, deja el cable suelto: no lo pone a 5 V. Para que el cable suba a 5 V hace falta una **resistencia de pull-up** entre el cable y 5 V. En este robot no hay ninguna en el cableado y los sensores funcionan, así que el propio módulo HC-SR04P la lleva en su patilla Trig.
+
+Una curiosidad: con este montaje **la señal se invierte**. Cuando el programa pone el pin en alto, la salida se activa y el TRIG baja a 0 V. El sensor recibe un pulso bajo en lugar de uno alto, y aun así mide bien.
 
 ---
 
