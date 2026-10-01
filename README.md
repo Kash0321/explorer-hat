@@ -229,6 +229,8 @@ El programa se compila en el PC, se copia a `~/apps` en la Raspberry Pi y se eje
 
 > ⚠️ **Versión de la extensión de C#:** desde la 2.160 la extensión envía al depurador de la Raspberry Pi comprobaciones de archivo (SHA384/SHA512) que este no admite, y los puntos de interrupción no funcionan aunque se vean en rojo ([dotnet/vscode-csharp#9802](https://github.com/dotnet/vscode-csharp/issues/9802)). Instala la **2.140.9** (en Extensiones, rueda ⚙ de *C#* → *Descargar VSIX de versión específica*, o desde las [versiones del repositorio](https://github.com/dotnet/vscode-csharp/releases), archivo `csharp-win32-x64-2.140.9.vsix`; después *Instalar desde VSIX...*), desactiva su actualización automática y reinicia las extensiones cuando VS Code lo pida.
 
+> ⚠️ **Deshabilita C# Dev Kit en este repositorio.** Con la extensión de C# 2.140.9, C# Dev Kit (probado con la 3.40.210) deja el depurador parado en el primer punto de interrupción: no responde a F10 (paso a paso) ni a F5 (continuar). En Extensiones, rueda ⚙ de *C# Dev Kit* → **Deshabilitar (área de trabajo)**. Comprueba después que la extensión **C#** sigue habilitada y recarga la ventana (*Developer: Reload Window*). Si VS Code dice que el tipo de depuración `coreclr` no es compatible, es que la extensión C# se ha deshabilitado también: no instales nada, solo vuelve a habilitarla.
+
 **En la Raspberry Pi:** el depurador de Visual Studio en `~/vsdbg`:
 ```bash
 curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg

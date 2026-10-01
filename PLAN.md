@@ -14,7 +14,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Montaje terminado (01/10/2026):** la UPS y la Pi forman un bloque (con el montaje que trae la UPS) que encaja
   en el hueco del chasis entre los soportes de los motores y se atornilla en dos ranuras. Ya están los 10 sensores
   LM393 para la lección 11.
-- **En curso:** Fase 4 (documentación, rama `fase-4-documentacion`) y revisar la depuración desde VS Code (Fase 3).
+- **En curso:** Fase 4 (documentación, rama `fase-4-documentacion`): faltan datos de montaje por confirmar.
+- **Depuración desde VS Code arreglada (01/10/2026):** hay que deshabilitar C# Dev Kit en este repositorio (Fase 3).
 - **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
   `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o el arreglo de `Dispose` del
   binding (Fase 6).
@@ -192,13 +193,24 @@ Propuesta, dos formas de trabajar:
         interrupción incorrecto", dotnet/vscode-csharp#9802) → usar la 2.140.9 sin actualización automática (en el README).
         `PathMap` a `/_/` + `sourceFileMap` para que los símbolos no dependan de la carpeta del PC.
         Aviso: un punto de interrupción congela el PWM por software y cada motor queda parado o a toda velocidad.
+        **Paso a paso arreglado (01/10/2026):** se detenía en el punto de interrupción, pero no respondía a F10 ni a F5.
+        Diagnóstico con el registro de los dos lados: `vsdbg` en la Pi con `--engineLogging=/tmp/vsdbg.log` (a través
+        de un script en `debuggerPath`) y `"logging": {"engineLogging": true}` en `launch.json` para `vsdbg-ui` del PC.
+        VS Code enviaba `next`/`continue` a `vsdbg-ui`, pero `vsdbg-ui` no los reenviaba a la Pi (sí el `disconnect`);
+        antes había pedido a C# Dev Kit el servicio `ManagedEditAndContinueRemoteDebuggerService2`. Causa: **C# Dev Kit
+        3.40.210** (se actualizó sola) con la extensión de C# 2.140.9. Solución: deshabilitar C# Dev Kit en el área de
+        trabajo (en el README y en `.vscode/extensions.json` como no recomendada). Descartados: la versión de `vsdbg`
+        (con la 18.7.10521.2, la misma de la extensión, fallaba igual; la 18.10.10709.3 de `~/vsdbg` funciona) y el
+        `ssh.exe` de Windows (reenvía bien los mensajes sin salto de línea). Probado: F10 y F5 hasta el final.
   - [x] Ejecutar como `pi`, no como `root` (el usuario ya está en los grupos `gpio` e `i2c`).
-  - [~] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
+  - [x] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
         Sin `-t`, cerrar el terminal puede dejar el programa corriendo en la Pi con los motores en marcha.
         Parar el depurador mata el programa (SIGKILL) sin parar los motores: `postDebugTask` *Parar el robot*
         (`pkill -INT` + `pinctrl set ... op dl`). Probado desde el PC: detenido en un punto de interrupción y Shift+F5,
         no queda ni el programa ni vsdbg en la Pi y todos los pines a nivel bajo. (Esa vez el PWM se congeló con los
-        motores parados; falta el caso de motores congelados a toda velocidad.)
+        motores parados.) Caso de motores congelados a toda velocidad probado el 01/10/2026 (ruedas en el aire):
+        detenido tras `Thread.Sleep` con los motores en marcha, pines 19 y 21 fijos en `hi`; Shift+F5 → *Parar el robot*
+        deja los 8 pines en `lo` y ni el programa ni vsdbg en la Pi.
   - [x] Cada conexión SSH desde el PC tardaba ~5 s (el despliegue abre 3 o 4). Medido en Windows: por nombre 4,6 s,
         con `AddressFamily inet` 2,95 s, por IP 0,48 s (`Resolve-DnsName harlequin.local` ~1,1 s). Solución: reserva DHCP
         en el router (MAC wifi `b8:27:eb:0b:5b:db` → 192.168.0.236) y `HostName` con la IP en `~/.ssh/config` del PC. Hecho: 0,52 s por conexión.

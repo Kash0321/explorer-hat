@@ -14,7 +14,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Repositorio clonado en la Pi** en `~/work/explorer-hat`. Los programas desplegados desde el PC van a `~/apps/<Proyecto>` y el depurador está en `~/vsdbg`.
 * **I2C habilitado** (`/dev/i2c-1`): el HAT responde en 0x28 (táctil CAP1208) y 0x48 (analógico ADS1015). La UPS responde en 0x42 (INA219). Por SSH no interactivo, `i2cdetect` e `i2cget` están en `/usr/sbin`, fuera del `PATH`.
 * **Librerías:** `System.Device.Gpio` e `Iot.Device.Bindings` 4.2.0.
-* **PC de desarrollo:** Windows con VS Code y .NET 10. Desde ahí se despliega y depura con las tareas de `.vscode/` (ver README). La extensión de C# debe ser la **2.140.9**: la 2.160.x rompe los puntos de interrupción remotos (dotnet/vscode-csharp#9802).
+* **PC de desarrollo:** Windows con VS Code y .NET 10. Desde ahí se despliega y depura con las tareas de `.vscode/` (ver README). La extensión de C# debe ser la **2.140.9**: la 2.160.x rompe los puntos de interrupción remotos (dotnet/vscode-csharp#9802). **C# Dev Kit debe estar deshabilitada en este repositorio** (*Deshabilitar (área de trabajo)*): la 3.40.210 con la extensión de C# 2.140.9 deja el depurador parado en el primer punto de interrupción, sin responder a F10 ni a F5. Al deshabilitarla, comprueba que la extensión C# sigue habilitada (si no, VS Code dice que el tipo `coreclr` no es compatible).
 
 ## 🔌 Hardware (Pimoroni Explorer HAT Pro)
 * **Motores:** motor 1 = GPIO 19 (velocidad) / 20 (dirección); motor 2 = GPIO 21 / 26. **El motor `One` es la rueda derecha** y `Two` la izquierda (girar a la derecha: `One` hacia atrás, `Two` hacia delante). Motores amarillos TT con reductora 1:48.
