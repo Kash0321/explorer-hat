@@ -16,6 +16,170 @@
 
 ---
 
+## 🔩 Montaje del robot
+
+### Piezas
+
+* **Raspberry Pi 3 Model B+**: el cerebro del robot.
+* **Waveshare UPS HAT (B)** con dos baterías 18650: la alimentación. Va **debajo** de la Raspberry Pi.
+* **Pimoroni Explorer HAT Pro**: va **encima** de la Raspberry Pi. Maneja los motores, las luces y las entradas y salidas.
+* **Dos motores TT amarillos** con reductora 1:48. El motor **One** es la rueda **derecha** y el motor **Two** es la rueda **izquierda**.
+* **Tres sensores de distancia HC-SR04** (ultrasonidos): izquierda, centro y derecha. [POR CONFIRMAR: ¿el modelo exacto es HC-SR04 o HC-SR04P? El README de ObstacleAvoidance dice «HC-SR04P».]
+* **Dos discos de 20 ranuras**, uno en cada motor. Servirán para contar vueltas (lección 11 de `PLAN.md`).
+* **Chasis** con soportes para los motores.
+
+### Pasos
+
+1. Monta los motores en los soportes del chasis, con los discos de 20 ranuras en sus ejes.
+2. Pon la UPS HAT (B) **debajo** de la Raspberry Pi, con el montaje que trae. Sus contactos tocan por debajo los pines de alimentación y de I2C de la Pi. No ocupan ningún GPIO del Explorer HAT.
+3. Pon el Explorer HAT Pro **encima** de la Raspberry Pi, en los 40 pines.
+4. Con su montaje, la UPS y la Pi forman un solo bloque. Ese bloque encaja en el hueco del chasis, entre los soportes de los motores, justo encima de dos ranuras. Atorníllalo por esas ranuras. Así no se mueve en los giros ni al frenar.
+5. Conecta el motor de la rueda **derecha** a la borna **MOTOR 1** del HAT y el de la rueda **izquierda** a **MOTOR 2**. Si una rueda gira al revés de lo esperado, intercambia los dos cables de ese motor.
+6. Monta los tres sensores HC-SR04 en la parte delantera del robot, mirando hacia delante: izquierda, centro y derecha. [POR CONFIRMAR: ¿cómo se sujetan los sensores al chasis y a qué altura?]
+7. Conecta los sensores como indica la tabla de cableado de abajo.
+8. Coloca las dos baterías 18650 en la UPS. Respeta la polaridad (+ y −) que marca el soporte.
+
+> 🔋 **Alimentación:** con la UPS HAT (B) no hay bajadas de tensión, ni con los motores en marcha. Las baterías externas USB y los cables micro-USB malos sí las provocan. La comparativa está en `PLAN.md`, Fase 2.
+
+---
+
+## 🔌 Pinout y cableado
+
+Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de la Raspberry Pi llega.
+
+| Elemento | Conector del HAT | GPIO | Notas |
+|---|---|---|---|
+| Motor 1 (rueda derecha, `One`) | Borna MOTOR 1 | 19 (velocidad) / 20 (dirección) | La velocidad es PWM por software |
+| Motor 2 (rueda izquierda, `Two`) | Borna MOTOR 2 | 21 (velocidad) / 26 (dirección) | La velocidad es PWM por software |
+| Luz azul (`Lights.One`) | LED 1 de la placa | 4 | |
+| Luz amarilla (`Lights.Two`) | LED 2 de la placa | 17 | |
+| Luz roja (`Lights.Three`) | LED 3 de la placa | 27 | |
+| Luz verde (`Lights.Four`) | LED 4 de la placa | 5 | |
+| Sensor izquierdo, TRIG | OUT3 | 13 | Salida |
+| Sensor izquierdo, ECHO | IN3 | 24 | Entrada (admite 5 V) |
+| Sensor central, TRIG | OUT1 | 6 | Salida |
+| Sensor central, ECHO | IN1 | 23 | Entrada (admite 5 V) |
+| Sensor derecho, TRIG | OUT2 | 12 | Salida |
+| Sensor derecho, ECHO | IN2 | 22 | Entrada (admite 5 V) |
+| Libre | OUT4 | 16 | Salida |
+| Libre | IN4 | 25 | Entrada. Se probará con un sensor LM393 (lección 11) |
+
+**Chips I2C** (bus `/dev/i2c-1`):
+
+| Dirección | Chip | Para qué sirve |
+|---|---|---|
+| `0x28` | CAP1208 | Pads táctiles del Explorer HAT Pro |
+| `0x42` | INA219 | Mide la tensión y la corriente de las baterías de la UPS HAT (B) |
+| `0x48` | ADS1015 | Entradas analógicas del Explorer HAT Pro |
+
+> ℹ️ Cada sensor HC-SR04 tiene cuatro cables: **VCC** (5 V), **TRIG**, **ECHO** y **GND**. TRIG va a una salida OUT del HAT y ECHO a una entrada IN. [POR CONFIRMAR: ¿de dónde se toman los 5 V (VCC) y la masa (GND) de los sensores: de los conectores de 5 V y GND del HAT, de los pines de la Pi o de otro sitio?]
+
+> ⚠️ Los pines de la tabla ya tienen dueño. No conectes otro aparato a un pin que ya usa el robot.
+
+---
+
+## ⚡ Por qué los sensores van a las entradas del HAT
+
+El sensor HC-SR04 funciona con **5 V**. Cuando mide, su pin **ECHO** responde con una señal de **5 V**.
+
+Los pines GPIO de la Raspberry Pi solo aguantan **3,3 V**. Con 5 V se puede estropear la Pi.
+
+Las entradas **IN1 a IN4** del Explorer HAT Pro sí **admiten 5 V**: protegen al GPIO de la Pi. Por eso **ECHO va siempre a una entrada IN** del HAT y nunca a un GPIO suelto.
+
+El pin **TRIG** es al revés: la Pi envía el pulso al sensor. Va a una salida **OUT** del HAT. [POR CONFIRMAR: las salidas OUT del HAT son de colector abierto (así se dice en `PLAN.md`, Fase 6). ¿Los TRIG llevan una resistencia de pull-up a 5 V, o el sensor detecta el pulso sin ella?]
+
+---
+
+## 🔧 Habilitar I2C
+
+El HAT (táctil y analógico) y la UPS hablan con la Raspberry Pi por el bus I2C. Hay que activarlo una sola vez.
+
+1. Abre el archivo de configuración y añade (o descomenta) esta línea:
+   ```bash
+   sudo nano /boot/firmware/config.txt
+   ```
+   ```
+   dtparam=i2c_arm=on
+   ```
+   También puedes activarlo con `sudo raspi-config` → *Interface Options* → *I2C*.
+2. Reinicia la Raspberry Pi:
+   ```bash
+   sudo reboot
+   ```
+3. Comprueba que existe `/dev/i2c-1` y que se ven los chips:
+   ```bash
+   /usr/sbin/i2cdetect -y 1
+   ```
+   Deben aparecer **0x28**, **0x42** y **0x48**. (`i2cdetect` está en `/usr/sbin`, que no siempre está en el `PATH`, sobre todo por SSH.)
+
+Si no aparece alguno, apaga la Raspberry Pi y revisa que el HAT y la UPS estén bien encajados.
+
+---
+
+## 🦺 Normas de seguridad en el taller
+
+Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para niños y monitores.
+
+### Antes de ejecutar un programa
+
+* **Prueba siempre con las ruedas en el aire.** Pon el robot sobre un bote o un libro, sin que las ruedas toquen nada.
+* Esto vale sobre todo para programas **nuevos** y para depurar.
+* Solo después de probarlo en el aire, déjalo en el suelo.
+* **El monitor da el visto bueno** antes de mover el robot.
+* Despeja la zona: sin cables por el suelo y sin objetos frágiles.
+
+### Cómo parar el robot
+
+1. **Ctrl+C** en el terminal: el programa para los motores antes de salir.
+2. La **tecla del programa**: en ObstacleAvoidance, pulsa cualquier tecla para parar.
+3. **Parada de emergencia**, en la Raspberry Pi:
+   ```bash
+   bash tools/parar-robot.sh
+   ```
+   Desde el PC también sirve la tarea de VS Code **Parar el robot**.
+4. **Levanta el robot** del suelo y aparta los dedos de las ruedas.
+5. Si nada funciona, **desconecta la alimentación** de la UPS HAT (B). [POR CONFIRMAR: ¿la UPS HAT (B) tiene un interruptor de encendido? ¿Dónde está y cómo se apaga el robot de golpe de forma segura?]
+
+### Si se corta la wifi
+
+* El programa se para solo en unos **15 a 30 segundos**, si has hecho la preparación SSH de este README.
+* Durante ese tiempo los motores **siguen girando**. Levanta el robot o pulsa la parada de emergencia.
+
+### Depuración
+
+* Un **punto de interrupción congela el programa** y los motores se quedan **parados o a toda velocidad**.
+* Depura siempre con las ruedas en el aire.
+* El botón de parar del depurador cierra el programa de golpe. Después se ejecuta sola la tarea *Parar el robot*.
+
+### En el código
+
+* Usa siempre `SafeExplorerHat` dentro de un bloque `using`.
+* Termina cada movimiento con `Speed = 0.0` en los dos motores, también si hay una excepción.
+
+### Baterías 18650
+
+* **No las cortocircuites.** No pongas metal ni cables pelados sobre sus polos.
+* Colócalas con la polaridad correcta.
+* **No las dejes cargando sin vigilar.**
+* No uses baterías hinchadas, abolladas o calientes. Avisa al monitor.
+* Usa solo baterías que quepan en la UPS (el límite es de 67 mm de largo).
+* Guárdalas fuera del robot si no se usan durante mucho tiempo.
+
+### Cables y manos
+
+* Revisa que **no haya cables sueltos** ni sin sujetar. Pueden engancharse en las ruedas.
+* **Pelo largo recogido, y dedos y ropa lejos de las ruedas** mientras los motores están en marcha.
+* No toques los pines ni las placas con el robot encendido.
+* Apaga el robot y desconecta la alimentación antes de cambiar un cable.
+* Si ves humo, huele a quemado o algo se calienta mucho: desconecta la alimentación y avisa al monitor.
+
+### Aviso de tensión baja
+
+* Un LED rojo **PWR** fijo en la Raspberry Pi indica que la tensión es correcta.
+* Si el robot hace cosas raras, mira el estado de alimentación con `vcgencmd get_throttled` (`0x0` = bien).
+
+---
+
 ## 📂 Estructura del Proyecto (`src/`)
 
 El entorno está organizado en soluciones independientes según el nivel de aprendizaje:

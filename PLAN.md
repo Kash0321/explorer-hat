@@ -11,7 +11,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   está casi cerrada (PR #7).
 - **Alimentación resuelta (01/10/2026):** la Waveshare UPS HAT (B) está instalada y probada: ninguna caída de
   tensión, ni con los motores (comparativa de todas las fuentes en la Fase 2).
-- **Esperando hardware:** sujetar la Pi y la UPS al chasis. Ya están los 10 sensores LM393 para la lección 11.
+- **Montaje terminado (01/10/2026):** la UPS y la Pi forman un bloque (con el montaje que trae la UPS) que encaja
+  en el hueco del chasis entre los soportes de los motores y se atornilla en dos ranuras. Ya están los 10 sensores
+  LM393 para la lección 11.
+- **En curso:** Fase 4 (documentación, rama `fase-4-documentacion`) y revisar la depuración desde VS Code (Fase 3).
 - **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
   `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o el arreglo de `Dispose` del
   binding (Fase 6).
@@ -159,7 +162,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
         filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
         temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
-      - Pendiente: sujetar la batería y la Pi al chasis. En campo libre, a veces no avanza en línea recta (los dos
+      - Sujeción: hecha el 01/10/2026 (la UPS y la Pi, en un bloque atornillado al chasis). En campo libre, a veces no avanza en línea recta (los dos
         motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
@@ -221,9 +224,12 @@ Propuesta, dos formas de trabajar:
 - [ ] Guía de compilación ligera para 1 GB de RAM y ~3,5 GB libres en la microSD.
 
 ## Fase 4: Documentación
-- [ ] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
-      habilitar I2C, normas de seguridad en el taller.
-- [ ] README propio de cada ejemplo (el de BasicSample está vacío).
+- [~] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
+      habilitar I2C, normas de seguridad en el taller. Escrito; quedan datos de montaje por confirmar con el usuario
+      (marcadores `[POR CONFIRMAR]` en README.md).
+- [x] README propio de cada ejemplo: BasicSample (estaba vacío), Common (`SafeExplorerHat`), ObstacleAvoidance
+      (cómo decide: filtro, lecturas nuevas, giro a pasos, modos N y S), SonarDashboard (tecla F y `--registro`)
+      y UpsDashboard.
 - [x] Corregir AGENTS.md (espacio libre real, desarrollo en la propia Pi, requisito de I2C). Ampliado como memoria del
       proyecto para los asistentes: entorno, hardware, seguridad, cómo trabajar desde el PC por SSH y flujo de ramas.
 - [x] Decidir si hace falta CLAUDE.md: una línea `@AGENTS.md`, para que cualquier instalación de Claude Code lo cargue.
