@@ -1,5 +1,9 @@
 {
     "recommendations": [
         "ms-dotnettools.csharp"
+    ],
+    // C# Dev Kit makes the remote debugger hang after the first breakpoint (see README)
+    "unwantedRecommendations": [
+        "ms-dotnettools.csdevkit"
     ]
 }

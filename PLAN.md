@@ -7,11 +7,16 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (01/10/2026)
-- **Cerradas:** fases 0, 1 y 2 (la 2 con el PR #9: filtro del HC-SR04, giro a pasos y frenada suave). La Fase 3
-  está casi cerrada (PR #7).
+- **Cerradas:** fases 0 a 4. Solo queda abierta en la Fase 3 la guía de compilación ligera en la Pi (poco urgente:
+  se compila en el PC). *Ejecutar en la Pi* se usa a diario con todos los programas (probado ya en el PR #7).
 - **Alimentación resuelta (01/10/2026):** la Waveshare UPS HAT (B) está instalada y probada: ninguna caída de
   tensión, ni con los motores (comparativa de todas las fuentes en la Fase 2).
-- **Esperando hardware:** sujetar la Pi y la UPS al chasis. Ya están los 10 sensores LM393 para la lección 11.
+- **Montaje terminado (01/10/2026):** la UPS y la Pi forman un bloque (con el montaje que trae la UPS) que encaja
+  en el hueco del chasis entre los soportes de los motores y se atornilla en dos ranuras. Ya están los 10 sensores
+  LM393 para la lección 11.
+- **Fase 4 cerrada (01/10/2026):** README de montaje, pinout, I2C y seguridad, y README de cada ejemplo.
+- **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
+  y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
 - **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
   `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o el arreglo de `Dispose` del
   binding (Fase 6).
@@ -159,7 +164,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
         filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
         temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
-      - Pendiente: sujetar la batería y la Pi al chasis. En campo libre, a veces no avanza en línea recta (los dos
+      - Sujeción: hecha el 01/10/2026 (la UPS y la Pi, en un bloque atornillado al chasis). En campo libre, a veces no avanza en línea recta (los dos
         motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
@@ -175,7 +180,7 @@ Propuesta, dos formas de trabajar:
 - **Desde el PC con VS Code** (Windows, macOS o Linux), usando el OpenSSH que ya traen los tres sistemas:
   - [x] Autenticación SSH con clave (`ssh-keygen` + copiar la clave pública a la Pi); nada de contraseñas.
         Pasos en el README; nombre de host `harlequin` en `~/.ssh/config` del PC. Hecho en el PC (Windows, clave ED25519).
-  - [~] `tasks.json`: `dotnet publish -r linux-arm64 --self-contained false` en el PC → `scp` a `~/apps/<Proyecto>`
+  - [x] `tasks.json`: `dotnet publish -r linux-arm64 --self-contained false` en el PC → `scp` a `~/apps/<Proyecto>`
         → `ssh -t pi@<host> dotnet ~/apps/<Proyecto>/<Proyecto>.dll`. El nombre del host, configurable (sin datos personales).
         Hecho: tareas *Desplegar en la Pi*, *Ejecutar en la Pi* (eligen el programa) y *Parar el robot*; el host está
         en `.vscode/settings.json`. Probado desde el PC: *Ejecutar en la Pi* con SonarDashboard funciona.
@@ -189,13 +194,24 @@ Propuesta, dos formas de trabajar:
         interrupción incorrecto", dotnet/vscode-csharp#9802) → usar la 2.140.9 sin actualización automática (en el README).
         `PathMap` a `/_/` + `sourceFileMap` para que los símbolos no dependan de la carpeta del PC.
         Aviso: un punto de interrupción congela el PWM por software y cada motor queda parado o a toda velocidad.
+        **Paso a paso arreglado (01/10/2026):** se detenía en el punto de interrupción, pero no respondía a F10 ni a F5.
+        Diagnóstico con el registro de los dos lados: `vsdbg` en la Pi con `--engineLogging=/tmp/vsdbg.log` (a través
+        de un script en `debuggerPath`) y `"logging": {"engineLogging": true}` en `launch.json` para `vsdbg-ui` del PC.
+        VS Code enviaba `next`/`continue` a `vsdbg-ui`, pero `vsdbg-ui` no los reenviaba a la Pi (sí el `disconnect`);
+        antes había pedido a C# Dev Kit el servicio `ManagedEditAndContinueRemoteDebuggerService2`. Causa: **C# Dev Kit
+        3.40.210** (se actualizó sola) con la extensión de C# 2.140.9. Solución: deshabilitar C# Dev Kit en el área de
+        trabajo (en el README y en `.vscode/extensions.json` como no recomendada). Descartados: la versión de `vsdbg`
+        (con la 18.7.10521.2, la misma de la extensión, fallaba igual; la 18.10.10709.3 de `~/vsdbg` funciona) y el
+        `ssh.exe` de Windows (reenvía bien los mensajes sin salto de línea). Probado: F10 y F5 hasta el final.
   - [x] Ejecutar como `pi`, no como `root` (el usuario ya está en los grupos `gpio` e `i2c`).
-  - [~] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
+  - [x] Seguridad: con `ssh -t`, Ctrl+C llega al programa y se paran los motores (depende de la Fase 2).
         Sin `-t`, cerrar el terminal puede dejar el programa corriendo en la Pi con los motores en marcha.
         Parar el depurador mata el programa (SIGKILL) sin parar los motores: `postDebugTask` *Parar el robot*
         (`pkill -INT` + `pinctrl set ... op dl`). Probado desde el PC: detenido en un punto de interrupción y Shift+F5,
         no queda ni el programa ni vsdbg en la Pi y todos los pines a nivel bajo. (Esa vez el PWM se congeló con los
-        motores parados; falta el caso de motores congelados a toda velocidad.)
+        motores parados.) Caso de motores congelados a toda velocidad probado el 01/10/2026 (ruedas en el aire):
+        detenido tras `Thread.Sleep` con los motores en marcha, pines 19 y 21 fijos en `hi`; Shift+F5 → *Parar el robot*
+        deja los 8 pines en `lo` y ni el programa ni vsdbg en la Pi.
   - [x] Cada conexión SSH desde el PC tardaba ~5 s (el despliegue abre 3 o 4). Medido en Windows: por nombre 4,6 s,
         con `AddressFamily inet` 2,95 s, por IP 0,48 s (`Resolve-DnsName harlequin.local` ~1,1 s). Solución: reserva DHCP
         en el router (MAC wifi `b8:27:eb:0b:5b:db` → 192.168.0.236) y `HostName` con la IP en `~/.ssh/config` del PC. Hecho: 0,52 s por conexión.
@@ -221,9 +237,17 @@ Propuesta, dos formas de trabajar:
 - [ ] Guía de compilación ligera para 1 GB de RAM y ~3,5 GB libres en la microSD.
 
 ## Fase 4: Documentación
-- [ ] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
-      habilitar I2C, normas de seguridad en el taller.
-- [ ] README propio de cada ejemplo (el de BasicSample está vacío).
+- [x] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
+      habilitar I2C, normas de seguridad en el taller. Datos confirmados con el usuario (01/10/2026): sensores
+      HC-SR04P, cada uno en su soporte; VCC al 5V del HAT y GND al GND del HAT; TRIG directo a OUT1–OUT3, sin
+      resistencia: como las salidas OUT son de colector abierto, la pull-up del TRIG debe estar en el módulo (en la
+      foto de la placa no se ve si es una resistencia o la interna del chip U3, RCW9006; se puede comprobar con un
+      multímetro: ~5 V entre Trig y Gnd con el robot encendido y sin programa), y el
+      pulso de disparo llega invertido (bajo en vez de alto) y aun así funciona. UPS: interruptor deslizante OFF/ON
+      (en OFF al colocar las baterías) y pulsador *boot* para activar la protección (wiki de Waveshare).
+- [x] README propio de cada ejemplo: BasicSample (estaba vacío), Common (`SafeExplorerHat`), ObstacleAvoidance
+      (cómo decide: filtro, lecturas nuevas, giro a pasos, modos N y S), SonarDashboard (tecla F y `--registro`)
+      y UpsDashboard.
 - [x] Corregir AGENTS.md (espacio libre real, desarrollo en la propia Pi, requisito de I2C). Ampliado como memoria del
       proyecto para los asistentes: entorno, hardware, seguridad, cómo trabajar desde el PC por SSH y flujo de ramas.
 - [x] Decidir si hace falta CLAUDE.md: una línea `@AGENTS.md`, para que cualquier instalación de Claude Code lo cargue.
