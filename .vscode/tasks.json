@@ -57,7 +57,8 @@
             "options": [
                 "ExplorerHat.BasicSample",
                 "ExplorerHat.ObstacleAvoidance",
-                "ExplorerHat.SonarDashboard"
+                "ExplorerHat.SonarDashboard",
+                "ExplorerHat.UpsDashboard"
             ],
             "default": "ExplorerHat.BasicSample"
         }

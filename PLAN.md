@@ -113,6 +113,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
         La Redmi en el suelo con el giro a pasos (30/09/2026, modo S, batería ya usada) llegó al 91 % (20 caídas).
       - Conclusión: la UPS HAT (B) es la alimentación del robot. Las baterías externas USB quedan para trabajar con
         el robot quieto.
+- [x] Nuevo ejemplo `ExplorerHat.UpsDashboard`: panel de consola con todo lo que da la UPS (su única conexión de
+      datos es el INA219 en I2C 0x42): tensión de las baterías, carga estimada (6,0 V = 0 %, 8,4 V = 100 %, como el
+      ejemplo de Waveshare), corriente con signo, potencia, estado (cargando o descargando), mínimos de la sesión y
+      registros en bruto; además, `get_throttled` de la Pi y su temperatura. Solo lee, no cambia la configuración del
+      chip. Lee los registros con `I2cDevice` porque el binding `Ina219` de 4.2.0 tiene un fallo (ver Fase 6).
+      Probado: 7,88 V (79 %), −0,43 A descargando en reposo.
 - [x] Revisar por qué ObstacleAvoidance choca a veces. Causa: con el obstáculo delante no giraba (solo giraba
       mientras el sensor del lado elegido estuviera cerca), retrocedía y volvía a chocar. Arreglado: gira mientras
       haya algo delante o en ese lado, límite de 20 a 30 cm, sonar cada ~0,27 s en vez de ~0,5 s y pausas de
@@ -260,5 +266,9 @@ solo cubre motores y las 4 luces. Falta:
       cierra todos los pines. Los hilos de `SoftwarePwmChannel` de los motores siguen escribiendo y el
       proceso muere. Arreglo: pasar `shouldDispose: false` a los hijos, liberar los motores antes que las
       luces y el controlador el último. Comprobar también que al liberar un motor que iba marcha atrás no quede el pin de dirección en alto.
+- [ ] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
+      `ReadCurrent()` leen el registro como número sin signo (`ReadRegister` devuelve `ushort`), así que las tensiones
+      y corrientes negativas (por ejemplo, baterías descargándose en la UPS HAT (B)) salen como valores enormes.
+      Arreglo: convertir a `short` antes de escalar. No hay ninguna incidencia abierta: posible PR a dotnet/iot.
 - [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
 - [ ] Preparar PR(s) a dotnet/iot.
