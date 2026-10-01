@@ -240,7 +240,9 @@ Propuesta, dos formas de trabajar:
 - [x] README: montaje, cableado de los sensores HC-SR04 (niveles de 5 V → entradas del HAT), pinout,
       habilitar I2C, normas de seguridad en el taller. Datos confirmados con el usuario (01/10/2026): sensores
       HC-SR04P, cada uno en su soporte; VCC al 5V del HAT y GND al GND del HAT; TRIG directo a OUT1–OUT3, sin
-      resistencia: como las salidas OUT son de colector abierto, la pull-up del TRIG debe estar en el módulo, y el
+      resistencia: como las salidas OUT son de colector abierto, la pull-up del TRIG debe estar en el módulo (en la
+      foto de la placa no se ve si es una resistencia o la interna del chip U3, RCW9006; se puede comprobar con un
+      multímetro: ~5 V entre Trig y Gnd con el robot encendido y sin programa), y el
       pulso de disparo llega invertido (bajo en vez de alto) y aun así funciona. UPS: interruptor deslizante OFF/ON
       (en OFF al colocar las baterías) y pulsador *boot* para activar la protección (wiki de Waveshare).
 - [x] README propio de cada ejemplo: BasicSample (estaba vacío), Common (`SafeExplorerHat`), ObstacleAvoidance

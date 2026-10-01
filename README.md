@@ -90,7 +90,7 @@ Las entradas **IN1 a IN4** del Explorer HAT Pro sí **admiten 5 V**: protegen al
 
 El pin **TRIG** es al revés: la Pi envía el pulso al sensor. Va **directo** a una salida **OUT** del HAT, sin ningún componente en medio.
 
-Las salidas OUT del HAT son de **colector abierto**: dentro tienen un transistor que funciona como un interruptor a masa. Activa, la salida une el cable a 0 V. Inactiva, deja el cable suelto: no lo pone a 5 V. Para que el cable suba a 5 V hace falta una **resistencia de pull-up** entre el cable y 5 V. En este robot no hay ninguna en el cableado y los sensores funcionan, así que el propio módulo HC-SR04P la lleva en su patilla Trig.
+Las salidas OUT del HAT son de **colector abierto**: dentro tienen un transistor que funciona como un interruptor a masa. Activa, la salida une el cable a 0 V. Inactiva, deja el cable suelto: no lo pone a 5 V. Para que el cable suba a 5 V hace falta una **resistencia de pull-up** entre el cable y 5 V. En este robot no hay ninguna en el cableado y los sensores funcionan, así que es el propio módulo HC-SR04P el que sube su Trig. No se ve en la placa si lo hace con una resistencia o con la resistencia interna de su chip de control (U3, RCW9006). Se puede comprobar con un multímetro: con el robot encendido y sin ningún programa en marcha, entre Trig y Gnd debe haber unos 5 V.
 
 Una curiosidad: con este montaje **la señal se invierte**. Cuando el programa pone el pin en alto, la salida se activa y el TRIG baja a 0 V. El sensor recibe un pulso bajo en lugar de uno alto, y aun así mide bien.
 
