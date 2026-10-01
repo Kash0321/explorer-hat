@@ -18,7 +18,7 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #9, cuyas descripciones resumen cada fase.
+     sobre todo los #4 a #12, cuyas descripciones resumen cada fase.
 
 2. Comprueba que llegas a la Raspberry Pi sin que te pida nada:
    ssh -o BatchMode=yes harlequin true

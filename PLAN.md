@@ -17,9 +17,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Fase 4 cerrada (01/10/2026):** README de montaje, pinout, I2C y seguridad, y README de cada ejemplo.
 - **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
   y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
+- **Nuevo ejemplo:** `ExplorerHat.UpsDashboard`, panel con los datos de la UPS (PR #11).
 - **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
-  `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o el arreglo de `Dispose` del
-  binding (Fase 6).
+  `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6
+  (arreglo de `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
+- **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
+  resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
