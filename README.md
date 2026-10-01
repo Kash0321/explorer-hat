@@ -24,7 +24,7 @@
 * **Waveshare UPS HAT (B)** con dos baterías 18650: la alimentación. Va **debajo** de la Raspberry Pi.
 * **Pimoroni Explorer HAT Pro**: va **encima** de la Raspberry Pi. Maneja los motores, las luces y las entradas y salidas.
 * **Dos motores TT amarillos** con reductora 1:48. El motor **One** es la rueda **derecha** y el motor **Two** es la rueda **izquierda**.
-* **Tres sensores de distancia HC-SR04** (ultrasonidos): izquierda, centro y derecha. [POR CONFIRMAR: ¿el modelo exacto es HC-SR04 o HC-SR04P? El README de ObstacleAvoidance dice «HC-SR04P».]
+* **Tres sensores de distancia HC-SR04P** (ultrasonidos): izquierda, centro y derecha. El HC-SR04P es la versión del HC-SR04 que funciona con cualquier tensión de 3 a 5,5 V. En el resto del documento los llamamos HC-SR04.
 * **Dos discos de 20 ranuras**, uno en cada motor. Servirán para contar vueltas (lección 11 de `PLAN.md`).
 * **Chasis** con soportes para los motores.
 
@@ -35,9 +35,11 @@
 3. Pon el Explorer HAT Pro **encima** de la Raspberry Pi, en los 40 pines.
 4. Con su montaje, la UPS y la Pi forman un solo bloque. Ese bloque encaja en el hueco del chasis, entre los soportes de los motores, justo encima de dos ranuras. Atorníllalo por esas ranuras. Así no se mueve en los giros ni al frenar.
 5. Conecta el motor de la rueda **derecha** a la borna **MOTOR 1** del HAT y el de la rueda **izquierda** a **MOTOR 2**. Si una rueda gira al revés de lo esperado, intercambia los dos cables de ese motor.
-6. Monta los tres sensores HC-SR04 en la parte delantera del robot, mirando hacia delante: izquierda, centro y derecha. [POR CONFIRMAR: ¿cómo se sujetan los sensores al chasis y a qué altura?]
+6. Monta los tres sensores en la parte delantera del robot, cada uno con su soporte, mirando hacia delante: izquierda, centro y derecha.
 7. Conecta los sensores como indica la tabla de cableado de abajo.
-8. Coloca las dos baterías 18650 en la UPS. Respeta la polaridad (+ y −) que marca el soporte.
+8. Pon el interruptor deslizante de la UPS en **OFF**. Después coloca las dos baterías 18650, respetando la polaridad (+ y −) que marca el soporte. Si colocas las baterías con el interruptor en ON, la placa se puede dañar por un cortocircuito.
+9. Pulsa el pulsador de la UPS (*boot*). Activa el circuito de protección de las baterías. Hay que hacerlo cada vez que se colocan las baterías.
+10. Pon el interruptor en **ON** para encender el robot.
 
 > 🔋 **Alimentación:** con la UPS HAT (B) no hay bajadas de tensión, ni con los motores en marcha. Las baterías externas USB y los cables micro-USB malos sí las provocan. La comparativa está en `PLAN.md`, Fase 2.
 
@@ -138,7 +140,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
    ```
    Desde el PC también sirve la tarea de VS Code **Parar el robot**.
 4. **Levanta el robot** del suelo y aparta los dedos de las ruedas.
-5. Si nada funciona, **desconecta la alimentación** de la UPS HAT (B). [POR CONFIRMAR: ¿la UPS HAT (B) tiene un interruptor de encendido? ¿Dónde está y cómo se apaga el robot de golpe de forma segura?]
+5. Si nada funciona, **pon en OFF el interruptor deslizante** de la UPS HAT (B). Es un apagado de golpe: úsalo solo en una emergencia, porque puede dañar la tarjeta microSD. Para apagar normalmente, ejecuta `sudo poweroff`, espera a que el LED verde de la Pi deje de parpadear y después pon el interruptor en OFF.
 
 ### Si se corta la wifi
 
@@ -159,7 +161,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 ### Baterías 18650
 
 * **No las cortocircuites.** No pongas metal ni cables pelados sobre sus polos.
-* Colócalas con la polaridad correcta.
+* Colócalas con la polaridad correcta y con el interruptor de la UPS en **OFF**.
 * **No las dejes cargando sin vigilar.**
 * No uses baterías hinchadas, abolladas o calientes. Avisa al monitor.
 * Usa solo baterías que quepan en la UPS (el límite es de 67 mm de largo).

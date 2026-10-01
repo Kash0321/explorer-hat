@@ -6,6 +6,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Objetivo:** talleres con niños para aprender programación, electrónica y robótica con C#. El autor del repositorio escribió el binding `Iot.Device.ExplorerHat` de dotnet/iot (PR #926).
 * **Estado y siguientes pasos:** en `PLAN.md` (fases 0–6, con lo probado y lo pendiente). Marca allí el avance (`[ ]`, `[~]`, `[x]`) y anota los resultados de las pruebas.
 * **Retomar el trabajo en una sesión nueva:** prompt en `docs/retomar-sesion.md`.
+* **El usuario** es experto en programación; la electrónica es su afición y quiere aprender: explícale los conceptos de electrónica según aparezcan (qué es, por qué importa y cómo comprobarlo), sin dar por sabido el vocabulario.
 * **Idioma:** conversación, documentación y mensajes de commit en español. Comentarios del código en inglés, como el resto del código.
 
 ## 🖥️ Entorno de ejecución
