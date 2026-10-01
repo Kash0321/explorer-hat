@@ -6,11 +6,12 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (30/09/2026)
+## Estado actual (01/10/2026)
 - **Cerradas:** fases 0, 1 y 2 (la 2 con el PR #9: filtro del HC-SR04, giro a pasos y frenada suave). La Fase 3
   está casi cerrada (PR #7).
-- **Esperando hardware:** la Waveshare UPS HAT (B) (comprada) y sujetar la batería y la Pi al chasis.
-  Ya están los 10 sensores LM393 para la lección 11.
+- **Alimentación resuelta (01/10/2026):** la Waveshare UPS HAT (B) está instalada y probada: ninguna caída de
+  tensión, ni con los motores (comparativa de todas las fuentes en la Fase 2).
+- **Esperando hardware:** sujetar la Pi y la UPS al chasis. Ya están los 10 sensores LM393 para la lección 11.
 - **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
   `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o el arreglo de `Dispose` del
   binding (Fase 6).
@@ -77,8 +78,47 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
         Pi sin usar el GPIO, INA219 en I2C 0x42). Las Samsung 25R (64,9 mm) caben (límite 67 mm).
         Descartadas: UPS HAT original (2,5 A) y Geekworm X728 (usa los GPIO 5, 6, 12, 16 y 20 del Explorer HAT).
       - **Decisión (30/09/2026):** comprar la Waveshare UPS HAT (B).
-- [ ] Probar la Waveshare UPS HAT (B) cuando llegue: montaje con el Explorer HAT encima, `i2cdetect -y 1`
+- [x] Probar la Waveshare UPS HAT (B) cuando llegue: montaje con el Explorer HAT encima, `i2cdetect -y 1`
       (0x28, 0x42 y 0x48) y ObstacleAvoidance con `tools/vigilar-tension.sh`, como en las pruebas anteriores.
+      Probada el 01/10/2026, solo con baterías (cargador de la UPS desconectado, 2×18650 a 7,9 V al empezar).
+      - `i2cdetect -y 1` ve 0x28, 0x42 (INA219 de la UPS) y 0x48. Por SSH no interactivo, `i2cdetect` e `i2cget`
+        están en `/usr/sbin` (fuera del `PATH`).
+      - `tools/vigilar-tension.sh` registra también la tensión y la corriente de las baterías si encuentra la UPS
+        (INA219 con resistencia de 0,1 Ω; corriente negativa = descarga), y `tools/comparar-tension.sh` resume
+        la tensión mínima y la corriente máxima de cada tramo.
+      - Resultado: **ninguna caída de tensión** en ninguna fase; `throttled=0x0` al final, también en los bits que
+        recuerdan lo ocurrido desde el arranque.
+
+        | Tramo | Tensión baja | Caídas | Baterías (mín.) | Corriente máx. |
+        |---|---|---|---|---|
+        | Reposo (~1,5 min) | 0 % | 0 | 7,84 V | 0,65 A |
+        | Compilando la solución (2 min, CPU al 100 %) | 0 % | 0 | 7,83 V | 0,70 A |
+        | ObstacleAvoidance N, ruedas en el aire (~1 min) | 0 % | 0 | 7,73 V | 1,15 A |
+        | ObstacleAvoidance S, ruedas en el aire (~1 min, 8 maniobras) | 0 % | 0 | 7,72 V | 1,11 A |
+
+        Esta prueba se hizo con el giro a pasos, que arranca los motores más veces que el programa de las pruebas
+        anteriores: para la UPS fue una prueba algo más dura.
+      - **Comparativa de todas las fuentes probadas** (ObstacleAvoidance con las ruedas en el aire, % del tiempo
+        con tensión baja):
+
+        | Fuente | Reposo | Compilando | Motores N | Motores S |
+        |---|---|---|---|---|
+        | Cargador 5 V 3 A con cables micro-USB malos | caídas constantes | caídas | — | — |
+        | Cargador 5 V 3 A con cable bueno | sin caídas | sin caídas | sin caídas (BasicSample) | — |
+        | Placa 2×18650 en paralelo con elevador (DIY MORE V8) | caídas al arrancar la Pi | — | 98 % | 92 % |
+        | Batería externa Redmi 10000 mAh (5,1 V 2,4 A) | sin caídas | sin caídas | 68 % (6 caídas) | 54 % (6 caídas) |
+        | Batería externa Xiaomi PLM10ZM 5000 mAh (5,1 V 2,1 A), poca carga | 4 caídas en 4 min | — | 97 % | 91 % |
+        | **Waveshare UPS HAT (B), 2×18650 en serie** | **0 %** | **0 %** | **0 %** | **0 %** |
+
+        La Redmi en el suelo con el giro a pasos (30/09/2026, modo S, batería ya usada) llegó al 91 % (20 caídas).
+      - Conclusión: la UPS HAT (B) es la alimentación del robot. Las baterías externas USB quedan para trabajar con
+        el robot quieto.
+- [x] Nuevo ejemplo `ExplorerHat.UpsDashboard`: panel de consola con todo lo que da la UPS (su única conexión de
+      datos es el INA219 en I2C 0x42): tensión de las baterías, carga estimada (6,0 V = 0 %, 8,4 V = 100 %, como el
+      ejemplo de Waveshare), corriente con signo, potencia, estado (cargando o descargando), mínimos de la sesión y
+      registros en bruto; además, `get_throttled` de la Pi y su temperatura. Solo lee, no cambia la configuración del
+      chip. Lee los registros con `I2cDevice` porque el binding `Ina219` de 4.2.0 tiene un fallo (ver Fase 6).
+      Probado: 7,88 V (79 %), −0,43 A descargando en reposo.
 - [x] Revisar por qué ObstacleAvoidance choca a veces. Causa: con el obstáculo delante no giraba (solo giraba
       mientras el sensor del lado elegido estuviera cerca), retrocedía y volvía a chocar. Arreglado: gira mientras
       haya algo delante o en ese lado, límite de 20 a 30 cm, sonar cada ~0,27 s en vez de ~0,5 s y pausas de
@@ -226,5 +266,9 @@ solo cubre motores y las 4 luces. Falta:
       cierra todos los pines. Los hilos de `SoftwarePwmChannel` de los motores siguen escribiendo y el
       proceso muere. Arreglo: pasar `shouldDispose: false` a los hijos, liberar los motores antes que las
       luces y el controlador el último. Comprobar también que al liberar un motor que iba marcha atrás no quede el pin de dirección en alto.
+- [ ] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
+      `ReadCurrent()` leen el registro como número sin signo (`ReadRegister` devuelve `ushort`), así que las tensiones
+      y corrientes negativas (por ejemplo, baterías descargándose en la UPS HAT (B)) salen como valores enormes.
+      Arreglo: convertir a `short` antes de escalar. No hay ninguna incidencia abierta: posible PR a dotnet/iot.
 - [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
 - [ ] Preparar PR(s) a dotnet/iot.
