@@ -12,7 +12,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Raspberry Pi 3 B+** (`harlequin`), Debian 13 de 64 bits (`linux-arm64`), 1 GB de RAM y unos 3 GB libres en la microSD: evita generar logs masivos o archivos basura.
 * **.NET 10.0.401** en `~/.dotnet`, con enlace en `/usr/local/bin/dotnet` para que funcione también por SSH sin sesión interactiva.
 * **Repositorio clonado en la Pi** en `~/work/explorer-hat`. Los programas desplegados desde el PC van a `~/apps/<Proyecto>` y el depurador está en `~/vsdbg`.
-* **I2C habilitado** (`/dev/i2c-1`): el HAT responde en 0x28 (táctil CAP1208) y 0x48 (analógico ADS1015).
+* **I2C habilitado** (`/dev/i2c-1`): el HAT responde en 0x28 (táctil CAP1208) y 0x48 (analógico ADS1015). La UPS responde en 0x42 (INA219). Por SSH no interactivo, `i2cdetect` e `i2cget` están en `/usr/sbin`, fuera del `PATH`.
 * **Librerías:** `System.Device.Gpio` e `Iot.Device.Bindings` 4.2.0.
 * **PC de desarrollo:** Windows con VS Code y .NET 10. Desde ahí se despliega y depura con las tareas de `.vscode/` (ver README). La extensión de C# debe ser la **2.140.9**: la 2.160.x rompe los puntos de interrupción remotos (dotnet/vscode-csharp#9802).
 
@@ -46,4 +46,4 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Lo que hace el usuario, no el asistente:** todo lo que requiere `sudo` (pide contraseña y no hay terminal) y los programas que esperan una tecla (`Console.ReadKey`, como ObstacleAvoidance): dale los comandos exactos para su terminal. El usuario suele tener abierta una terminal SSH en la Pi: dale los comandos para ejecutarlos allí directamente, sin el prefijo `ssh harlequin`.
 * **Ramas y PR:** una rama por fase de `PLAN.md` (`fase-N-descripcion`) a partir de `main`, subida a GitHub y fusionada por PR (`gh` está autenticado en la Pi). El usuario hace el merge; después, comprueba que la rama no tiene commits fuera de `origin/main`, bórrala (local y remota) y actualiza `main`.
 * **Actualización de Dependencias:** Al añadir paquetes, usa la sintaxis explícita apuntando al archivo `.csproj` correspondiente: `dotnet add src/[Proyecto]/[Proyecto].csproj package [Nombre]`.
-* **Alimentación:** muchos cables micro-USB no dan la corriente suficiente. Si hay comportamientos raros, mira `vcgencmd get_throttled` (`0x0` = bien; bit 0 = tensión baja ahora). Resultados y método de las pruebas con baterías en `PLAN.md` (Fase 2).
+* **Alimentación:** el robot usa una **Waveshare UPS HAT (B)** (2×18650 en serie, salida de 5 V hasta 5 A) debajo de la Pi: sin caídas de tensión ni con los motores. `tools/vigilar-tension.sh` registra también la tensión y la corriente de sus baterías. Con cargador, muchos cables micro-USB no dan la corriente suficiente. Si hay comportamientos raros, mira `vcgencmd get_throttled` (`0x0` = bien; bit 0 = tensión baja ahora). Resultados y método de las pruebas con baterías en `PLAN.md` (Fase 2).

@@ -11,6 +11,7 @@
 * **Placa:** Raspberry Pi 3 Model B+ (ARM64 de 64 bits).
 * **OS:** Raspberry Pi OS 64-bit (Debian Moderno).
 * **Hardware IoT:** Pimoroni Explorer Hat Pro (Conexión I2C habilitada).
+* **Alimentación:** Waveshare UPS HAT (B) con dos baterías 18650, montada debajo de la Raspberry Pi. Las baterías externas USB y los cables micro-USB malos provocan bajadas de tensión al mover los motores (comparativa en `PLAN.md`, Fase 2).
 * **Entorno:** .NET SDK 10.0.401 instalado localmente en la Raspberry Pi.
 
 ---
