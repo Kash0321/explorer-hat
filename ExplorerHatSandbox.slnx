@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/lessons/">
+    <Project Path="lessons/Lesson01.Lights/Lesson01.Lights.csproj" />
+    <Project Path="lessons/Lesson02.TrafficLight/Lesson02.TrafficLight.csproj" />
+    <Project Path="lessons/Lesson03.Motors/Lesson03.Motors.csproj" />
+    <Project Path="lessons/Lesson04.Square/Lesson04.Square.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />
     <Project Path="src/ExplorerHat.Common/ExplorerHat.Common.csproj" />

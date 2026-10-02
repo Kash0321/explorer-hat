@@ -186,6 +186,14 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 
 ---
 
+## 🎓 Lecciones del taller (`lessons/`)
+
+Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores y 04 Cuadrado.
+Cada lección es un proyecto pequeño con un único `Program.cs` y un README con retos. Índice y forma de
+ejecutarlas en [`lessons/README.md`](lessons/README.md).
+
+---
+
 ## 📂 Estructura del Proyecto (`src/`)
 
 El entorno está organizado en soluciones independientes según el nivel de aprendizaje:
@@ -273,7 +281,7 @@ sudo sysctl --system
 
 ### Ejecutar y depurar
 
-* **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige el programa. Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir.
+* **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige el programa. Para las lecciones, *Ejecutar una lección en la Pi*. Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir.
 * **Depurar BasicSample:** pestaña *Run and Debug*, configuración **Depurar BasicSample en la Pi** y F5.
 * **Depurar programas que leen el teclado** (como ObstacleAvoidance): primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
 * **Parar el robot:** la tarea **Parar el robot** para los programas del robot y pone a nivel bajo los pines de motores y luces.

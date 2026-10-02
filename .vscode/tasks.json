@@ -32,6 +32,18 @@
             }
         },
         {
+            "label": "Ejecutar una lección en la Pi",
+            "detail": "Despliega una lección de lessons/ y la ejecuta en la Raspberry Pi (Ctrl+C para pararla)",
+            "type": "shell",
+            "command": "dotnet publish lessons/${input:lesson}/${input:lesson}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:lesson} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:lesson} && mkdir -p ~/apps\" && scp -r -q publish/${input:lesson} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:lesson} && dotnet ~/apps/${input:lesson}/${input:lesson}.dll\"",
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated",
+                "clear": true
+            }
+        },
+        {
             "label": "Desplegar BasicSample",
             "detail": "Usada por la configuración de depuración de BasicSample",
             "type": "shell",
@@ -45,7 +57,7 @@
             "label": "Parar el robot",
             "detail": "Para los programas del robot en la Raspberry Pi y pone a nivel bajo los pines de motores y luces",
             "type": "shell",
-            "command": "ssh ${config:explorerHat.host} \"pkill -INT -f '[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)'; sleep 1; pinctrl set 19,20,21,26,4,17,27,5 op dl\"",
+            "command": "ssh ${config:explorerHat.host} \"pkill -INT -f '[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)|[L]esson[0-9]+[.]'; sleep 1; pinctrl set 19,20,21,26,4,17,27,5 op dl\"",
             "problemMatcher": []
         }
     ],
@@ -61,6 +73,18 @@
                 "ExplorerHat.UpsDashboard"
             ],
             "default": "ExplorerHat.BasicSample"
+        },
+        {
+            "id": "lesson",
+            "type": "pickString",
+            "description": "¿Qué lección?",
+            "options": [
+                "Lesson01.Lights",
+                "Lesson02.TrafficLight",
+                "Lesson03.Motors",
+                "Lesson04.Square"
+            ],
+            "default": "Lesson01.Lights"
         }
     ]
 }

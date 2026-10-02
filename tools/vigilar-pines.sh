@@ -10,7 +10,7 @@ END=$((SECONDS + ${2:-1200}))
 : > "$LOG"
 while [ $SECONDS -lt $END ]; do
   pins=$(pinctrl get 19,20,21,26 | awk '{printf "%s=%s ", $1, $6}')
-  procs=$(pgrep -fc '[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)')
+  procs=$(pgrep -fc '[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)|[L]esson[0-9]+[.]')
   echo "$(date +%T.%N | cut -c1-10) $pins procs=$procs" >> "$LOG"
   sleep 0.2
 done
