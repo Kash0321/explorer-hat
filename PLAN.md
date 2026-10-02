@@ -7,11 +7,11 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (02/10/2026)
-- **Fase 5 empezada (02/10/2026):** lecciones 01 a 04 escritas en `lessons/` (rama `fase-5-lecciones`). Las cuatro
-  están probadas en la Pi (la 03 y la 04, con las ruedas en el aire) y la 04 está calibrada en el suelo (250 ms =
-  90°). Siguiente: lección 05 (botones) o 06 (distancia).
-- **Nueva Fase 7 (02/10/2026):** robot con IA. El robot es el cuerpo y un portátil con un LLM local es el cerebro.
-  Análisis, decisiones y pasos en la Fase 7. Va después de la Fase 5.
+- **Fase 5 empezada (02/10/2026, PR #15):** lecciones 01 a 04 en `lessons/` (luces, semáforo, motores y cuadrado).
+  Las cuatro están probadas en la Pi (la 03 y la 04, también con las ruedas en el aire) y la 04 está calibrada en el
+  suelo con transportador (250 ms = 90°; tiene un modo calibración que se para tras cada giro).
+- **Nueva Fase 7 (02/10/2026, PR #14):** robot con IA. El robot es el cuerpo y un portátil con un LLM local es el
+  cerebro. Análisis, decisiones y pasos en la Fase 7. Va después de la Fase 5.
 - **Cerradas:** fases 0 a 4. Solo queda abierta en la Fase 3 la guía de compilación ligera en la Pi (poco urgente:
   se compila en el PC). *Ejecutar en la Pi* se usa a diario con todos los programas (probado ya en el PR #7).
 - **Alimentación resuelta (01/10/2026):** la Waveshare UPS HAT (B) está instalada y probada: ninguna caída de
@@ -23,9 +23,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
   y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
 - **Nuevo ejemplo:** `ExplorerHat.UpsDashboard`, panel con los datos de la UPS (PR #11).
-- **Siguiente paso propuesto:** Fase 5, lecciones 01 a 04 (luces, semáforo, motores y cuadrado), en una rama
-  `fase-5-lecciones`. Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6
-  (arreglo de `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
+- **Siguiente paso propuesto:** seguir con la Fase 5: lección 06 (distancia: un HC-SR04 que frena el robot,
+  reutilizando el filtro de lecturas falsas) o 05 (botones: entradas digitales con `if`; solo queda libre IN4,
+  GPIO 25). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
+  `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
