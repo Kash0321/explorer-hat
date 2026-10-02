@@ -7,6 +7,9 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (02/10/2026)
+- **Fase 5 empezada (02/10/2026):** lecciones 01 a 04 escritas en `lessons/` (rama `fase-5-lecciones`). Las cuatro
+  están probadas en la Pi (la 03 y la 04, con las ruedas en el aire) y la 04 está calibrada en el suelo (250 ms =
+  90°). Siguiente: lección 05 (botones) o 06 (distancia).
 - **Nueva Fase 7 (02/10/2026):** robot con IA. El robot es el cuerpo y un portátil con un LLM local es el cerebro.
   Análisis, decisiones y pasos en la Fase 7. Va después de la Fase 5.
 - **Cerradas:** fases 0 a 4. Solo queda abierta en la Fase 3 la guía de compilación ligera en la Pi (poco urgente:
@@ -258,11 +261,26 @@ Propuesta, dos formas de trabajar:
 - [x] Decidir si hace falta CLAUDE.md: una línea `@AGENTS.md`, para que cualquier instalación de Claude Code lo cargue.
 
 ## Fase 5: Itinerario didáctico (nuevos ejemplos graduados)
-Propuesta; cada lección es un proyecto pequeño con un único `Program.cs` legible por niños.
-- [ ] 01 Luces: encender y apagar LEDs, bucles.
-- [ ] 02 Semáforo: secuencias y tiempos con `Thread.Sleep`.
-- [ ] 03 Motores: adelante, atrás, girar.
-- [ ] 04 Dibujar un cuadrado: bucles con movimiento.
+Cada lección es un proyecto pequeño en `lessons/LessonNN.Nombre`, con un único `Program.cs` legible por niños
+(*top-level statements*, código y comentarios en inglés) y un README en español con retos. Índice en
+`lessons/README.md`. Tarea de VS Code *Ejecutar una lección en la Pi*; `tools/parar-robot.sh`, `vigilar-pines.sh` y
+la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
+- [x] 01 Luces (`Lesson01.Lights`): instrucciones en orden, `Thread.Sleep`, bucle `for`. Probada en la Pi
+      (02/10/2026): termina con código 0 y los 8 pines a nivel bajo.
+- [x] 02 Semáforo (`Lesson02.TrafficLight`): variables y ciclos con `for`, modo noche. Probada en la Pi
+      (02/10/2026), también la parada: con SIGINT a los 5 s escribe "Parada de emergencia (SIGINT)", termina y deja
+      los pines a nivel bajo; con `tools/parar-robot.sh`, ningún proceso y pines a nivel bajo.
+- [x] 03 Motores (`Lesson03.Motors`): velocidad de cada motor, avanzar, retroceder y girar, con una luz por
+      movimiento. Probada con las ruedas en el aire (02/10/2026), registrando los pines cada 0,2 s: los pines de
+      dirección (20 = `One`, 26 = `Two`) dan el sentido correcto en cada movimiento (girar a la derecha: 20 alto y
+      26 bajo), código 0, pines a nivel bajo al terminar y `throttled=0x0`.
+- [x] 04 Dibujar un cuadrado (`Lesson04.Square`): métodos propios (`MoveForwards`, `TurnRight`, `Stop`), bucle con
+      movimiento, `if`/`else` y calibrar `turnTime`. Al empezar pregunta si se usa el **modo calibración** (`y`): se
+      para tras cada giro y espera una tecla para medir la esquina. Probada con las ruedas en el aire (02/10/2026):
+      4 veces avanzar (luz verde) y girar a la derecha (luz amarilla, pin 20 alto), código 0 y pines a nivel bajo.
+      Calibrada en el suelo con un transportador (velocidad 0,8, UPS HAT (B)): 240 ms → ~85°, **250 ms → casi 90°**,
+      320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
+      90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
 - [ ] 05 Botones: entradas digitales (condiciones `if`).
 - [ ] 06 Distancia: un sensor HC-SR04, frenar ante un obstáculo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).

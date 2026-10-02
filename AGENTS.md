@@ -25,6 +25,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 
 ## ⛔ Restricciones Estrictas de Código
 1. **Sintaxis Clara y Pedagógica:** El código final debe ser leído por niños. Evita patrones avanzados innecesarios (como inyección de dependencias compleja o abstracciones pesadas). Prioriza estructuras secuenciales, bucles `for/while` tradicionales y métodos explícitos (`Speed = 0.5`).
+   * **Lecciones (`lessons/LessonNN.Nombre`):** un único `Program.cs` con *top-level statements* (sin clase ni `namespace`), los valores que el niño puede cambiar en variables al principio, código y comentarios en inglés y un README en español con retos. Los scripts de parada reconocen los procesos `LessonNN.*`.
 2. **Control del Tiempo:** El uso de `Thread.Sleep()` o `Task.Delay()` es explícitamente bienvenido para que los niños puedan cronometrar los movimientos del robot de forma visual ("Avanza 2 segundos, gira 1 segundo").
 3. **Liberación de Pines:** Usa `SafeExplorerHat` (proyecto `src/ExplorerHat.Common`) en lugar de `Iot.Device.ExplorerHat.ExplorerHat`, siempre dentro de un bloque `using`. Tiene las mismas propiedades `Motors` y `Lights`, y además:
    * Evita el fallo de `Iot.Device.Bindings` 4.2.0 por el que liberar `ExplorerHat` mata el proceso (`Can not write to pin 19 because it is not open`).

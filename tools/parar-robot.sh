@@ -3,7 +3,7 @@
 # and forces every motor and light pin of the Explorer HAT low.
 #   bash tools/parar-robot.sh                            (on the Raspberry Pi)
 #   ssh harlequin 'bash -s' < tools/parar-robot.sh       (from the PC)
-PROGRAMS='[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)'
+PROGRAMS='[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)|[L]esson[0-9]+[.]'
 pkill -INT -f "$PROGRAMS"
 sleep 1.5
 pkill -KILL -f "$PROGRAMS"
