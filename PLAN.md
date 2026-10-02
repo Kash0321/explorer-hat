@@ -6,7 +6,9 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (01/10/2026)
+## Estado actual (02/10/2026)
+- **Nueva Fase 7 (02/10/2026):** robot con IA. El robot es el cuerpo y un portátil con un LLM local es el cerebro.
+  Análisis, decisiones y pasos en la Fase 7. Va después de la Fase 5.
 - **Cerradas:** fases 0 a 4. Solo queda abierta en la Fase 3 la guía de compilación ligera en la Pi (poco urgente:
   se compila en el PC). *Ejecutar en la Pi* se usa a diario con todos los programas (probado ya en el PR #7).
 - **Alimentación resuelta (01/10/2026):** la Waveshare UPS HAT (B) está instalada y probada: ninguna caída de
@@ -299,3 +301,63 @@ solo cubre motores y las 4 luces. Falta:
       Arreglo: convertir a `short` antes de escalar. No hay ninguna incidencia abierta: posible PR a dotnet/iot.
 - [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
 - [ ] Preparar PR(s) a dotnet/iot.
+
+## Fase 7: Robot con IA (agente)
+Idea (02/10/2026): en los últimos talleres, el robot funciona como un agente. Entiende órdenes en lenguaje natural
+(primero escritas y después habladas), mira sus sensores y decide qué hacer con los motores y las luces. Va después
+de la Fase 5: las herramientas del agente son los métodos que los niños escriben en las lecciones
+(`Avanzar(segundos)`, `Girar(...)`, `EncenderLuz(...)`).
+
+Análisis (a partir de una conversación del usuario con Gemini, revisada con el contexto del proyecto):
+- **El LLM no puede ir en la Pi.** Con 1 GB de RAM solo caben modelos de 0,5B o menos (~0,5–2 tokens/s según
+  Gemini, sin medir), que fallan a menudo al dar JSON o llamadas a herramientas. Además, con los 4 núcleos al 100 %
+  se retrasan el hilo del PWM por software de los motores y la medida del eco del HC-SR04, y la Pi baja su frecuencia
+  al llegar a 60 °C.
+- **Arquitectura:** la Pi es el cuerpo (ejecuta las acciones y tiene la capa reactiva de seguridad) y un portátil de
+  la red local es el cerebro (el LLM elige las acciones).
+- **Todo en C#**, no en Python con la librería `explorerhat` de Pimoroni que proponía Gemini: se perdería
+  `SafeExplorerHat` (y su ejemplo tenía mal los colores de las luces). En el portátil, `Microsoft.Extensions.AI`
+  con Ollama, que admite llamadas a herramientas (*tool calling*).
+- **Seguridad, siempre en la Pi y nunca en el LLM:**
+  - El LLM solo elige acciones de una lista cerrada; nunca toca un pin.
+  - La Pi valida y recorta los valores (velocidad, duración, luces que existen).
+  - Cada movimiento tiene una duración máxima (por ejemplo, 3 s) y termina con `Speed = 0.0`. Si se corta la red,
+    el robot se para al terminar la acción en curso (en la Fase 3, un corte de SSH dejó los motores al 100 %).
+  - Capa reactiva: parada por obstáculo a 30 cm con `Sonar` y `DistanceSensor` (con su filtro de lecturas falsas),
+    no a 10 cm como proponía Gemini: el sonar mide cada ~0,2 s y el filtro añade una lectura de retraso.
+- **Privacidad:** son niños de 10 a 14 años. Nada de Web Speech API de Chrome (envía la voz a Google). La voz y el LLM
+  van en local; la nube, solo de reserva y sin voz. Antes de usar la nube, revisar con la organización del taller
+  el consentimiento y la protección de datos de menores.
+- **Voz:** con *push-to-talk* (botón que se mantiene pulsado para hablar), porque en el taller hablan varios niños a la
+  vez. El micrófono va en el portátil: la Pi 3B+ no tiene entrada de micrófono (su conector de 3,5 mm es solo de salida).
+- **Latencia:** Gemini promete menos de 1 s por orden. Solo es realista con tarjeta gráfica: hay que medirlo.
+
+Decisiones (02/10/2026):
+- LLM local en el portátil (Ollama), con una API en la nube de reserva si el portátil no da la velocidad suficiente.
+- Primera versión con órdenes escritas; la voz, después.
+- Portátil del taller: sin decidir. Equipo candidato: MSI Prestige 15 A12UD (i7-1280P de 14 núcleos, 32 GB de RAM,
+  NVIDIA RTX 3050 Ti Laptop con 4 GB de VRAM, 299 GB libres). En 4 GB de VRAM caben enteros los modelos de 3B
+  cuantizados a 4 bits (~2 GB); uno de 7B (~4,7 GB) no cabe entero y una parte va por la CPU. Su controlador NVIDIA es
+  de enero de 2022 (30.0.15.1165 = 511.65) y Ollama pide la 531 o superior para usar la tarjeta gráfica: hay que
+  actualizarlo.
+
+Pasos:
+- [ ] Medir el LLM en el portátil candidato: Ollama con `qwen2.5:3b` y `llama3.2:3b`, y `qwen2.5:7b` para comparar.
+      Unas 20 órdenes de prueba en español: tiempo de respuesta y aciertos en la herramienta y en sus valores.
+      Repetir con la API de reserva.
+- [ ] Decidir el protocolo entre el portátil y la Pi (HTTP sencillo, WebSocket o MQTT, que necesita un servidor más)
+      y cómo detecta la Pi que se ha perdido la conexión.
+- [ ] Servicio de órdenes en la Pi (C#, con `SafeExplorerHat`): lista cerrada de acciones, validación, duración
+      máxima, parada al perder la conexión y parada por obstáculo. Probarlo con las ruedas en el aire y con órdenes
+      escritas a mano, sin LLM. Repetir la prueba de corte de wifi de la Fase 3.
+- [ ] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
+      el estado de los sensores (distancias y batería).
+- [ ] Voz: Whisper local en el portátil (por ejemplo, whisper.cpp) con *push-to-talk*. Probar con ruido de fondo.
+- [ ] Opcional: respuesta hablada (un altavoz con amplificador propio en el conector de 3,5 mm de la Pi, o el portátil).
+- [ ] Opcional: cámara en el conector CSI de la Pi y un modelo de visión en el portátil, para que el robot "vea".
+- [ ] Opcional, como experimento para el taller: `llama.cpp` con un modelo de 0,5B en la Pi, con los motores parados.
+      Medir tokens/s, RAM y temperatura, para que los niños vean con datos por qué el cerebro va fuera. Ocupa unos
+      400 MB (la microSD tiene ~2,6 GB libres).
+- [ ] Lecciones: sentir, pensar y actuar; editar el *system prompt* y la lista de herramientas; capa reactiva frente a
+      capa deliberativa; comparar su programa fijo con el agente. La parte compleja (servidor, JSON y validación) es
+      código del monitor, no de los niños.
