@@ -7,6 +7,6 @@ PROGRAMS='[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard)|[L]esso
 pkill -INT -f "$PROGRAMS"
 sleep 1.5
 pkill -KILL -f "$PROGRAMS"
-# Motor 1 (19, 20), motor 2 (21, 26) and lights (4, 17, 27, 5)
-pinctrl set 19,20,21,26,4,17,27,5 op dl
-pinctrl get 19,20,21,26,4,17,27,5 | awk '{printf "%s%s ", $1, $6} END {print ""}'
+# Motor 1 (19, 20), motor 2 (21, 26), lights (4, 17, 27, 5) and OUT4 (16, the LED of lesson 05)
+pinctrl set 19,20,21,26,4,17,27,5,16 op dl
+pinctrl get 19,20,21,26,4,17,27,5,16 | awk '{printf "%s%s ", $1, $6} END {print ""}'

@@ -28,8 +28,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Lección 09 (Robot autónomo), 03/10/2026, rama `fase-5-leccion-09`:** probada con las ruedas en el aire (los
   tres sensores, 10 pasos de giro sin salida, final por tiempo y Ctrl+C) y en el suelo con cajas (15 obstáculos en
   60 s; solo choca con algunas esquinas, que el sensor no ve).
-- **Siguiente paso propuesto:** seguir con la Fase 5: lección 05 (botones:
-  entradas digitales con `if`; solo queda libre IN4, GPIO 25). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
+- **Lección 05 (Botones), 03/10/2026, rama `fase-5-leccion-05`:** pulsador y LED en una protoboard, probada; sin
+  rebotes. Arreglada la parada de emergencia desde el PC (finales de línea CRLF en los `.sh`).
+- **Siguiente paso propuesto:** lección 11 (probar un LM393 con un disco; IN4 está ahora ocupada por el pulsador,
+  que se puede quitar) o la propuesta 12 (pantalla LCD; antes, revisar la tensión del bus I2C). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
   `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -286,7 +288,24 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Calibrada en el suelo con un transportador (velocidad 0,8, UPS HAT (B)): 240 ms → ~85°, **250 ms → casi 90°**,
       320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
       90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
-- [ ] 05 Botones: entradas digitales (condiciones `if`).
+- [x] 05 Botones (`Lesson05.Buttons`, 03/10/2026): pulsador de 12 mm entre 5V e IN4 (GPIO 25) y LED rojo con 330 Ω
+      entre 5V y OUT4 (GPIO 16), en una protoboard (esquema SVG en el README). El programa lee y escribe con
+      `GpioController` (el binding no tiene entradas ni salidas: Fase 6). Tres partes: la luz roja y el LED siguen al
+      botón (10 s), contar pulsaciones (cambio de suelto a pulsado, `wasPressed`, 10 s) y el LED parpadea una vez por
+      pulsación. Bucles `for` que cuentan milisegundos (sin `while` ni `Stopwatch`, que llegan en la 06).
+      - Sin programa: IN4 lee 0 en 50 de 50 lecturas y sigue al botón (5 pulsaciones de ~0,2 s y una de 2,1 s): las
+        entradas del HAT tienen pull-down; no hace falta la resistencia de 10 kΩ. `pinctrl set 16 op dh` enciende el LED.
+      - Con la lección: el programa contó 16 y el usuario también. Rebotes: ninguno, ni leyendo cada 1 ms (copia de
+        diagnóstico con el tiempo entre pulsaciones: mínimo 475 ms). Pines a nivel bajo al terminar.
+      - `tools/parar-robot.sh` y la tarea *Parar el robot* ponen también OUT4 (16) a nivel bajo.
+      - **Fallo encontrado:** en el PC con Windows, git guardaba los `.sh` con CRLF y `ssh harlequin 'bash -s' <
+        tools/parar-robot.sh` no paraba nada (`pinctrl`: `Unknown argument "dl^M"`; el patrón de `pkill` no
+        coincide). Arreglado con `.gitattributes` (`*.sh text eol=lf`) y probado desde el PC. La tarea de VS Code no
+        estaba afectada (lleva el comando dentro).
+      Notas previas sobre el material. Alternativas si faltara algo: un LM393 de horquilla como "botón sin contacto" (meter
+      una tarjeta en la ranura; además prepara la lección 11, que usa el mismo sensor en IN4) o dos cables dupont que
+      se tocan (5V → IN4). Para comprar: módulo de botón con 3 pines (VCC, GND, salida; ya trae la resistencia) o
+      botones arcade de 30 mm, más fáciles de pulsar para los niños.
 - [x] 06 Distancia (`Lesson06.Distance`): el HC-SR04 del centro, luces por zonas (verde > 60 cm, amarilla, roja
       < 30 cm), `if`/`else if`/`else`, bucle `while` con cronómetro (`Stopwatch`, 10 s como máximo) y `break` al
       pararse. Filtro sencillo: la más cercana de las dos últimas lecturas (`Math.Min`), como `DistanceSensor` de
@@ -330,7 +349,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         nivel bajo al terminar.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
-      de un tutorial. Hacerlo desde cero.
+      de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
+      entradas digitales: mismo problema que el segundo sensor de la lección 11 (solo IN4 está libre).
 - [ ] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
       ópticos de horquilla en las entradas digitales del HAT (requiere Fase 6).
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
@@ -342,6 +362,36 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
             que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
       - [ ] Corregir la desviación en línea recta (regular la velocidad de cada motor con los pulsos) y programar
             movimientos precisos: avanzar N cm, girar N grados.
+- [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
+      variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
+      obstáculos esquivados) para las pruebas en el suelo. `Iot.Device.Bindings` 4.2.0 trae `Lcd2004` y `Pcf8574`.
+      Antes de conectarla:
+      - Dirección I2C: 0x27 (PCF8574T) o 0x3F (PCF8574AT), según el chip; los puentes A0–A2 la cambian. No choca con
+        0x28, 0x42 ni 0x48.
+      - **Tensión del bus I2C:** la pantalla necesita 5 V, y el adaptador suele llevar resistencias de pull-up de SDA y
+        SCL a su VCC: con VCC a 5 V, SDA y SCL de la Pi (3,3 V) quedarían por encima de 3,3 V. Medir esas resistencias
+        y decidir: quitarlas (la Pi ya tiene pull-ups a 3,3 V), un conversor de niveles o alimentar el adaptador a 3,3 V
+        (el contraste puede no bastar).
+      - Ver por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3) con el Explorer HAT encima.
+
+### Componentes disponibles (03/10/2026)
+- 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
+- 2 módulos TCRT5000 (infrarrojo por reflexión, con potenciómetro; por confirmar): lección 10.
+- Pantalla LCD 2004A con adaptador I2C PCF8574: lección 12 (propuesta).
+- 4 pulsadores táctiles de 12 mm (4 patas, 2 contactos): lección 05.
+- Resistencias de 10 kΩ (pull-down si hiciera falta) y de 330 Ω (para LED), y LED rojos y amarillos de 5 mm.
+- 3 módulos láser KY-008 (650 nm, pines S, centro y −). **Peligro para los ojos:** solo con el monitor, nunca
+  apuntando a una persona ni a superficies que reflejen. Idea: alarma de haz cortado con una fotorresistencia (no hay).
+- Módulo L298N (HW-095): doble puente H para dos motores, con radiador y regulador de 5 V. El robot no lo necesita
+  (el Explorer HAT lleva un DRV8833) y necesitaría 6 GPIO que no hay libres. Pierde ~2 V (transistores bipolares).
+  Sirve para explicar qué es un puente H.
+- 2 protoboards de 400 puntos (30 filas, columnas a–j y dos líneas de alimentación + y − a cada lado) y muchos cables
+  dupont (macho-hembra, hembra-hembra y algunos macho-macho).
+- Una placa ESP32 DevKit (módulo ESP-WROOM-32, 30 pines, wifi y Bluetooth, lógica de 3,3 V). Ideas: mando a distancia
+  inalámbrico del robot, o contar los pulsos de los LM393 (tiene contadores de pulsos por hardware) y pasárselos a la
+  Pi, porque a la Pi le faltan entradas. Se puede programar en C# con .NET nanoFramework.
+- IN4 (GPIO 25) con nada conectado lee 0 en 50 de 50 lecturas (pull de la Pi desactivado): la entrada del HAT
+  parece tener pull-down o un búfer que la mantiene baja. Confirmar con el pulsador.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
