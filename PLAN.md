@@ -29,8 +29,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   ([dotnet/iot#2612](https://github.com/dotnet/iot/pull/2612), "Fixes #1659") y el de `DCMotor` y `ExplorerHat`
   ([dotnet/iot#2613](https://github.com/dotnet/iot/pull/2613): `Dispose` ya no tumba el proceso y un motor liberado
   marcha atrás ya no se queda a toda velocidad). Los dos con pruebas unitarias y prueba en la Pi. Pendientes de
-  revisión: atender los comentarios sin *force push*. Siguiente: la incidencia de los eventos de GPIO. Después, la lección 10 (siguelíneas) o la 07 (pads táctiles, que necesita un binding
-  para el CAP1208).
+  revisión: atender los comentarios sin *force push*. Abiertas también dos incidencias de `System.Device.Gpio` en la
+  Pi 3: los eventos de GPIO con libgpiod v2 ([dotnet/iot#2614](https://github.com/dotnet/iot/issues/2614)) y
+  `QueryComponentInformation` ([dotnet/iot#2615](https://github.com/dotnet/iot/issues/2615)); el robot no necesita
+  sus arreglos. Siguiente, a elegir: ampliar el binding (entradas y salidas del HAT, ADS1015, CAP1208), la lección 10
+  (siguelíneas) o la 07 (pads táctiles, que necesita un binding para el CAP1208).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
@@ -368,7 +371,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       y no pierde ranuras: es lo que usa la lección.
     - Fallo de `System.Device.Gpio` 4.2.0 en la Pi 3 (`RaspberryPi3Driver`): `UnregisterCallbackForPinValueChangedEvent`
       lanza `GpiodException: Device or resource busy` (intenta volver a abrir la línea). Registrar una sola vez y no
-      quitarlo. Con la excepción, `SafeExplorerHat` paró el motor (`Error inesperado: motores parados`).
+      quitarlo. Informado en dotnet/iot#2614 (Fase 6). Con la excepción, `SafeExplorerHat` paró el motor (`Error inesperado: motores parados`).
   - [x] Lección `Lesson11.Odometry` con un sensor (03/10/2026): parte 1 mide la velocidad (2 s), espera una tecla para
         medir con la cinta; parte 2 avanza 50 cm (`while` con distancia `&&` tiempo máximo de 5 s, por si falla el
         sensor); después de cada parte cuenta 0,5 s más lo que resbala. Con las ruedas en el aire (versión sin tecla):
@@ -543,14 +546,27 @@ solo cubre motores y las 4 luces. Falta:
     Configuración tras el setter arreglado: `0x39EF` (BADC 12 bits, SADC 32 muestras). Al terminar, `Reset()` deja
     la UPS como estaba: `0x399F` (la configuración de fábrica) y calibración `0x0000`.
 - [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
-- [ ] **Posible incidencia en `System.Device.Gpio` 4.2.0 (Pi 3, `RaspberryPi3Driver`):** quitar un aviso de eventos
+- [x] **Incidencia en `System.Device.Gpio` (Pi 3, `RaspberryPi3Driver`):** quitar un aviso de eventos
       con `UnregisterCallbackForPinValueChangedEvent` lanza `GpiodException: Device or resource busy` (detalles en la
       lección 11 de la Fase 5). Buscada el 03/10/2026: no hay ninguna igual (la más parecida, #1637, es de la Pi 4 y
-      está cerrada). Antes de informar, reproducirla con un programa mínimo y con la versión de `main`.
+      está cerrada). **Informada el 03/10/2026: [dotnet/iot#2614](https://github.com/dotnet/iot/issues/2614)**, solo
+      la incidencia (el robot no necesita el arreglo).
+  - Reproducida con un programa mínimo (no versionado, `~/apps/GpioEventsOld` con 4.2.0 y `~/apps/GpioEventsMain` con
+    `main`), igual en los dos: tras el primer `RegisterCallbackForPinValueChangedEvent`, fallan un segundo registro,
+    quitar un aviso y `WaitForEvent`. `OpenPin` y `ClosePin` funcionan.
+  - Causa: `RaspberryPi3LinuxDriver` llama a `_interruptDriver.OpenPin` antes de cada operación con eventos. La Pi
+    tiene libgpiod 2.2.1 (`libgpiod.so.3`, Debian 13), así que el controlador de eventos es `LibGpiodV2Driver`, y su
+    `OpenPin` vuelve a pedir la línea al kernel (el de libgpiod v1 no hace nada si ya está abierta). Las pruebas de
+    hardware de dotnet/iot se ejecutan en Raspbian 11 (libgpiod v1): por eso no lo ven.
+  - Forma de evitarlo: un solo aviso por pin, sin quitarlo nunca.
+- [x] **Incidencia nueva, encontrada al reproducir la anterior:** en la Pi 3, `GpioController.QueryComponentInformation()`
+      lanza `NotSupportedException` (con 4.2.0 y con `main`): `RaspberryPi3Driver` llama a `GetChipInfo()`, que
+      `RaspberryPi3LinuxDriver` no implementa. **Informada el 03/10/2026:
+      [dotnet/iot#2615](https://github.com/dotnet/iot/issues/2615).**
 - [~] Preparar PR(s) a dotnet/iot. Punto de partida (03/10/2026):
   - **Hecho el 03/10/2026:** el PR de `Ina219` (#2612) y el de `DCMotor` y `ExplorerHat` (#2613). Cómo se trabaja
-    con el clon del fork, las pruebas y la prueba en la Pi: en `AGENTS.md` ("Contribuir a dotnet/iot"). Siguiente:
-    el fallo de los eventos de GPIO, como incidencia, si se reproduce con `main`.
+    con el clon del fork, las pruebas y la prueba en la Pi: en `AGENTS.md` ("Contribuir a dotnet/iot"). Y las
+    incidencias #2614 (eventos de GPIO) y #2615 (`QueryComponentInformation`).
   - **Integración continua de dotnet/iot (Azure DevOps):** compila y prueba en Linux, macOS y Windows, en Debug y
     Release. `Button.Tests` (por ejemplo, `ButtonTests.If_Button_Is_Held_Down_Longer_Than_Debouncing`, que mide
     tiempos) falla casi siempre en Linux Debug: en el #2612 (dos veces), en el #2613 y en el #2605 de otro autor.
