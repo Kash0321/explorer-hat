@@ -20,20 +20,29 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
   Alimentación con la Waveshare UPS HAT (B), sin caídas de tensión. Ejemplos en `src/`: BasicSample,
   ObstacleAvoidance, SonarDashboard y UpsDashboard.
-- **Hallazgos de esta sesión:** la parada de emergencia desde el PC fallaba por los finales de línea CRLF de los `.sh`
-  (arreglado con `.gitattributes`); los sensores de velocidad saltan en cada borde de ranura y las entradas IN del HAT
-  no tienen histéresis (leer cada ~1 ms lo evita); un corte de batería dejó un archivo vacío (las tareas de despliegue
-  hacen `sync`); la fila lateral del HAT da GPIO libres de 3,3 V.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, los PR a dotnet/iot (en curso, 03/10/2026):** abiertos el de `Ina219`
-  ([dotnet/iot#2612](https://github.com/dotnet/iot/pull/2612), "Fixes #1659") y el de `DCMotor` y `ExplorerHat`
-  ([dotnet/iot#2613](https://github.com/dotnet/iot/pull/2613): `Dispose` ya no tumba el proceso y un motor liberado
-  marcha atrás ya no se queda a toda velocidad). Los dos con pruebas unitarias y prueba en la Pi. Pendientes de
-  revisión: atender los comentarios sin *force push*. Abiertas también dos incidencias de `System.Device.Gpio` en la
-  Pi 3: los eventos de GPIO con libgpiod v2 ([dotnet/iot#2614](https://github.com/dotnet/iot/issues/2614)) y
-  `QueryComponentInformation` ([dotnet/iot#2615](https://github.com/dotnet/iot/issues/2615)); el robot no necesita
-  sus arreglos. Siguiente, a elegir: ampliar el binding (entradas y salidas del HAT, ADS1015, CAP1208), la lección 10
-  (siguelíneas) o la 07 (pads táctiles, que necesita un binding para el CAP1208).
+- **Fase 6, sesión del 03/10/2026 (noche), en dotnet/iot:**
+
+  | Qué | Estado | Pendiente |
+  |---|---|---|
+  | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | Abierto, sin revisión | Revisión de los mantenedores |
+  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Abierto, sin revisión | Revisión de los mantenedores |
+  | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta | Solo incidencia |
+  | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta | Solo incidencia |
+
+  Los dos PR fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro): según raffaeler, pgrawehr y
+  joperezr preparan el arreglo. Si los mantenedores comentan, se responde en el PR y los cambios van en commits
+  nuevos (sin *force push*). Para mirar el estado: `gh pr checks <PR> -R dotnet/iot` y los comentarios con
+  `gh api repos/dotnet/iot/issues/<n>/comments`.
+- **Hallazgos de esta sesión:** con 4.2.0, liberar un `DCMotor` marcha atrás deja la rueda **a toda velocidad**
+  (`SafeExplorerHat` lo evita porque para antes); `ExplorerHat.Dispose` tumba el proceso; el INA219 de la UPS lee la
+  corriente sin signo; en la Pi 3 con libgpiod v2 solo se puede registrar un aviso de GPIO por pin. Detalles en la
+  Fase 6.
+- **Siguiente paso decidido (03/10/2026): ampliar el binding `ExplorerHat`** con lo que le falta del HAT (entradas,
+  salidas, entradas analógicas y pads táctiles). **Empieza con una sesión de reflexión y diseño, sin programar:** el
+  punto de partida comprobado, las preguntas abiertas y lo que hay que leer están en la Fase 6, "Ampliar el binding:
+  punto de partida". Después: la lección 07 (pads táctiles) y la 08 (analógico), que lo necesitan, o la 10
+  (siguelíneas).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
@@ -586,6 +595,56 @@ solo cubre motores y las 4 luces. Falta:
   - **Antes de programar:** leer `CONTRIBUTING.md` y las normas de dotnet/iot (CLA de la .NET Foundation, estilo,
     pruebas unitarias si el binding las tiene), compilar el binding en el PC y probar en la Pi con una referencia de
     proyecto o un paquete local, sin tocar los programas del robot.
+
+### Ampliar el binding: punto de partida (03/10/2026)
+Siguiente trabajo decidido. La primera sesión es **de reflexión y diseño, sin programar**: leer, contestar las
+preguntas de abajo con el usuario y dejar aquí el diseño acordado y el orden de los PR. Después, una rama y un PR por
+pieza, como en los PR #2612 y #2613.
+
+**Lo comprobado:**
+- **Código:** `C:\work\iot\src\devices\ExplorerHat` en el PC (clon del fork; cómo se trabaja con él, en
+  `AGENTS.md`). Clases: `ExplorerHat`, `Motors`, `Lights`, `Led` y `DCMotorExtensions`. El README del binding dice
+  "Capacitive touchpad, inputs, outputs, and 3.3v breakout not supported... Working on them". El `.csproj` incluye
+  las carpetas `Gpio/`, `Lighting/` y `Motorization/`, que no existen (restos del diseño original).
+- **El PR #2613 (abierto) cambia `ExplorerHat.cs`, `Motors.cs` y `Lights.cs`** y crea `ExplorerHat/tests` con
+  `FakeGpioDriver`. Decidir antes si el trabajo nuevo parte de la rama `explorerhat-dispose` (el PR nuevo dependería
+  del #2613) o si espera a que lo fusionen.
+- **Lo que falta, con sus pines** (ver también la lista de arriba):
+
+  | Pieza | Conexión | Lo que sabemos |
+  |---|---|---|
+  | Entradas IN1–IN4 | GPIO 23, 22, 24, 25 | Admiten 5 V (búfer en el HAT); leen 0 sin nada conectado (pull-down); sin histéresis: el LM393 da saltos en cada borde (Fase 5, lección 11) |
+  | Salidas OUT1–OUT4 | GPIO 6, 12, 13, 16 | Colector abierto: el pin en alto activa la salida y la une a 0 V (lógica invertida); necesitan pull-up externa (README, "Por qué los sensores van a las entradas del HAT") |
+  | Entradas analógicas 1–4 | ADS1015, I2C 0x48 | Hay binding `Ads1115`; su código y su README no mencionan el ADS1015 (12 bits, otras velocidades): comprobar si sirve |
+  | Pads táctiles 1–8 | CAP1208, I2C 0x28 | No hay ningún binding CAP1xxx en dotnet/iot: haría falta uno nuevo |
+
+- **En el robot, esos pines ya tienen dueño:** IN1–IN3 y OUT1–OUT3 son los HC-SR04 (que usan el binding `Hcsr04`
+  con números de pin) e IN4 es el LM393 derecho. Las pruebas en la Pi tienen que contar con ello.
+- **Eventos de GPIO en la Pi 3 con libgpiod v2:** un solo aviso por pin y sin quitarlo (#2614). Afecta a cualquier
+  diseño de las entradas con eventos.
+
+**Lo que hay que leer en la sesión de diseño:**
+- La referencia técnica del Explorer HAT (enlazada en el README del binding) y la librería de Python de Pimoroni
+  (`pimoroni/explorer-hat`, GitHub): pines, rango de las entradas analógicas y registros del CAP1208.
+- La hoja de datos del CAP1208 (Microchip) y la del ADS1015 (TI), frente al binding `Ads1115`.
+- `Documentation/Devices-conventions.md` de dotnet/iot (la plantilla de PR lo pide para los bindings nuevos) y
+  bindings parecidos para copiar el estilo de la API (por ejemplo, `Button`, `Mcp23xxx` o `Pcx857x`).
+
+**Preguntas abiertas:**
+1. **Forma de la API:** ¿colecciones `Inputs`, `Outputs`, `Analog` y `Touch` como `Lights` (`hat.Inputs.One.Read()`),
+   o algo más cercano a `GpioPin`? ¿Cómo se expone la lógica invertida de las salidas? ¿Y los números de pin, para
+   usarlos con otros bindings como `Hcsr04`?
+2. **Entradas:** ¿lectura simple, eventos (con el límite de #2614) o los dos?
+3. **Analógico:** ¿reutilizar `Ads1115` (si sirve para el ADS1015) o ampliarlo con el ADS1015? ¿Qué rango y escala?
+4. **Pads táctiles:** ¿binding `Cap1xxx` general (CAP1208, CAP1188…) en su propio PR y después su uso en
+   `ExplorerHat`? ¿Lectura por sondeo o con la señal ALERT del chip (si el HAT la conecta a un GPIO)?
+5. **Propiedad y `Dispose`:** seguir el patrón arreglado en el #2613 (el controlador es de `ExplorerHat`; los hijos no
+   lo liberan). ¿Quién es dueño de los dispositivos I2C?
+6. **Orden y tamaño de los PR:** por ejemplo, 1) entradas y salidas, 2) analógico, 3) binding del CAP1208, 4) pads en
+   `ExplorerHat`. Cada uno con pruebas unitarias (`FakeGpioDriver`, `I2cSimulatedDeviceBase`), prueba en la Pi y el
+   README del binding al día.
+7. **Para los niños:** cómo lo usarán las lecciones 05 (botones), 07 (pads) y 08 (analógico), y qué cambia en
+   `SafeExplorerHat` (expone `Motors` y `Lights`; tendría que exponer lo nuevo).
 
 ## Fase 7: Robot con IA (agente)
 Idea (02/10/2026): en los últimos talleres, el robot funciona como un agente. Entiende órdenes en lenguaje natural
