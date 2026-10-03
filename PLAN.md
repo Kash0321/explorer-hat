@@ -25,8 +25,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
   y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
 - **Nuevo ejemplo:** `ExplorerHat.UpsDashboard`, panel con los datos de la UPS (PR #11).
-- **Siguiente paso propuesto:** seguir con la Fase 5: lección 05 (botones:
-  entradas digitales con `if`; solo queda libre IN4, GPIO 25) o 09 (robot autónomo simplificado, a partir de la 06). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
+- **Lección 09 (Robot autónomo), 03/10/2026, rama `fase-5-leccion-09`:** probada con las ruedas en el aire (los
+  tres sensores, 10 pasos de giro sin salida, final por tiempo y Ctrl+C). Falta la prueba en el suelo.
+- **Siguiente paso propuesto:** probar la lección 09 en el suelo y seguir con la Fase 5: lección 05 (botones:
+  entradas digitales con `if`; solo queda libre IN4, GPIO 25). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
   `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -303,7 +305,23 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
-- [ ] 09 Robot autónomo: versión simplificada de ObstacleAvoidance.
+- [~] 09 Robot autónomo (`Lesson09.Autonomous`): versión simplificada de ObstacleAvoidance, sin hilos ni clases.
+      Mirar, pensar y actuar en un bucle de 60 s como máximo: `Look()` mide los tres sensores uno detrás de otro
+      (60 ms entre lecturas, ~5 veces por segundo) con el filtro de la 06 en cada uno. Con algo a menos de 30 cm:
+      para, retrocede 300 ms, mira dos veces con el robot quieto (`LookTwice`, para que el filtro solo use lecturas
+      nuevas) y gira a pasos de 150 ms hacia el lado con más sitio hasta que el centro y el lado del que se aleja
+      quedan libres (`||` y `&&`, `for` con `break`); tras 10 pasos sin salida, vuelve a retroceder. Velocidad 0,8,
+      luces como en la 03. Probada con las ruedas en el aire (03/10/2026), registrando los pines cada 0,2 s:
+      - Mano en el sensor izquierdo (3 veces): retrocede (20 y 26 altos) y gira a la derecha (20 alto). En el derecho
+        (4 veces): gira a la izquierda (26 alto). Termina de girar al quitar la mano.
+      - Mano fija en el centro: gira hacia el lado con más sitio; tras 10 pasos (23 líneas entre dos `Obstacle!`)
+        retrocede y repite.
+      - Final por tiempo (`Time is up!`) y con Ctrl+C (`Parada de emergencia (SIGINT)`; el bucle aún escribe una
+        lectura): pines a nivel bajo, ningún proceso, `throttled=0x0` en toda la sesión.
+      - El sensor derecho da a veces 46 cm en lugar de ~76 cm, en parejas: probablemente un eco real que solo
+        detecta a veces. No afecta (es más de 30 cm).
+      - [ ] Probar en el suelo con cajas: si esquiva, si los giros a pasos son suficientes y si a 0,8 frena a tiempo
+            (en la 06, a 0,8 y 0,6, quedaba a ~20 cm; aquí mira cada ~0,2 s en lugar de cada ~0,07 s).
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero.
