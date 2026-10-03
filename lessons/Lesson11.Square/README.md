@@ -18,8 +18,8 @@ La lección 04 otra vez, pero ahora el robot no cuenta tiempo: cuenta los pulsos
 
 ## Qué hardware usa
 
-Los dos sensores de velocidad, como en la [segunda parte](../Lesson11.Straight/README.md): el izquierdo en INPUT 3 (en
-lugar del sensor de distancia izquierdo) y el derecho en INPUT 4. Las luces verde (avanzar) y amarilla (girar).
+Los dos sensores de velocidad, como en la [segunda parte](../Lesson11.Straight/README.md): el izquierdo a 3,3 V en
+el pin PWM de la fila lateral (GPIO 18) y el derecho en INPUT 4. Las luces verde (avanzar) y amarilla (girar).
 
 ## Las cuentas del giro
 

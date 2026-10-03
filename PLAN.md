@@ -393,6 +393,14 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         CS (8), RX (15), TX (14) y 3v3. Van directos a la Pi, sin protección: solo 3,3 V. Opción mejor: el LM393
         izquierdo alimentado desde 3v3 y su D0 en PWM (GPIO 18), sin quitar el HC-SR04 izquierdo. Pendiente de
         probar que el LM393 funciona bien a 3,3 V.
+        **Hecho (03/10/2026, rama `fase-5-todos-los-sensores`):** nodo de 3,3 V en la protoboard pequeña del HAT
+        (cable desde el pin 3v3), LM393 izquierdo a 3,3 V con D0 en PWM (GPIO 18) y el HC-SR04 izquierdo de vuelta en
+        IN3. Todo conectado a la vez: los tres HC-SR04 (SonarDashboard: 22/24, 24/24 y 23/24 lecturas), los dos LM393 y
+        la pantalla (0x27). Diagnóstico con motores en el aire: el LM393 a 3,3 V cuenta igual que el de 5 V
+        (0,4 → 34,7 frente a 33,7 pulsos/s; 1,0 → 57,0 frente a 55,7) y con **0 saltos** en GPIO 18, frente a 46–70 en
+        IN4: la entrada de la Pi tiene histéresis (disparador de Schmitt) y el búfer de las entradas IN del HAT, por lo
+        visto, no. `Lesson11.Straight` y `Lesson11.Square` leen ahora la rueda izquierda en GPIO 18. Probado `Lesson11.Straight` en el aire:
+        104 y 102 pulsos en 1 m, código 0 y pines a nivel bajo.
   - [x] Corregir la desviación en línea recta: `Lesson11.Straight` (03/10/2026). Cuenta los dos sensores cada ~1 ms
         y corrige con un control proporcional sobre la diferencia de pulsos (`speed ∓ difference * correction`,
         `correction` 0,02, `Math.Clamp` 0–1); `correct` permite compararlo sin corrección. Luces: verde = iguales,

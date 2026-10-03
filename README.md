@@ -58,13 +58,17 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 | Luz roja (`Lights.Three`) | LED 3 de la placa | 27 | |
 | Luz verde (`Lights.Four`) | LED 4 de la placa | 5 | |
 | Sensor izquierdo, TRIG | OUT3 | 13 | Salida |
-| Sensor izquierdo, ECHO | IN3 | 24 | Entrada (admite 5 V). En la lección 11 (ir recto), sensor de velocidad de la rueda izquierda |
+| Sensor izquierdo, ECHO | IN3 | 24 | Entrada (admite 5 V) |
 | Sensor central, TRIG | OUT1 | 6 | Salida |
 | Sensor central, ECHO | IN1 | 23 | Entrada (admite 5 V) |
 | Sensor derecho, TRIG | OUT2 | 12 | Salida |
 | Sensor derecho, ECHO | IN2 | 22 | Entrada (admite 5 V) |
 | LED de la lección 05 (en la protoboard) | OUT4 | 16 | Salida. La parada de emergencia también la pone a nivel bajo |
-| Pulsador de la lección 05 o sensor de velocidad LM393 de la rueda derecha (lección 11) | IN4 | 25 | Entrada, con pull-down dentro del HAT. Uno u otro, según la lección |
+| Sensor de velocidad LM393 de la rueda derecha (o el pulsador de la lección 05) | IN4 | 25 | Entrada, con pull-down dentro del HAT. Sensor a 5 V |
+| Sensor de velocidad LM393 de la rueda izquierda | PWM (fila lateral) | 18 | Entrada de **3,3 V**: el sensor se alimenta desde el pin 3v3 |
+| Pantalla LCD 2004 (adaptador I2C) | SDA y SCL (fila lateral) | 2 y 3 | Bus I2C, alimentada desde el pin 3v3 |
+
+> ⚠️ **La fila lateral del HAT (marcada "3.3V ONLY")** tiene SDA, SCL, PWM, MOSI, MISO, SCK, CS, RX, TX y 3v3. Esos pines van directos a la Raspberry Pi, sin protección: **nunca les llegue más de 3,3 V**. Todo lo que se conecte a ellos se alimenta desde el pin 3v3, nunca desde 5V. En la protoboard pequeña del HAT, el nodo de 3,3 V está separado del de 5 V.
 
 **Chips I2C** (bus `/dev/i2c-1`):
 
@@ -73,6 +77,7 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 | `0x28` | CAP1208 | Pads táctiles del Explorer HAT Pro |
 | `0x42` | INA219 | Mide la tensión y la corriente de las baterías de la UPS HAT (B) |
 | `0x48` | ADS1015 | Entradas analógicas del Explorer HAT Pro |
+| `0x27` | PCF8574T | Adaptador I2C de la pantalla LCD 2004 (funciona a 3,3 V; el contraste se ajusta con su potenciómetro azul) |
 
 > ℹ️ Cada sensor HC-SR04 tiene cuatro cables: **VCC** (alimentación), **TRIG**, **ECHO** y **GND** (masa). **VCC va al pin 5V del HAT** y **GND al pin GND del HAT**. TRIG va a una salida OUT del HAT y ECHO a una entrada IN. Todos los GND (Pi, HAT y sensores) tienen que estar unidos: es la *masa común*, la referencia de 0 V con la que se miden todas las señales.
 
