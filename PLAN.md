@@ -370,7 +370,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - Módulo L298N (HW-095): doble puente H para dos motores, con radiador y regulador de 5 V. El robot no lo necesita
   (el Explorer HAT lleva un DRV8833) y necesitaría 6 GPIO que no hay libres. Pierde ~2 V (transistores bipolares).
   Sirve para explicar qué es un puente H.
-- Falta comprobar si hay protoboard y cables dupont macho-hembra.
+- 2 protoboards de 400 puntos (30 filas, columnas a–j y dos líneas de alimentación + y − a cada lado) y muchos cables
+  dupont (macho-hembra, hembra-hembra y algunos macho-macho).
+- Una placa ESP32 DevKit (módulo ESP-WROOM-32, 30 pines, wifi y Bluetooth, lógica de 3,3 V). Ideas: mando a distancia
+  inalámbrico del robot, o contar los pulsos de los LM393 (tiene contadores de pulsos por hardware) y pasárselos a la
+  Pi, porque a la Pi le faltan entradas. Se puede programar en C# con .NET nanoFramework.
 - IN4 (GPIO 25) con nada conectado lee 0 en 50 de 50 lecturas (pull de la Pi desactivado): la entrada del HAT
   parece tener pull-down o un búfer que la mantiene baja. Confirmar con el pulsador.
 
