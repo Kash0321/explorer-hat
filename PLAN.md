@@ -25,8 +25,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
   y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
 - **Nuevo ejemplo:** `ExplorerHat.UpsDashboard`, panel con los datos de la UPS (PR #11).
+- **Lección 09 (Robot autónomo), 03/10/2026, rama `fase-5-leccion-09`:** probada con las ruedas en el aire (los
+  tres sensores, 10 pasos de giro sin salida, final por tiempo y Ctrl+C) y en el suelo con cajas (15 obstáculos en
+  60 s; solo choca con algunas esquinas, que el sensor no ve).
 - **Siguiente paso propuesto:** seguir con la Fase 5: lección 05 (botones:
-  entradas digitales con `if`; solo queda libre IN4, GPIO 25) o 09 (robot autónomo simplificado, a partir de la 06). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
+  entradas digitales con `if`; solo queda libre IN4, GPIO 25). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
   `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -303,7 +306,28 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
-- [ ] 09 Robot autónomo: versión simplificada de ObstacleAvoidance.
+- [x] 09 Robot autónomo (`Lesson09.Autonomous`): versión simplificada de ObstacleAvoidance, sin hilos ni clases.
+      Mirar, pensar y actuar en un bucle de 60 s como máximo: `Look()` mide los tres sensores uno detrás de otro
+      (60 ms entre lecturas, ~5 veces por segundo) con el filtro de la 06 en cada uno. Con algo a menos de 30 cm:
+      para, retrocede 300 ms, mira dos veces con el robot quieto (`LookTwice`, para que el filtro solo use lecturas
+      nuevas) y gira a pasos de 150 ms hacia el lado con más sitio hasta que el centro y el lado del que se aleja
+      quedan libres (`||` y `&&`, `for` con `break`); tras 10 pasos sin salida, vuelve a retroceder. Velocidad 0,8,
+      luces como en la 03. Probada con las ruedas en el aire (03/10/2026), registrando los pines cada 0,2 s:
+      - Mano en el sensor izquierdo (3 veces): retrocede (20 y 26 altos) y gira a la derecha (20 alto). En el derecho
+        (4 veces): gira a la izquierda (26 alto). Termina de girar al quitar la mano.
+      - Mano fija en el centro: gira hacia el lado con más sitio; tras 10 pasos (23 líneas entre dos `Obstacle!`)
+        retrocede y repite.
+      - Final por tiempo (`Time is up!`) y con Ctrl+C (`Parada de emergencia (SIGINT)`; el bucle aún escribe una
+        lectura): pines a nivel bajo, ningún proceso, `throttled=0x0` en toda la sesión.
+      - El sensor derecho da a veces 46 cm en lugar de ~76 cm, en parejas: probablemente un eco real que solo
+        detecta a veces. No afecta (es más de 30 cm).
+      - En el suelo (03/10/2026, 60 s, ~2 × 2 m con cajas y una pared, UPS HAT (B)): 15 obstáculos. Casi siempre los
+        ve a 20–30 cm y queda a ~15–25 cm; giros de 1 a 3 pasos; ~10–13 cm de avance entre dos miradas. El usuario lo
+        ve bien en general. Un par de choques con **esquinas de cajas**: el sensor no las ve hasta tenerlas encima
+        (centro de 115 a 8 cm, izquierda de 40 a 4 cm): la cara inclinada desvía el eco (reflexión especular) o la
+        esquina queda entre dos conos. Explicado en el README como límite del sensor; no se corrige en la lección.
+        Sin caídas de tensión (`0x0` en 857 muestras; baterías a 7,77 V como mínimo, 1,15 A como máximo) y pines a
+        nivel bajo al terminar.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero.
