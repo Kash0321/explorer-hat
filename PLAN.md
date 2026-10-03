@@ -25,10 +25,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   no tienen histéresis (leer cada ~1 ms lo evita); un corte de batería dejó un archivo vacío (las tareas de despliegue
   hacen `sync`); la fila lateral del HAT da GPIO libres de 3,3 V.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, los PR a dotnet/iot (en curso):** abierto el PR de `Ina219`
-  ([dotnet/iot#2612](https://github.com/dotnet/iot/pull/2612), "Fixes #1659", 03/10/2026), con tres arreglos, pruebas
-  unitarias y la prueba con la UPS. Pendiente de revisión: atender los comentarios sin *force push*. Siguiente: el
-  `Dispose` de `ExplorerHat`. Después, la lección 10 (siguelíneas) o la 07 (pads táctiles, que necesita un binding
+- **Fase 6, los PR a dotnet/iot (en curso, 03/10/2026):** abiertos el de `Ina219`
+  ([dotnet/iot#2612](https://github.com/dotnet/iot/pull/2612), "Fixes #1659") y el de `DCMotor` y `ExplorerHat`
+  ([dotnet/iot#2613](https://github.com/dotnet/iot/pull/2613): `Dispose` ya no tumba el proceso y un motor liberado
+  marcha atrás ya no se queda a toda velocidad). Los dos con pruebas unitarias y prueba en la Pi. Pendientes de
+  revisión: atender los comentarios sin *force push*. Siguiente: la incidencia de los eventos de GPIO. Después, la lección 10 (siguelíneas) o la 07 (pads táctiles, que necesita un binding
   para el CAP1208).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -471,7 +472,7 @@ solo cubre motores y las 4 luces. Falta:
 - [ ] 4 salidas de colector abierto (GPIO 6, 12, 13, 16).
 - [ ] 4 entradas analógicas (ADS1015, I2C 0x48). Comprobar si sirve el binding `Ads1115` existente.
 - [ ] 8 pads táctiles capacitivos (CAP1208, I2C 0x28). No hay binding CAP1xxx en dotnet/iot.
-- [ ] **Prioritario, confirmado en 4.2.0:** `ExplorerHat` pasa su `GpioController` a `Motors`, `Lights`, cada
+- [~] **Prioritario, confirmado en 4.2.0:** `ExplorerHat` pasa su `GpioController` a `Motors`, `Lights`, cada
       `Led` y cada `DCMotor` con `shouldDispose = true` (valor por defecto), así que el primero que se libera
       cierra todos los pines. Los hilos de `SoftwarePwmChannel` de los motores siguen escribiendo y el
       proceso muere. Arreglo: pasar `shouldDispose: false` a los hijos, liberar los motores antes que las
@@ -481,6 +482,38 @@ solo cubre motores y las 4 luces. Falta:
       y `new Lights(_controller)`, y en `Dispose` libera `Lights` antes que `Motors`; `DCMotor.Create(..., _controller)`
       también usa `shouldDispose` por defecto. El último cambio del binding (PR #2586, 02/07/2026) solo movió las
       asignaciones `= null` fuera del `if (_shouldDispose)`.
+      **PR abierto el 03/10/2026: [dotnet/iot#2613](https://github.com/dotnet/iot/pull/2613)**, rama
+      `explorerhat-dispose` del fork. Pendiente de la revisión de los mantenedores. Al revisar el código salieron
+      dos fallos de `DCMotor`, en el mismo PR (el de `ExplorerHat` no basta sin ellos):
+  - `DCMotor.Create` (las variantes con números de pin) crea el `SoftwarePwmChannel` con `shouldDispose = true`:
+    al liberar el motor se libera el controlador aunque se pida `shouldDispose: false`, y otro motor que lo comparte
+    tumba el proceso desde su hilo de PWM.
+  - **Fallo de seguridad en `DCMotor2PinNoEnable`** (el tipo de motor del Explorer HAT: el DRV8833 tiene dos
+    entradas por motor, sin pin de activación). Marcha atrás, el pin de dirección está en alto; al liberar, el pin de
+    PWM queda en bajo y el de dirección sigue en alto: para el DRV8833 eso es **toda la tensión al motor**. El
+    controlador de la Pi 3 no cambia el pin al cerrarlo, así que la rueda sigue a toda velocidad después de `Dispose`
+    y después de terminar el programa. Arreglo: poner en bajo el pin de dirección al liberar. `DCMotor3Pin` y
+    `DCMotor2PinWithBiDirectionalPin` no tienen el fallo: su PWM va al pin de activación.
+  - Arreglo de `ExplorerHat`: los hijos no liberan el controlador, los motores se liberan antes que las luces,
+    `Lights` libera cada `Led` y `ExplorerHat(controller, shouldDispose: false)` ya no libera el del que llama.
+  - Pruebas unitarias nuevas (`src/devices/DCMotor/tests` y `src/devices/ExplorerHat/tests`, 9 casos) con un
+    `GpioDriver` falso que, como la Pi, conserva el valor de un pin al cerrarlo. Con el código original, las de un
+    motor fallan (pin de dirección en alto a −0,5 y −1; controlador del que llama liberado) y las de dos motores y
+    las de `ExplorerHat` tumban el proceso de pruebas (`ObjectDisposedException` en el hilo de PWM).
+  - Prueba en la Pi con las ruedas en el aire (programas aparte, no versionados: `~/apps/DisposeCheckNew` con el
+    binding arreglado y `~/apps/DisposeCheckOld` con 4.2.0; caso `hat`: luces, `One` a −0,6 y `Two` a 0,6 y
+    `Dispose`; caso `motor`: `DCMotor.Create(19, 20)` a −0,6 y `Dispose`; `tools/parar-robot.sh` después de cada
+    uno). El usuario lo repitió en su terminal mirando la rueda derecha:
+
+    | Bindings | Caso | Resultado | Pines 19 y 20 tras `Dispose` | Rueda derecha |
+    |---|---|---|---|---|
+    | Arreglado | `hat` | código 0 | `lo`, `lo` (los 8, `lo`) | se para |
+    | Arreglado | `motor` | código 0 | `lo`, `lo` | se para |
+    | 4.2.0 | `hat` | el proceso se cae (código 134, `Can not get a pin mode of a pin that is not open`) | `lo`, **`hi`** | **sigue a toda velocidad** |
+    | 4.2.0 | `motor` | código 0, sin error | `lo`, **`hi`** | **sigue a toda velocidad** |
+
+  - Cuando salga una versión con el arreglo, `SafeExplorerHat` podrá dejar de usar `SharedGpioController`; la parada
+    ante señales y el forzado a nivel bajo de los pines siguen haciendo falta.
 - [~] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
       `ReadCurrent()` leen el registro como número sin signo (`ReadRegister` devuelve `ushort`), así que las tensiones
       y corrientes negativas (por ejemplo, baterías descargándose en la UPS HAT (B)) salen como valores enormes.
@@ -515,8 +548,16 @@ solo cubre motores y las 4 luces. Falta:
       lección 11 de la Fase 5). Buscada el 03/10/2026: no hay ninguna igual (la más parecida, #1637, es de la Pi 4 y
       está cerrada). Antes de informar, reproducirla con un programa mínimo y con la versión de `main`.
 - [~] Preparar PR(s) a dotnet/iot. Punto de partida (03/10/2026):
-  - **Hecho el 03/10/2026:** el PR de `Ina219` (#2612). Cómo se trabaja con el clon del fork, las pruebas y la
-    prueba en la Pi: en `AGENTS.md` ("Contribuir a dotnet/iot"). Siguiente: el `Dispose` de `ExplorerHat`.
+  - **Hecho el 03/10/2026:** el PR de `Ina219` (#2612) y el de `DCMotor` y `ExplorerHat` (#2613). Cómo se trabaja
+    con el clon del fork, las pruebas y la prueba en la Pi: en `AGENTS.md` ("Contribuir a dotnet/iot"). Siguiente:
+    el fallo de los eventos de GPIO, como incidencia, si se reproduce con `main`.
+  - **Integración continua de dotnet/iot (Azure DevOps):** compila y prueba en Linux, macOS y Windows, en Debug y
+    Release. `Button.Tests` (por ejemplo, `ButtonTests.If_Button_Is_Held_Down_Longer_Than_Debouncing`, que mide
+    tiempos) falla casi siempre en Linux Debug: en el #2612 (dos veces), en el #2613 y en el #2605 de otro autor.
+    Según raffaeler (mantenedor, 03/10/2026), pgrawehr y joperezr preparan un PR para arreglar esas pruebas. Desde
+    fuera no se puede repetir una compilación: se pide en un comentario, y raffaeler la repitió. El registro de la
+    consola solo muestra el resultado de algunos proyectos de pruebas; para saber cuál falla, el *binlog* (método en
+    `AGENTS.md`). En el *binlog* se ve que `Ina219.Tests`, `DCMotor.Tests` y `ExplorerHat.Tests` pasan.
   - **Fork `Kash0321/iot`:** existe, pero está 374 commits por detrás y su rama es `master` (la de dotnet/iot es
     `main`). Como las ramas se llaman distinto, lo más sencillo es clonar el fork, añadir
     `upstream` (dotnet/iot), crear cada rama desde `upstream/main` y subirla al fork. Un PR por arreglo.
