@@ -33,9 +33,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Lección 11 (Contar vueltas), 03/10/2026, rama `fase-5-leccion-11`:** primera parte, con un LM393 en la rueda
   derecha (IN4): mide la velocidad y avanza una distancia exacta; probada en el aire y en el suelo. El sensor salta
   unos µs en cada borde de ranura: leer cada ~1 ms lo evita.
-- **Siguiente paso propuesto:** segunda parte de la lección 11 (sensor en la rueda izquierda para ir recto; para
-  empezar, el ECHO del HC-SR04 izquierdo deja libre IN3) o la propuesta 12 (pantalla LCD; antes, revisar la tensión
-  del bus I2C). Alternativa: los PR a dotnet/iot de la Fase 6 (arreglo de `Dispose` de `ExplorerHat` y lectura con
+- **Lección 11, segunda parte (Ir recto), 03/10/2026, rama `fase-5-leccion-11-recto`:** dos sensores de velocidad
+  (el izquierdo en IN3, en lugar del ECHO del HC-SR04 izquierdo) y control proporcional: de más de 45 cm de desvío
+  en 1 m a 2–10 cm. Protección si un sensor deja de contar. **Al terminar, volver a conectar el HC-SR04 izquierdo.**
+- **Siguiente paso propuesto:** la propuesta 12 (pantalla LCD; antes, revisar la tensión del bus I2C), girar ángulos
+  exactos con los pulsos, o los PR a dotnet/iot de la Fase 6 (arreglo de `Dispose` de `ExplorerHat` y lectura con
   signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -355,7 +357,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
       entradas digitales: mismo problema que el segundo sensor de la lección 11 (solo IN4 está libre).
-- [~] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
+- [x] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
       ópticos de horquilla en las entradas digitales del HAT.
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
   - [x] Comprados 10 sensores de velocidad LM393 (horquilla óptica con salida digital) para probarlos.
@@ -383,11 +385,25 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         parte 2 siempre parada a 49 pulsos y 4–7 pulsos más al frenar (una vez 0), unos 55 cm en total; con la cinta,
         cuando fue recto, 55 cm, igual que lo contado (55,1 cm). **Se desvía a la izquierda** a menudo: la rueda
         derecha gira más rápido que la izquierda.
-  - [ ] **Decidir dónde conectar el segundo sensor:** los ECHO de los tres HC-SR04 ocupan IN1–IN3 (GPIO 23, 22
-        y 24). Opciones: quitar un HC-SR04 en esa lección, llevar un ECHO o un LM393 a un GPIO libre de la Pi
-        que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
-  - [ ] Corregir la desviación en línea recta (regular la velocidad de cada motor con los pulsos) y programar
-        movimientos precisos: avanzar N cm, girar N grados.
+  - [x] **Dónde conectar el segundo sensor** (03/10/2026): de momento, en la lección se desconecta el HC-SR04
+        izquierdo y su D0 va a IN3 (GPIO 24), con el VCC y el GND que deja libres. Más adelante: las entradas
+        analógicas (ADS1015, ~500 lecturas/s por canal: bastaría para ranuras de ≥ 7 ms, pero necesita la Fase 6) o
+        un ESP32 que cuente los dos sensores. La Pi no tiene GPIO libres accesibles con el Explorer HAT encima.
+  - [x] Corregir la desviación en línea recta: `Lesson11.Straight` (03/10/2026). Cuenta los dos sensores cada ~1 ms
+        y corrige con un control proporcional sobre la diferencia de pulsos (`speed ∓ difference * correction`,
+        `correction` 0,02, `Math.Clamp` 0–1); `correct` permite compararlo sin corrección. Luces: verde = iguales,
+        amarilla = derecha por delante, azul = izquierda por delante. Avanza 100 cm (media de las dos ruedas).
+    - Diagnóstico en el aire, las dos ruedas a la misma velocidad: casi iguales (derecha/izquierda 1,037 a 0,4;
+      1,007 a 0,6; 1,006 a 0,8; 0,969 a 1,0). La diferencia aparece en el suelo (peso, patinaje, rueda loca).
+    - En el suelo, 1 m a 0,6: **sin corrección** (7 pruebas) diferencia final de 4 a 11 pulsos y más de 45 cm a la
+      izquierda; **con corrección** (17 pruebas) de 0 a 4 pulsos y de 2 a 10 cm de la línea, a uno u otro lado. Las
+      diferencias incluyen 0,5 s de inercia sin corregir. Queda un error pequeño, propio del control proporcional.
+    - En 3 pruebas el sensor izquierdo se salió de su sitio (0 y 13 pulsos frente a 28–30): la corrección paró la
+      rueda derecha y puso la izquierda a tope (el robot giraba sobre una rueda). Añadida una protección: con la
+      corrección, si la diferencia pasa de `maxDifference` (10 pulsos), se para y avisa. Probada con el sensor fuera
+      del disco y las ruedas en el aire: parada a los 11 pulsos con el aviso.
+  - [ ] Girar ángulos exactos con los pulsos (falta medir la distancia entre las ruedas; ahora es un reto de la
+        lección) y el cuadrado de la lección 04 con pulsos.
 - [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
       variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
       obstáculos esquivados) para las pruebas en el suelo. `Iot.Device.Bindings` 4.2.0 trae `Lcd2004` y `Pcf8574`.

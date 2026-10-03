@@ -58,7 +58,7 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 | Luz roja (`Lights.Three`) | LED 3 de la placa | 27 | |
 | Luz verde (`Lights.Four`) | LED 4 de la placa | 5 | |
 | Sensor izquierdo, TRIG | OUT3 | 13 | Salida |
-| Sensor izquierdo, ECHO | IN3 | 24 | Entrada (admite 5 V) |
+| Sensor izquierdo, ECHO | IN3 | 24 | Entrada (admite 5 V). En la lección 11 (ir recto), sensor de velocidad de la rueda izquierda |
 | Sensor central, TRIG | OUT1 | 6 | Salida |
 | Sensor central, ECHO | IN1 | 23 | Entrada (admite 5 V) |
 | Sensor derecho, TRIG | OUT2 | 12 | Salida |
@@ -188,7 +188,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 
 ## 🎓 Lecciones del taller (`lessons/`)
 
-Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 09 Robot autónomo y 11 Contar vueltas.
+Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 09 Robot autónomo y 11 Contar vueltas (con su segunda parte, Ir recto).
 Cada lección es un proyecto pequeño con un único `Program.cs` y un README con retos. Índice y forma de
 ejecutarlas en [`lessons/README.md`](lessons/README.md).
 
