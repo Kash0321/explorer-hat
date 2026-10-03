@@ -20,7 +20,7 @@ int pauseTime = 300;          // a short stop after each move
 double wheelDiameter = 6.5;   // centimeters
 double wheelDistance = 13;    // centimeters between the middle of both wheels
 int slots = 20;               // slots in each disc: pulses for each turn of the wheel
-int leftPin = 24;             // IN3: speed sensor of the left wheel (motor Two)
+int leftPin = 18;             // PWM pin of the 3.3V row: speed sensor of the left wheel (motor Two), powered at 3.3 V
 int rightPin = 25;            // IN4: speed sensor of the right wheel (motor One)
 
 double cmPerPulse = wheelDiameter * Math.PI / slots;

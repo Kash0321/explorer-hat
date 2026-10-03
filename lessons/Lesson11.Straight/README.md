@@ -23,17 +23,24 @@ acelera la otra. **Mueve los motores.**
 
 * **Dos sensores de velocidad LM393**, uno en cada rueda:
 
-  | Rueda | Motor | Sensor (D0) | GPIO |
-  |---|---|---|---|
-  | Izquierda | Two | INPUT 3 | 24 |
-  | Derecha | One | INPUT 4 | 25 |
+  | Rueda | Motor | Alimentación (VCC) | Señal (D0) | GPIO |
+  |---|---|---|---|---|
+  | Izquierda | Two | **3,3 V** (pin 3v3 de la fila lateral) | **PWM** de la fila lateral "3.3V ONLY" | 18 |
+  | Derecha | One | 5 V | INPUT 4 | 25 |
 
 * Las luces verde, amarilla, azul y roja.
 
-> ⚠️ **INPUT 3 es la entrada del sensor de distancia izquierdo.** Para esta lección, desconecta ese HC-SR04
-> (ECHO, VCC y GND) y usa sus sitios para el sensor de velocidad izquierdo. Al terminar, vuelve a conectarlo: las
-> lecciones 06 y 09 lo necesitan. Comprueba que el disco de cada rueda pasa centrado por la ranura de su sensor y que
-> el sensor no se mueve.
+> ⚠️ **El sensor izquierdo va a 3,3 V, nunca a 5 V.** Los pines de la fila lateral del HAT ("3.3V ONLY") llegan
+> directos a la Pi, sin protección: con el sensor a 5 V, su salida D0 daría 5 V y podría dañar la Pi. Las entradas
+> IN1 a IN4 sí admiten 5 V, pero IN1 a IN3 son de los sensores de distancia.
+
+Comprueba que el disco de cada rueda pasa centrado por la ranura de su sensor y que el sensor no se mueve.
+
+**Una curiosidad:** con el motor en marcha, la salida del sensor derecho (por IN4) da saltos falsos de unos
+microsegundos en cada borde de ranura, y la del izquierdo (por GPIO 18) no da ninguno. Las entradas de la Pi tienen
+**histéresis** (un *disparador de Schmitt*): para cambiar de 0 a 1 la señal tiene que subir bastante, y para volver
+a 0, bajar bastante, así que no les afectan las dudas en la zona media. El búfer que protege las entradas IN del HAT
+no la tiene y copia esas dudas. El programa no los ve, porque lee cada milisegundo.
 
 ## Qué hace
 

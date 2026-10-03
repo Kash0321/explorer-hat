@@ -17,7 +17,7 @@ double distance = 100;        // centimeters
 int maxTime = 6000;           // the robot stops after this time (milliseconds), also if a sensor does not work
 double wheelDiameter = 6.5;   // centimeters
 int slots = 20;               // slots in each disc: pulses for each turn of the wheel
-int leftPin = 24;             // IN3: speed sensor of the left wheel (motor Two)
+int leftPin = 18;             // PWM pin of the 3.3V row: speed sensor of the left wheel (motor Two), powered at 3.3 V
 int rightPin = 25;            // IN4: speed sensor of the right wheel (motor One)
 
 double cmPerPulse = wheelDiameter * Math.PI / slots;
@@ -113,7 +113,7 @@ using (var gpio = new GpioController())
     }
     else if (clock.ElapsedMilliseconds >= maxTime)
     {
-        Console.WriteLine("Time is up! Are both speed sensors connected (IN3 and IN4)?");
+        Console.WriteLine("Time is up! Are both speed sensors connected (PWM and IN4)?");
     }
 
     // The robot does not stop at once: count the pulses for a moment after stopping the motors
