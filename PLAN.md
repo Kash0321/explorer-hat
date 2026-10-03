@@ -286,7 +286,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Calibrada en el suelo con un transportador (velocidad 0,8, UPS HAT (B)): 240 ms → ~85°, **250 ms → casi 90°**,
       320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
       90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
-- [ ] 05 Botones: entradas digitales (condiciones `if`).
+- [ ] 05 Botones: entradas digitales (condiciones `if`). Solo queda libre IN4 (GPIO 25). Sin pulsador (03/10/2026):
+      el usuario tiene que comprarlo. Alternativas sin comprar: un LM393 de horquilla como "botón sin contacto" (meter
+      una tarjeta en la ranura; además prepara la lección 11, que usa el mismo sensor en IN4) o dos cables dupont que
+      se tocan (5V → IN4). Para comprar: módulo de botón con 3 pines (VCC, GND, salida; ya trae la resistencia) o
+      botones arcade de 30 mm, más fáciles de pulsar para los niños.
 - [x] 06 Distancia (`Lesson06.Distance`): el HC-SR04 del centro, luces por zonas (verde > 60 cm, amarilla, roja
       < 30 cm), `if`/`else if`/`else`, bucle `while` con cronómetro (`Stopwatch`, 10 s como máximo) y `break` al
       pararse. Filtro sencillo: la más cercana de las dos últimas lecturas (`Math.Min`), como `DistanceSensor` de
@@ -330,7 +334,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         nivel bajo al terminar.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
-      de un tutorial. Hacerlo desde cero.
+      de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
+      entradas digitales: mismo problema que el segundo sensor de la lección 11 (solo IN4 está libre).
 - [ ] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
       ópticos de horquilla en las entradas digitales del HAT (requiere Fase 6).
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
@@ -342,6 +347,23 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
             que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
       - [ ] Corregir la desviación en línea recta (regular la velocidad de cada motor con los pulsos) y programar
             movimientos precisos: avanzar N cm, girar N grados.
+- [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
+      variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
+      obstáculos esquivados) para las pruebas en el suelo. `Iot.Device.Bindings` 4.2.0 trae `Lcd2004` y `Pcf8574`.
+      Antes de conectarla:
+      - Dirección I2C: 0x27 (PCF8574T) o 0x3F (PCF8574AT), según el chip; los puentes A0–A2 la cambian. No choca con
+        0x28, 0x42 ni 0x48.
+      - **Tensión del bus I2C:** la pantalla necesita 5 V, y el adaptador suele llevar resistencias de pull-up de SDA y
+        SCL a su VCC: con VCC a 5 V, SDA y SCL de la Pi (3,3 V) quedarían por encima de 3,3 V. Medir esas resistencias
+        y decidir: quitarlas (la Pi ya tiene pull-ups a 3,3 V), un conversor de niveles o alimentar el adaptador a 3,3 V
+        (el contraste puede no bastar).
+      - Ver por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3) con el Explorer HAT encima.
+
+### Componentes disponibles (03/10/2026)
+- 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
+- 2 módulos TCRT5000 (infrarrojo por reflexión, con potenciómetro; por confirmar): lección 10.
+- Pantalla LCD 2004A con adaptador I2C PCF8574: lección 12 (propuesta).
+- Sin pulsadores: comprar para la lección 05.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
