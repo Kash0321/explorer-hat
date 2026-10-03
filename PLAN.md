@@ -6,10 +6,12 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (02/10/2026)
-- **Fase 5 empezada (02/10/2026, PR #15):** lecciones 01 a 04 en `lessons/` (luces, semáforo, motores y cuadrado).
+## Estado actual (03/10/2026)
+- **Fase 5 en curso:** lecciones 01 a 04 en `lessons/` (luces, semáforo, motores y cuadrado; PR #15).
   Las cuatro están probadas en la Pi (la 03 y la 04, también con las ruedas en el aire) y la 04 está calibrada en el
   suelo con transportador (250 ms = 90°; tiene un modo calibración que se para tras cada giro).
+- **Lección 06 (Distancia), 03/10/2026, rama `fase-5-leccion-06`:** probada sin motores, con las ruedas en el
+  aire y en el suelo (frena a 58 cm, lee 27 cm y queda a ~20 cm de la pared).
 - **Nueva Fase 7 (02/10/2026, PR #14):** robot con IA. El robot es el cuerpo y un portátil con un LLM local es el
   cerebro. Análisis, decisiones y pasos en la Fase 7. Va después de la Fase 5.
 - **Cerradas:** fases 0 a 4. Solo queda abierta en la Fase 3 la guía de compilación ligera en la Pi (poco urgente:
@@ -23,9 +25,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
   y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
 - **Nuevo ejemplo:** `ExplorerHat.UpsDashboard`, panel con los datos de la UPS (PR #11).
-- **Siguiente paso propuesto:** seguir con la Fase 5: lección 06 (distancia: un HC-SR04 que frena el robot,
-  reutilizando el filtro de lecturas falsas) o 05 (botones: entradas digitales con `if`; solo queda libre IN4,
-  GPIO 25). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
+- **Siguiente paso propuesto:** seguir con la Fase 5: lección 05 (botones:
+  entradas digitales con `if`; solo queda libre IN4, GPIO 25) o 09 (robot autónomo simplificado, a partir de la 06). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
   `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -283,7 +284,23 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
       90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
 - [ ] 05 Botones: entradas digitales (condiciones `if`).
-- [ ] 06 Distancia: un sensor HC-SR04, frenar ante un obstáculo.
+- [x] 06 Distancia (`Lesson06.Distance`): el HC-SR04 del centro, luces por zonas (verde > 60 cm, amarilla, roja
+      < 30 cm), `if`/`else if`/`else`, bucle `while` con cronómetro (`Stopwatch`, 10 s como máximo) y `break` al
+      pararse. Filtro sencillo: la más cercana de las dos últimas lecturas (`Math.Min`), como `DistanceSensor` de
+      ObstacleAvoidance pero sin hilo. `moveMotors = false` por defecto: primero solo mide; el niño lo cambia a
+      `true`. Mide ~15 veces por segundo (pausa de 60 ms). Probada en la Pi (03/10/2026):
+      - Sin motores, por SSH: código 0, pines a nivel bajo y `throttled=0x0`. Con la mano, el usuario ve el cambio
+        verde → amarilla → roja y el final del programa.
+      - Con motores y las ruedas en el aire (una copia con `moveMotors = true`), registrando los pines cada 0,2 s:
+        pines de dirección (20 y 26) siempre bajos (hacia delante), PWM en los dos motores mientras no hay obstáculo,
+        y los dos pines de velocidad a nivel bajo desde que la mano se acerca hasta el final (2 s con la luz roja).
+        Ningún pin en alto sin programa, `throttled=0x0` (UPS con el cargador conectado).
+      - En el suelo frente a una pared a ~115 cm (03/10/2026, UPS HAT (B) sin cargador, suelo liso), dos veces:
+        se ve muy claro el cambio a la marcha lenta (0,6 basta para mover el robot), primera lectura amarilla a 58 cm,
+        lectura de parada a 27 cm y el robot **quieto a unos 20 cm** de la pared en las dos pruebas. Unos 3 cm (rápido) o 2,5 cm (lento) entre
+        dos lecturas; los ~7 cm restantes, desde la última lectura hasta pararse del todo. `dotnet` tarda ~3 s en
+        arrancar el programa en la Pi (motores parados). Sin caídas de tensión (`0x0`), baterías a 7,95 V como
+        mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
 - [ ] 09 Robot autónomo: versión simplificada de ObstacleAvoidance.
