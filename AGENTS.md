@@ -14,7 +14,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **.NET 10.0.401** en `~/.dotnet`, con enlace en `/usr/local/bin/dotnet` para que funcione también por SSH sin sesión interactiva.
 * **Repositorio clonado en la Pi** en `~/work/explorer-hat`. Los programas desplegados desde el PC van a `~/apps/<Proyecto>` y el depurador está en `~/vsdbg`.
 * **I2C habilitado** (`/dev/i2c-1`): el HAT responde en 0x28 (táctil CAP1208) y 0x48 (analógico ADS1015). La UPS responde en 0x42 (INA219) y la pantalla LCD en 0x27 (PCF8574T). Por SSH no interactivo, `i2cdetect` e `i2cget` están en `/usr/sbin`, fuera del `PATH`.
-* **Librerías:** `System.Device.Gpio` e `Iot.Device.Bindings` 4.2.0.
+* **Librerías:** `System.Device.Gpio` e `Iot.Device.Bindings` 4.2.0. La Pi tiene libgpiod 2.2.1 (`libgpiod.so.3`): los eventos de GPIO van por `LibGpiodV2Driver`, y con él solo se puede registrar un aviso por pin y no quitarlo (dotnet/iot#2614). `GpioController.QueryComponentInformation()` falla en la Pi 3 (dotnet/iot#2615).
 * **PC de desarrollo:** Windows con VS Code y .NET 10. Desde ahí se despliega y depura con las tareas de `.vscode/` (ver README). La extensión de C# debe ser la **2.140.9**: la 2.160.x rompe los puntos de interrupción remotos (dotnet/vscode-csharp#9802). **C# Dev Kit debe estar deshabilitada en este repositorio** (*Deshabilitar (área de trabajo)*): la 3.40.210 con la extensión de C# 2.140.9 deja el depurador parado en el primer punto de interrupción, sin responder a F10 ni a F5. Al deshabilitarla, comprueba que la extensión C# sigue habilitada (si no, VS Code dice que el tipo `coreclr` no es compatible).
 
 ## 🔌 Hardware (Pimoroni Explorer HAT Pro)
