@@ -82,7 +82,8 @@
                 "Lesson01.Lights",
                 "Lesson02.TrafficLight",
                 "Lesson03.Motors",
-                "Lesson04.Square"
+                "Lesson04.Square",
+                "Lesson06.Distance"
             ],
             "default": "Lesson01.Lights"
         }

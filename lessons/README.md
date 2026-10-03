@@ -10,8 +10,9 @@ repositorio; cada lección tiene un README en español para el monitor.
 | [02 Semáforo](Lesson02.TrafficLight/README.md) | Variables, repetir un ciclo con `for` | No |
 | [03 Motores](Lesson03.Motors/README.md) | Velocidad de cada motor, avanzar, retroceder y girar | **Sí** |
 | [04 Cuadrado](Lesson04.Square/README.md) | Métodos propios, bucles con movimiento, `if`/`else`, calibrar un giro | **Sí** |
+| [06 Distancia](Lesson06.Distance/README.md) | Un sensor que da números, `if`/`else if`/`else`, bucle `while` y `break` | **Sí**, con `moveMotors = true` |
 
-Las siguientes lecciones están en `PLAN.md` (Fase 5).
+La lección 05 (botones) y las siguientes están en `PLAN.md` (Fase 5).
 
 ## Cómo ejecutar una lección
 
@@ -28,7 +29,7 @@ Para parar una lección antes de que termine, pulsa **Ctrl+C**.
 
 ## Seguridad
 
-> ⚠️ **Las lecciones 03 y 04 mueven los motores.** Prueba siempre primero con las ruedas en el aire, con el robot
+> ⚠️ **Las lecciones 03, 04 y 06 mueven los motores** (la 06, solo con `moveMotors = true`). Prueba siempre primero con las ruedas en el aire, con el robot
 > sobre un bote o un libro. Las normas completas están en el [README del repositorio](../README.md).
 
 * Todas las lecciones usan `SafeExplorerHat` dentro de un bloque `using`. Al terminar, o con Ctrl+C, para los

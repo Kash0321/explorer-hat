@@ -4,6 +4,7 @@
     <Project Path="lessons/Lesson02.TrafficLight/Lesson02.TrafficLight.csproj" />
     <Project Path="lessons/Lesson03.Motors/Lesson03.Motors.csproj" />
     <Project Path="lessons/Lesson04.Square/Lesson04.Square.csproj" />
+    <Project Path="lessons/Lesson06.Distance/Lesson06.Distance.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />
