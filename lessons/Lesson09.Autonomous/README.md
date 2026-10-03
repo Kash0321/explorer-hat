@@ -74,6 +74,21 @@ Antes de ponerlo en el suelo, comprueba que decide bien:
 Con las ruedas en el aire el robot no se mueve, así que el obstáculo no cambia de sitio: tú decides cuándo deja de
 verlo.
 
+## En el suelo
+
+Nuestra prueba (60 s, velocidad 0,8, UPS HAT (B), unos 2 × 2 m con cajas y una pared): 15 obstáculos. Casi siempre
+los vio a 20–30 cm y se paró a unos 15–25 cm. Para girar le bastaron 1 a 3 pasos. Entre dos miradas avanza unos
+10–13 cm: mira los tres sensores, así que cada uno mide menos veces que en la lección 06.
+
+Chocó un par de veces con **la esquina de una caja**. En la salida se ve que el sensor no la veía hasta tenerla
+encima: por ejemplo, el centro pasó de 115 cm a 8 cm de una mirada a la siguiente.
+
+**Por qué el sensor no ve las esquinas.** El ultrasonido rebota como la luz en un espejo. Si la cara de la caja
+está de frente, el eco vuelve al sensor. Si está inclinada, el sonido rebota hacia otro lado y el eco no vuelve: el
+sensor mide la pared de detrás, o nada (400 cm). Además, cada sensor solo oye en un cono estrecho delante de él, y
+una esquina puede quedar entre dos conos. Les pasa lo mismo a los objetos blandos (absorben el sonido) y a los muy
+pequeños o finos, como la pata de una silla.
+
 ## Retos
 
 * **Más listo con la velocidad.** Copia de la lección 06 la zona amarilla: si algo está a menos de 60 cm, avanza
