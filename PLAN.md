@@ -25,8 +25,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   no tienen histéresis (leer cada ~1 ms lo evita); un corte de batería dejó un archivo vacío (las tareas de despliegue
   hacen `sync`); la fila lateral del HAT da GPIO libres de 3,3 V.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Siguiente paso decidido (03/10/2026): la Fase 6, los PR a dotnet/iot.** Punto de partida comprobado en la Fase 6
-  ("Preparar PR(s)"): sincronizar el fork, empezar por `Ina219` (es la incidencia abierta #1659) y seguir con el
+- **Fase 6, los PR a dotnet/iot (en curso):** abierto el PR de `Ina219`
+  ([dotnet/iot#2612](https://github.com/dotnet/iot/pull/2612), "Fixes #1659", 03/10/2026), con tres arreglos, pruebas
+  unitarias y la prueba con la UPS. Pendiente de revisión: atender los comentarios sin *force push*. Siguiente: el
   `Dispose` de `ExplorerHat`. Después, la lección 10 (siguelíneas) o la 07 (pads táctiles, que necesita un binding
   para el CAP1208).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
@@ -480,19 +481,42 @@ solo cubre motores y las 4 luces. Falta:
       y `new Lights(_controller)`, y en `Dispose` libera `Lights` antes que `Motors`; `DCMotor.Create(..., _controller)`
       también usa `shouldDispose` por defecto. El último cambio del binding (PR #2586, 02/07/2026) solo movió las
       asignaciones `= null` fuera del `if (_shouldDispose)`.
-- [ ] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
+- [~] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
       `ReadCurrent()` leen el registro como número sin signo (`ReadRegister` devuelve `ushort`), así que las tensiones
       y corrientes negativas (por ejemplo, baterías descargándose en la UPS HAT (B)) salen como valores enormes.
       Arreglo: convertir a `short` antes de escalar. **Es la incidencia abierta #1659 de dotnet/iot** ("INA219 - strange
       readings", 2021): sin carga, la corriente salta entre 0 y 799 mA. Con su calibración (12,2 µA por unidad),
       −1 unidad leída sin signo da 65535 × 12,2 µA = 799,5 mA. Los mantenedores no tenían el chip para investigarla;
-      nosotros sí (UPS HAT (B), 0x42). El PR puede decir "Fixes #1659". Último cambio del binding: febrero de 2022.
+      nosotros sí (UPS HAT (B), 0x42). Último cambio del binding: febrero de 2022.
+      **PR abierto el 03/10/2026: [dotnet/iot#2612](https://github.com/dotnet/iot/pull/2612)** ("Fixes #1659"), rama
+      `ina219-signed-readings` del fork. Pendiente de la revisión de los mantenedores.
+  - Al revisar el binding aparecieron dos fallos más, en el mismo PR:
+    - `ReadBusVoltage()` convierte a `short` un registro que no tiene signo: con el rango de 32 V, desde 16,384 V
+      la tensión sale negativa. La UPS no llega a esa tensión; lo comprueban las pruebas unitarias.
+    - El setter de `ShuntAdcResolutionOrSamples` desplaza el valor 4 bits y lo escribe en el campo del ADC del bus
+      (BADC) en lugar del suyo (SADC): los valores de la enumeración ya están en la posición de SADC.
+    - `ReadPower()` no cambia: el registro de potencia no tiene signo (en la prueba, positivo con la corriente negativa).
+  - Pruebas unitarias nuevas (`src/devices/Ina219/tests`, con un INA219 simulado como el de `Ina236`): 23 casos; con
+    el código original fallan 10 (−1 en el registro de corriente da 799,527 mA) y con el arreglo pasan todos.
+  - Prueba en la Pi con la UPS (programa aparte, no versionado; 32 V, ±320 mV, `SetCalibration(4096, 1e-4f)`, es
+    decir, 0,1 mA por unidad; 2 minutos, quitando el cargador a mitad):
+
+    | | Cargando (13 lecturas) | Descargando (107 lecturas) |
+    |---|---|---|
+    | `ReadCurrent()` con el arreglo | +474 a +544 mA | **−339 a −458 mA** |
+    | El mismo registro leído sin signo (4.2.0) | +365 a +535 mA | **6093 a 6215 mA** |
+    | `ReadPower()` | ~4,2 W | ~2,9 W |
+
+    Configuración tras el setter arreglado: `0x39EF` (BADC 12 bits, SADC 32 muestras). Al terminar, `Reset()` deja
+    la UPS como estaba: `0x399F` (la configuración de fábrica) y calibración `0x0000`.
 - [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
 - [ ] **Posible incidencia en `System.Device.Gpio` 4.2.0 (Pi 3, `RaspberryPi3Driver`):** quitar un aviso de eventos
       con `UnregisterCallbackForPinValueChangedEvent` lanza `GpiodException: Device or resource busy` (detalles en la
       lección 11 de la Fase 5). Buscada el 03/10/2026: no hay ninguna igual (la más parecida, #1637, es de la Pi 4 y
       está cerrada). Antes de informar, reproducirla con un programa mínimo y con la versión de `main`.
-- [ ] Preparar PR(s) a dotnet/iot. Punto de partida (03/10/2026):
+- [~] Preparar PR(s) a dotnet/iot. Punto de partida (03/10/2026):
+  - **Hecho el 03/10/2026:** el PR de `Ina219` (#2612). Cómo se trabaja con el clon del fork, las pruebas y la
+    prueba en la Pi: en `AGENTS.md` ("Contribuir a dotnet/iot"). Siguiente: el `Dispose` de `ExplorerHat`.
   - **Fork `Kash0321/iot`:** existe, pero está 374 commits por detrás y su rama es `master` (la de dotnet/iot es
     `main`). Como las ramas se llaman distinto, lo más sencillo es clonar el fork, añadir
     `upstream` (dotnet/iot), crear cada rama desde `upstream/main` y subirla al fork. Un PR por arreglo.
