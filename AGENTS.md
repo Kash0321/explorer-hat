@@ -20,7 +20,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 ## 🔌 Hardware (Pimoroni Explorer HAT Pro)
 * **Motores:** motor 1 = GPIO 19 (velocidad) / 20 (dirección); motor 2 = GPIO 21 / 26. **El motor `One` es la rueda derecha** y `Two` la izquierda (girar a la derecha: `One` hacia atrás, `Two` hacia delante). Motores amarillos TT con reductora 1:48.
 * **Luces:** GPIO 4 (azul), 17 (amarilla), 27 (roja), 5 (verde).
-* **Sensores HC-SR04:** izquierda TRIG 13 / ECHO 24, centro 6 / 23, derecha 12 / 22. OUT4 (GPIO 16) e IN4 (GPIO 25): el LED y el pulsador de la lección 05, en una protoboard (se pueden quitar); IN4 tiene pull-down dentro del HAT.
+* **Sensores HC-SR04:** izquierda TRIG 13 / ECHO 24, centro 6 / 23, derecha 12 / 22. OUT4 (GPIO 16) e IN4 (GPIO 25): el LED y el pulsador de la lección 05, en una protoboard (se pueden quitar); IN4 tiene pull-down dentro del HAT. En la lección 11, IN4 es el sensor de velocidad LM393 de la rueda derecha (D0).
 * **La velocidad de los motores es PWM por software** (un hilo del programa). Si el programa muere o un depurador lo detiene, cada motor se queda como estuviera: **parado o a toda velocidad**.
 
 ## ⛔ Restricciones Estrictas de Código
