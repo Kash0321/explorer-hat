@@ -30,9 +30,13 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   60 s; solo choca con algunas esquinas, que el sensor no ve).
 - **Lección 05 (Botones), 03/10/2026, rama `fase-5-leccion-05`:** pulsador y LED en una protoboard, probada; sin
   rebotes. Arreglada la parada de emergencia desde el PC (finales de línea CRLF en los `.sh`).
-- **Siguiente paso propuesto:** lección 11 (probar un LM393 con un disco; IN4 está ahora ocupada por el pulsador,
-  que se puede quitar) o la propuesta 12 (pantalla LCD; antes, revisar la tensión del bus I2C). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
-  `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
+- **Lección 11 (Contar vueltas), 03/10/2026, rama `fase-5-leccion-11`:** primera parte, con un LM393 en la rueda
+  derecha (IN4): mide la velocidad y avanza una distancia exacta; probada en el aire y en el suelo. El sensor salta
+  unos µs en cada borde de ranura: leer cada ~1 ms lo evita.
+- **Siguiente paso propuesto:** segunda parte de la lección 11 (sensor en la rueda izquierda para ir recto; para
+  empezar, el ECHO del HC-SR04 izquierdo deja libre IN3) o la propuesta 12 (pantalla LCD; antes, revisar la tensión
+  del bus I2C). Alternativa: los PR a dotnet/iot de la Fase 6 (arreglo de `Dispose` de `ExplorerHat` y lectura con
+  signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
@@ -351,12 +355,34 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
       entradas digitales: mismo problema que el segundo sensor de la lección 11 (solo IN4 está libre).
-- [ ] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
-      ópticos de horquilla en las entradas digitales del HAT (requiere Fase 6).
+- [~] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
+      ópticos de horquilla en las entradas digitales del HAT.
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
   - [x] Comprados 10 sensores de velocidad LM393 (horquilla óptica con salida digital) para probarlos.
-  - [ ] Probar un LM393 con un disco en IN4 (GPIO 25, la única entrada libre): pulsos por vuelta, velocidad
-        máxima que se puede contar desde C# y rebotes.
+  - [x] Probar un LM393 con un disco en IN4 (GPIO 25) (03/10/2026). Montado en la rueda derecha (motor One), con
+        VCC y GND en la protoboard pequeña del HAT y D0 a INPUT 4 (en la primera prueba estaba en OUTPUT 4: no llegaba
+        nada aunque el LED de señal parpadeaba).
+    - A mano: 41 cambios por vuelta en dos vueltas (20 ranuras = 20 pulsos = 40 cambios; el de más, por la posición
+      de la marca). Rueda de 6,5 cm: 20,4 cm por vuelta, **1,02 cm por pulso**.
+    - Diagnóstico en C# (programa aparte, no versionado; rueda derecha en el aire, 3 s por velocidad): la salida
+      **salta 2 o 3 veces en unos µs justo en cada borde de ranura** (el comparador no tiene histéresis); con el
+      motor parado no hay ningún cambio. Contando solo los niveles que duran ≥ 0,5 ms (igual con 1, 2 o 3 ms):
+      0,4 → 37,3 pulsos/s (112 rpm), 0,6 → 46,3 (139), 0,8 → 51,3 (154), 1,0 → 55,3 (166). A 0,8, ~52 cm/s,
+      coherente con lo estimado en el suelo en la lección 06. Una ranura dura ≥ ~7 ms.
+    - Los eventos de GPIO (`RegisterCallbackForPinValueChangedEvent`) cuentan también los saltos (621 en 3 s a 1,0
+      frente a ~166 reales): no sirven sin filtro. Leer la entrada cada ~1 ms (`Thread.Sleep(1)`) no ve los saltos
+      y no pierde ranuras: es lo que usa la lección.
+    - Fallo de `System.Device.Gpio` 4.2.0 en la Pi 3 (`RaspberryPi3Driver`): `UnregisterCallbackForPinValueChangedEvent`
+      lanza `GpiodException: Device or resource busy` (intenta volver a abrir la línea). Registrar una sola vez y no
+      quitarlo. Con la excepción, `SafeExplorerHat` paró el motor (`Error inesperado: motores parados`).
+  - [x] Lección `Lesson11.Odometry` con un sensor (03/10/2026): parte 1 mide la velocidad (2 s), espera una tecla para
+        medir con la cinta; parte 2 avanza 50 cm (`while` con distancia `&&` tiempo máximo de 5 s, por si falla el
+        sensor); después de cada parte cuenta 0,5 s más lo que resbala. Con las ruedas en el aire (versión sin tecla):
+        85 pulsos en 2 s (43 cm/s), parada a 49 pulsos (50 cm) y 4 pulsos más por la inercia; código 0 y pines a nivel
+        bajo. En el suelo (7 pruebas a 0,6): parte 1 de 72 a 77 pulsos (37–39 cm/s; una vez 58, quizá un roce);
+        parte 2 siempre parada a 49 pulsos y 4–7 pulsos más al frenar (una vez 0), unos 55 cm en total; con la cinta,
+        cuando fue recto, 55 cm, igual que lo contado (55,1 cm). **Se desvía a la izquierda** a menudo: la rueda
+        derecha gira más rápido que la izquierda.
   - [ ] **Decidir dónde conectar el segundo sensor:** los ECHO de los tres HC-SR04 ocupan IN1–IN3 (GPIO 23, 22
         y 24). Opciones: quitar un HC-SR04 en esa lección, llevar un ECHO o un LM393 a un GPIO libre de la Pi
         que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
@@ -410,6 +436,9 @@ solo cubre motores y las 4 luces. Falta:
       y corrientes negativas (por ejemplo, baterías descargándose en la UPS HAT (B)) salen como valores enormes.
       Arreglo: convertir a `short` antes de escalar. No hay ninguna incidencia abierta: posible PR a dotnet/iot.
 - [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
+- [ ] **Posible incidencia en `System.Device.Gpio` 4.2.0 (Pi 3, `RaspberryPi3Driver`):** quitar un aviso de eventos
+      con `UnregisterCallbackForPinValueChangedEvent` lanza `GpiodException: Device or resource busy` (detalles en la
+      lección 11 de la Fase 5). Buscar si ya está abierta antes de informar.
 - [ ] Preparar PR(s) a dotnet/iot.
 
 ## Fase 7: Robot con IA (agente)

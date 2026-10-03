@@ -13,8 +13,9 @@ repositorio; cada lección tiene un README en español para el monitor.
 | [05 Botones](Lesson05.Buttons/README.md) | Entradas y salidas digitales, `if` con un botón, contar pulsaciones; montar un pulsador y un LED en una protoboard | No |
 | [06 Distancia](Lesson06.Distance/README.md) | Un sensor que da números, `if`/`else if`/`else`, bucle `while` y `break` | **Sí**, con `moveMotors = true` |
 | [09 Robot autónomo](Lesson09.Autonomous/README.md) | Mirar, pensar y actuar; juntar condiciones con `\|\|` y `&&` | **Sí** |
+| [11 Contar vueltas](Lesson11.Odometry/README.md) | Odometría con un sensor de velocidad, el número pi, `while` con dos condiciones | **Sí** |
 
-Las lecciones que faltan (07, 08, 10 y 11) están en `PLAN.md` (Fase 5).
+Las lecciones que faltan (07, 08 y 10, y la segunda parte de la 11) están en `PLAN.md` (Fase 5).
 
 ## Cómo ejecutar una lección
 
@@ -31,7 +32,7 @@ Para parar una lección antes de que termine, pulsa **Ctrl+C**.
 
 ## Seguridad
 
-> ⚠️ **Las lecciones 03, 04, 06 y 09 mueven los motores** (la 06, solo con `moveMotors = true`). Prueba siempre primero con las ruedas en el aire, con el robot
+> ⚠️ **Las lecciones 03, 04, 06, 09 y 11 mueven los motores** (la 06, solo con `moveMotors = true`). Prueba siempre primero con las ruedas en el aire, con el robot
 > sobre un bote o un libro. Las normas completas están en el [README del repositorio](../README.md).
 
 * Todas las lecciones usan `SafeExplorerHat` dentro de un bloque `using`. Al terminar, o con Ctrl+C, para los
