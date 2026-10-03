@@ -86,53 +86,53 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       `throttled=0x0` en reposo, con la CPU al 100 % y con los motores en marcha (BasicSample, ruedas en el aire).
       El LED rojo PWR fijo indica que la tensión es correcta. Falta revisar la batería (bajadas al mover los motores).
       Pruebas con ObstacleAvoidance (ruedas en el aire, tensión cada 0,2 s), arranque de golpe (N) / progresivo (S):
-      - Placa de 2×18650 en paralelo con elevador (DIY MORE V8): bajadas de tensión incluso sin motores
-        (arranque de la Pi); con motores, tensión baja el 98 % (N) / 92 % (S) del tiempo.
-      - Batería externa Redmi 10000 mAh (5,1 V 2,4 A): sin avisos en reposo ni compilando; con motores 68 % (N) /
-        54 % (S), 6 caídas en ambos casos, una por cada salida o maniobra (marcha atrás y giro).
-      - Batería externa Xiaomi Mi Power Bank 2 PLM10ZM (5000 mAh, 5,1 V 2,1 A), con poca carga (~3 h de uso):
-        caídas sueltas incluso en reposo (4 en 4 min); con motores 97 % (N) / 91 % (S). Descartada para motores
-        salvo que con carga completa mejore mucho (pendiente repetir). Para trabajar, de momento, la Redmi.
-      - El arranque progresivo no evita las caídas; se queda como opción (tecla S al iniciar) por estética.
-      - Propuesta: Waveshare UPS HAT (B) (2×18650 en serie + reductor, 5 V hasta 5 A, contactos por debajo de la
-        Pi sin usar el GPIO, INA219 en I2C 0x42). Las Samsung 25R (64,9 mm) caben (límite 67 mm).
-        Descartadas: UPS HAT original (2,5 A) y Geekworm X728 (usa los GPIO 5, 6, 12, 16 y 20 del Explorer HAT).
-      - **Decisión (30/09/2026):** comprar la Waveshare UPS HAT (B).
+  - Placa de 2×18650 en paralelo con elevador (DIY MORE V8): bajadas de tensión incluso sin motores
+    (arranque de la Pi); con motores, tensión baja el 98 % (N) / 92 % (S) del tiempo.
+  - Batería externa Redmi 10000 mAh (5,1 V 2,4 A): sin avisos en reposo ni compilando; con motores 68 % (N) /
+    54 % (S), 6 caídas en ambos casos, una por cada salida o maniobra (marcha atrás y giro).
+  - Batería externa Xiaomi Mi Power Bank 2 PLM10ZM (5000 mAh, 5,1 V 2,1 A), con poca carga (~3 h de uso):
+    caídas sueltas incluso en reposo (4 en 4 min); con motores 97 % (N) / 91 % (S). Descartada para motores
+    salvo que con carga completa mejore mucho (pendiente repetir). Para trabajar, de momento, la Redmi.
+  - El arranque progresivo no evita las caídas; se queda como opción (tecla S al iniciar) por estética.
+  - Propuesta: Waveshare UPS HAT (B) (2×18650 en serie + reductor, 5 V hasta 5 A, contactos por debajo de la
+    Pi sin usar el GPIO, INA219 en I2C 0x42). Las Samsung 25R (64,9 mm) caben (límite 67 mm).
+    Descartadas: UPS HAT original (2,5 A) y Geekworm X728 (usa los GPIO 5, 6, 12, 16 y 20 del Explorer HAT).
+  - **Decisión (30/09/2026):** comprar la Waveshare UPS HAT (B).
 - [x] Probar la Waveshare UPS HAT (B) cuando llegue: montaje con el Explorer HAT encima, `i2cdetect -y 1`
       (0x28, 0x42 y 0x48) y ObstacleAvoidance con `tools/vigilar-tension.sh`, como en las pruebas anteriores.
       Probada el 01/10/2026, solo con baterías (cargador de la UPS desconectado, 2×18650 a 7,9 V al empezar).
-      - `i2cdetect -y 1` ve 0x28, 0x42 (INA219 de la UPS) y 0x48. Por SSH no interactivo, `i2cdetect` e `i2cget`
-        están en `/usr/sbin` (fuera del `PATH`).
-      - `tools/vigilar-tension.sh` registra también la tensión y la corriente de las baterías si encuentra la UPS
-        (INA219 con resistencia de 0,1 Ω; corriente negativa = descarga), y `tools/comparar-tension.sh` resume
-        la tensión mínima y la corriente máxima de cada tramo.
-      - Resultado: **ninguna caída de tensión** en ninguna fase; `throttled=0x0` al final, también en los bits que
-        recuerdan lo ocurrido desde el arranque.
+  - `i2cdetect -y 1` ve 0x28, 0x42 (INA219 de la UPS) y 0x48. Por SSH no interactivo, `i2cdetect` e `i2cget`
+    están en `/usr/sbin` (fuera del `PATH`).
+  - `tools/vigilar-tension.sh` registra también la tensión y la corriente de las baterías si encuentra la UPS
+    (INA219 con resistencia de 0,1 Ω; corriente negativa = descarga), y `tools/comparar-tension.sh` resume
+    la tensión mínima y la corriente máxima de cada tramo.
+  - Resultado: **ninguna caída de tensión** en ninguna fase; `throttled=0x0` al final, también en los bits que
+    recuerdan lo ocurrido desde el arranque.
 
-        | Tramo | Tensión baja | Caídas | Baterías (mín.) | Corriente máx. |
-        |---|---|---|---|---|
-        | Reposo (~1,5 min) | 0 % | 0 | 7,84 V | 0,65 A |
-        | Compilando la solución (2 min, CPU al 100 %) | 0 % | 0 | 7,83 V | 0,70 A |
-        | ObstacleAvoidance N, ruedas en el aire (~1 min) | 0 % | 0 | 7,73 V | 1,15 A |
-        | ObstacleAvoidance S, ruedas en el aire (~1 min, 8 maniobras) | 0 % | 0 | 7,72 V | 1,11 A |
+    | Tramo | Tensión baja | Caídas | Baterías (mín.) | Corriente máx. |
+    |---|---|---|---|---|
+    | Reposo (~1,5 min) | 0 % | 0 | 7,84 V | 0,65 A |
+    | Compilando la solución (2 min, CPU al 100 %) | 0 % | 0 | 7,83 V | 0,70 A |
+    | ObstacleAvoidance N, ruedas en el aire (~1 min) | 0 % | 0 | 7,73 V | 1,15 A |
+    | ObstacleAvoidance S, ruedas en el aire (~1 min, 8 maniobras) | 0 % | 0 | 7,72 V | 1,11 A |
 
-        Esta prueba se hizo con el giro a pasos, que arranca los motores más veces que el programa de las pruebas
-        anteriores: para la UPS fue una prueba algo más dura.
-      - **Comparativa de todas las fuentes probadas** (ObstacleAvoidance con las ruedas en el aire, % del tiempo
-        con tensión baja):
+    Esta prueba se hizo con el giro a pasos, que arranca los motores más veces que el programa de las pruebas
+    anteriores: para la UPS fue una prueba algo más dura.
+  - **Comparativa de todas las fuentes probadas** (ObstacleAvoidance con las ruedas en el aire, % del tiempo
+    con tensión baja):
 
-        | Fuente | Reposo | Compilando | Motores N | Motores S |
-        |---|---|---|---|---|
-        | Cargador 5 V 3 A con cables micro-USB malos | caídas constantes | caídas | — | — |
-        | Cargador 5 V 3 A con cable bueno | sin caídas | sin caídas | sin caídas (BasicSample) | — |
-        | Placa 2×18650 en paralelo con elevador (DIY MORE V8) | caídas al arrancar la Pi | — | 98 % | 92 % |
-        | Batería externa Redmi 10000 mAh (5,1 V 2,4 A) | sin caídas | sin caídas | 68 % (6 caídas) | 54 % (6 caídas) |
-        | Batería externa Xiaomi PLM10ZM 5000 mAh (5,1 V 2,1 A), poca carga | 4 caídas en 4 min | — | 97 % | 91 % |
-        | **Waveshare UPS HAT (B), 2×18650 en serie** | **0 %** | **0 %** | **0 %** | **0 %** |
+    | Fuente | Reposo | Compilando | Motores N | Motores S |
+    |---|---|---|---|---|
+    | Cargador 5 V 3 A con cables micro-USB malos | caídas constantes | caídas | — | — |
+    | Cargador 5 V 3 A con cable bueno | sin caídas | sin caídas | sin caídas (BasicSample) | — |
+    | Placa 2×18650 en paralelo con elevador (DIY MORE V8) | caídas al arrancar la Pi | — | 98 % | 92 % |
+    | Batería externa Redmi 10000 mAh (5,1 V 2,4 A) | sin caídas | sin caídas | 68 % (6 caídas) | 54 % (6 caídas) |
+    | Batería externa Xiaomi PLM10ZM 5000 mAh (5,1 V 2,1 A), poca carga | 4 caídas en 4 min | — | 97 % | 91 % |
+    | **Waveshare UPS HAT (B), 2×18650 en serie** | **0 %** | **0 %** | **0 %** | **0 %** |
 
-        La Redmi en el suelo con el giro a pasos (30/09/2026, modo S, batería ya usada) llegó al 91 % (20 caídas).
-      - Conclusión: la UPS HAT (B) es la alimentación del robot. Las baterías externas USB quedan para trabajar con
-        el robot quieto.
+    La Redmi en el suelo con el giro a pasos (30/09/2026, modo S, batería ya usada) llegó al 91 % (20 caídas).
+  - Conclusión: la UPS HAT (B) es la alimentación del robot. Las baterías externas USB quedan para trabajar con
+    el robot quieto.
 - [x] Nuevo ejemplo `ExplorerHat.UpsDashboard`: panel de consola con todo lo que da la UPS (su única conexión de
       datos es el INA219 en I2C 0x42): tensión de las baterías, carga estimada (6,0 V = 0 %, 8,4 V = 100 %, como el
       ejemplo de Waveshare), corriente con signo, potencia, estado (cargando o descargando), mínimos de la sesión y
@@ -147,40 +147,40 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       esquiva de forma aceptable, aunque a veces duda cuando las medidas no se actualizan a tiempo.
 - [x] Mejorar la estabilidad de ObstacleAvoidance: filtrar lecturas falsas del HC-SR04 (saltos a ~277/361 cm)
       y decidir con medidas tomadas después de cada maniobra.
-      - Diagnóstico con el robot quieto y sin motores (`SonarDashboard --registro`, 30 s, 142 lecturas por sensor):
-        Centro (objeto a ~115 cm) salta 7 veces a 283–310 cm (5 %); Izquierda (~280 cm) tiene 4 lecturas sin eco y
-        3 saltos (152, 255 y 362 cm); Derecha (~34 cm) es estable. Los saltos son aislados (nunca dos seguidos) y casi
-        siempre a más distancia: el sensor pierde el eco del objeto y mide la pared de detrás. Son los peligrosos,
-        porque el robot cree que el camino está libre.
-      - Además, `Hcsr04.Distance` reintenta hasta 10 veces en silencio (hasta 160 ms cada intento) y lanza una excepción
-        si todos fallan: por eso a veces las medidas no se actualizaban a tiempo.
-      - Arreglo: `DistanceSensor` hace una sola lectura con `TryGetDistance` (sin eco = 400 cm) y su distancia es
-        la más cercana de las dos últimas lecturas: ignora un salto aislado sin retraso cuando el obstáculo se acerca
-        (solo tarda una lectura más en dar el camino por libre). `Sonar` mide en un hilo continuo (ciclo de ~0,2 s)
-        y `WaitForNewReadings()` espera dos lecturas nuevas de cada sensor: el robot la usa al arrancar, antes de
-        elegir el lado del giro y antes de volver a avanzar (si aún hay obstáculo, repite la maniobra).
-      - Probado con las ruedas en el aire (mano delante del centro y de los lados, 6 maniobras, 218 lecturas por
-        sensor): retrocede, espera, gira mientras hay obstáculo y vuelve a avanzar; sin errores y todos los pines
-        a nivel bajo al terminar. Con los motores en marcha siguen los saltos (p. ej. Centro 282 cm con la mano a 6 cm)
-        y el filtro los ignora. Falta probarlo en el suelo.
+  - Diagnóstico con el robot quieto y sin motores (`SonarDashboard --registro`, 30 s, 142 lecturas por sensor):
+    Centro (objeto a ~115 cm) salta 7 veces a 283–310 cm (5 %); Izquierda (~280 cm) tiene 4 lecturas sin eco y
+    3 saltos (152, 255 y 362 cm); Derecha (~34 cm) es estable. Los saltos son aislados (nunca dos seguidos) y casi
+    siempre a más distancia: el sensor pierde el eco del objeto y mide la pared de detrás. Son los peligrosos,
+    porque el robot cree que el camino está libre.
+  - Además, `Hcsr04.Distance` reintenta hasta 10 veces en silencio (hasta 160 ms cada intento) y lanza una excepción
+    si todos fallan: por eso a veces las medidas no se actualizaban a tiempo.
+  - Arreglo: `DistanceSensor` hace una sola lectura con `TryGetDistance` (sin eco = 400 cm) y su distancia es
+    la más cercana de las dos últimas lecturas: ignora un salto aislado sin retraso cuando el obstáculo se acerca
+    (solo tarda una lectura más en dar el camino por libre). `Sonar` mide en un hilo continuo (ciclo de ~0,2 s)
+    y `WaitForNewReadings()` espera dos lecturas nuevas de cada sensor: el robot la usa al arrancar, antes de
+    elegir el lado del giro y antes de volver a avanzar (si aún hay obstáculo, repite la maniobra).
+  - Probado con las ruedas en el aire (mano delante del centro y de los lados, 6 maniobras, 218 lecturas por
+    sensor): retrocede, espera, gira mientras hay obstáculo y vuelve a avanzar; sin errores y todos los pines
+    a nivel bajo al terminar. Con los motores en marcha siguen los saltos (p. ej. Centro 282 cm con la mano a 6 cm)
+    y el filtro los ignora. Falta probarlo en el suelo.
 - [x] Probar ObstacleAvoidance con el filtro en el suelo (batería Redmi, 30/09/2026).
-      - Primera prueba (N): esquiva bien, pero los giros eran excesivos (a veces una vuelta entera). Causa: giraba sin
-        parar y miraba mientras giraba; tras ver el camino libre seguía ~0,4 s (una lectura más por el filtro y hasta
-        0,2 s de espera del bucle). Además, el giro mínimo de 300 ms ya era un giro grande.
-      - Arreglo: **giro a pasos**: gira 150 ms, se para, espera lecturas nuevas con el robot quieto y repite mientras
-        haya algo delante o en el lado del que se aleja. Quitado el giro mínimo.
-      - Frenadas bruscas: el robot levantaba la rueda trasera al frenar (la batería y la Pi no iban sujetas al chasis).
-        Nuevo método `SlowDown`: con el modo S, frena en 3 pasos de 75 ms al ver un obstáculo y tras la marcha atrás.
-        Los pasos del giro siempre arrancan y paran de golpe (son demasiado cortos).
-      - Segunda prueba (S, ~2,5 min): 41 maniobras sin errores; giros de 1 paso (30), 2 (7), 3 (2) y 4 (1); 7 veces
-        seguía el obstáculo tras el giro y repitió la maniobra. El usuario lo ve "más listo", con salidas y frenadas
-        más elegantes. Pines a nivel bajo al terminar. Tensión baja el 91 % del tiempo (20 caídas): la batería ya
-        llevaba un rato en uso y el giro a pasos arranca los motores más veces. Lo resolverá la UPS HAT (B).
-      - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
-        filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
-        temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
-      - Sujeción: hecha el 01/10/2026 (la UPS y la Pi, en un bloque atornillado al chasis). En campo libre, a veces no avanza en línea recta (los dos
-        motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
+  - Primera prueba (N): esquiva bien, pero los giros eran excesivos (a veces una vuelta entera). Causa: giraba sin
+    parar y miraba mientras giraba; tras ver el camino libre seguía ~0,4 s (una lectura más por el filtro y hasta
+    0,2 s de espera del bucle). Además, el giro mínimo de 300 ms ya era un giro grande.
+  - Arreglo: **giro a pasos**: gira 150 ms, se para, espera lecturas nuevas con el robot quieto y repite mientras
+    haya algo delante o en el lado del que se aleja. Quitado el giro mínimo.
+  - Frenadas bruscas: el robot levantaba la rueda trasera al frenar (la batería y la Pi no iban sujetas al chasis).
+    Nuevo método `SlowDown`: con el modo S, frena en 3 pasos de 75 ms al ver un obstáculo y tras la marcha atrás.
+    Los pasos del giro siempre arrancan y paran de golpe (son demasiado cortos).
+  - Segunda prueba (S, ~2,5 min): 41 maniobras sin errores; giros de 1 paso (30), 2 (7), 3 (2) y 4 (1); 7 veces
+    seguía el obstáculo tras el giro y repitió la maniobra. El usuario lo ve "más listo", con salidas y frenadas
+    más elegantes. Pines a nivel bajo al terminar. Tensión baja el 91 % del tiempo (20 caídas): la batería ya
+    llevaba un rato en uso y el giro a pasos arranca los motores más veces. Lo resolverá la UPS HAT (B).
+  - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
+    filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
+    temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
+  - Sujeción: hecha el 01/10/2026 (la UPS y la Pi, en un bloque atornillado al chasis). En campo libre, a veces no avanza en línea recta (los dos
+    motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el
@@ -231,18 +231,18 @@ Propuesta, dos formas de trabajar:
         con `AddressFamily inet` 2,95 s, por IP 0,48 s (`Resolve-DnsName harlequin.local` ~1,1 s). Solución: reserva DHCP
         en el router (MAC wifi `b8:27:eb:0b:5b:db` → 192.168.0.236) y `HostName` con la IP en `~/.ssh/config` del PC. Hecho: 0,52 s por conexión.
   - [x] Seguridad ante cortes de wifi (probado desconectando el portátil con ObstacleAvoidance en marcha):
-        - `/etc/ssh/sshd_config.d/10-explorerhat.conf`: `ClientAliveInterval 5`, `ClientAliveCountMax 3`. No basta: sshd
-          solo comprueba al cliente cuando la sesión está en silencio, y ObstacleAvoidance escribe sin parar.
-        - `/etc/sysctl.d/90-explorerhat.conf`: `net.ipv4.tcp_retries2 = 6` (por defecto 15, ~15 min). La Pi da la
-          conexión por muerta en ~20 s, sshd cierra la sesión y el programa recibe SIGHUP.
-        - **Fallo encontrado en `SafeExplorerHat`:** al recibir SIGHUP escribía en la consola antes de parar los motores;
-          con el terminal perdido la escritura fallaba, el programa terminaba y los motores se quedaban **al 100 %**
-          (pines de PWM fijos en alto). Corregido: primero parar, después escribir (ignorando errores). Añadido también
-          parar los motores ante cualquier excepción no controlada. Reproducido con luces y un terminal cerrado de golpe:
-          antes 3/3 luces encendidas, después 3/3 apagadas.
-        - Prueba real con la corrección: corte ~19:36:09, sesiones en silencio cerradas a los 15 s (ClientAlive), la
-          del robot a las 19:36:38 (tcp_retries2), programa terminado y motores a nivel bajo a las 19:36:40 (~30 s).
-        - Si la Pi se reinstala, hay que volver a crear los dos archivos (en el README).
+    - `/etc/ssh/sshd_config.d/10-explorerhat.conf`: `ClientAliveInterval 5`, `ClientAliveCountMax 3`. No basta: sshd
+      solo comprueba al cliente cuando la sesión está en silencio, y ObstacleAvoidance escribe sin parar.
+    - `/etc/sysctl.d/90-explorerhat.conf`: `net.ipv4.tcp_retries2 = 6` (por defecto 15, ~15 min). La Pi da la
+      conexión por muerta en ~20 s, sshd cierra la sesión y el programa recibe SIGHUP.
+    - **Fallo encontrado en `SafeExplorerHat`:** al recibir SIGHUP escribía en la consola antes de parar los motores;
+      con el terminal perdido la escritura fallaba, el programa terminaba y los motores se quedaban **al 100 %**
+      (pines de PWM fijos en alto). Corregido: primero parar, después escribir (ignorando errores). Añadido también
+      parar los motores ante cualquier excepción no controlada. Reproducido con luces y un terminal cerrado de golpe:
+      antes 3/3 luces encendidas, después 3/3 apagadas.
+    - Prueba real con la corrección: corte ~19:36:09, sesiones en silencio cerradas a los 15 s (ClientAlive), la
+      del robot a las 19:36:38 (tcp_retries2), programa terminado y motores a nivel bajo a las 19:36:40 (~30 s).
+    - Si la Pi se reinstala, hay que volver a crear los dos archivos (en el README).
   - [x] Cambiar la contraseña de `pi` si sigue siendo la de los scripts antiguos (quedó en el historial público de git).
         Cambiada el 30/09/2026; el acceso por clave SSH desde el PC sigue funcionando.
   - [x] Versionar `launch.json`/`tasks.json` directamente (quitarlos de `.gitignore`) y borrar los scripts y plantillas antiguos.
@@ -293,15 +293,15 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       `GpioController` (el binding no tiene entradas ni salidas: Fase 6). Tres partes: la luz roja y el LED siguen al
       botón (10 s), contar pulsaciones (cambio de suelto a pulsado, `wasPressed`, 10 s) y el LED parpadea una vez por
       pulsación. Bucles `for` que cuentan milisegundos (sin `while` ni `Stopwatch`, que llegan en la 06).
-      - Sin programa: IN4 lee 0 en 50 de 50 lecturas y sigue al botón (5 pulsaciones de ~0,2 s y una de 2,1 s): las
-        entradas del HAT tienen pull-down; no hace falta la resistencia de 10 kΩ. `pinctrl set 16 op dh` enciende el LED.
-      - Con la lección: el programa contó 16 y el usuario también. Rebotes: ninguno, ni leyendo cada 1 ms (copia de
-        diagnóstico con el tiempo entre pulsaciones: mínimo 475 ms). Pines a nivel bajo al terminar.
-      - `tools/parar-robot.sh` y la tarea *Parar el robot* ponen también OUT4 (16) a nivel bajo.
-      - **Fallo encontrado:** en el PC con Windows, git guardaba los `.sh` con CRLF y `ssh harlequin 'bash -s' <
-        tools/parar-robot.sh` no paraba nada (`pinctrl`: `Unknown argument "dl^M"`; el patrón de `pkill` no
-        coincide). Arreglado con `.gitattributes` (`*.sh text eol=lf`) y probado desde el PC. La tarea de VS Code no
-        estaba afectada (lleva el comando dentro).
+  - Sin programa: IN4 lee 0 en 50 de 50 lecturas y sigue al botón (5 pulsaciones de ~0,2 s y una de 2,1 s): las
+    entradas del HAT tienen pull-down; no hace falta la resistencia de 10 kΩ. `pinctrl set 16 op dh` enciende el LED.
+  - Con la lección: en la parte 1, la luz roja y el LED siguen al botón; en la parte 2, el programa contó 16 y el usuario también. Rebotes: ninguno, ni leyendo cada 1 ms (copia de
+    diagnóstico con el tiempo entre pulsaciones: mínimo 475 ms). Pines a nivel bajo al terminar.
+  - `tools/parar-robot.sh` y la tarea *Parar el robot* ponen también OUT4 (16) a nivel bajo.
+  - **Fallo encontrado:** en el PC con Windows, git guardaba los `.sh` con CRLF y `ssh harlequin 'bash -s' <
+    tools/parar-robot.sh` no paraba nada (`pinctrl`: `Unknown argument "dl^M"`; el patrón de `pkill` no
+    coincide). Arreglado con `.gitattributes` (`*.sh text eol=lf`) y probado desde el PC. La tarea de VS Code no
+    estaba afectada (lleva el comando dentro).
       Notas previas sobre el material. Alternativas si faltara algo: un LM393 de horquilla como "botón sin contacto" (meter
       una tarjeta en la ranura; además prepara la lección 11, que usa el mismo sensor en IN4) o dos cables dupont que
       se tocan (5V → IN4). Para comprar: módulo de botón con 3 pines (VCC, GND, salida; ya trae la resistencia) o
@@ -311,18 +311,18 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       pararse. Filtro sencillo: la más cercana de las dos últimas lecturas (`Math.Min`), como `DistanceSensor` de
       ObstacleAvoidance pero sin hilo. `moveMotors = false` por defecto: primero solo mide; el niño lo cambia a
       `true`. Mide ~15 veces por segundo (pausa de 60 ms). Probada en la Pi (03/10/2026):
-      - Sin motores, por SSH: código 0, pines a nivel bajo y `throttled=0x0`. Con la mano, el usuario ve el cambio
-        verde → amarilla → roja y el final del programa.
-      - Con motores y las ruedas en el aire (una copia con `moveMotors = true`), registrando los pines cada 0,2 s:
-        pines de dirección (20 y 26) siempre bajos (hacia delante), PWM en los dos motores mientras no hay obstáculo,
-        y los dos pines de velocidad a nivel bajo desde que la mano se acerca hasta el final (2 s con la luz roja).
-        Ningún pin en alto sin programa, `throttled=0x0` (UPS con el cargador conectado).
-      - En el suelo frente a una pared a ~115 cm (03/10/2026, UPS HAT (B) sin cargador, suelo liso), dos veces:
-        se ve muy claro el cambio a la marcha lenta (0,6 basta para mover el robot), primera lectura amarilla a 58 cm,
-        lectura de parada a 27 cm y el robot **quieto a unos 20 cm** de la pared en las dos pruebas. Unos 3 cm (rápido) o 2,5 cm (lento) entre
-        dos lecturas; los ~7 cm restantes, desde la última lectura hasta pararse del todo. `dotnet` tarda ~3 s en
-        arrancar el programa en la Pi (motores parados). Sin caídas de tensión (`0x0`), baterías a 7,95 V como
-        mínimo y 1,02 A como máximo.
+  - Sin motores, por SSH: código 0, pines a nivel bajo y `throttled=0x0`. Con la mano, el usuario ve el cambio
+    verde → amarilla → roja y el final del programa.
+  - Con motores y las ruedas en el aire (una copia con `moveMotors = true`), registrando los pines cada 0,2 s:
+    pines de dirección (20 y 26) siempre bajos (hacia delante), PWM en los dos motores mientras no hay obstáculo,
+    y los dos pines de velocidad a nivel bajo desde que la mano se acerca hasta el final (2 s con la luz roja).
+    Ningún pin en alto sin programa, `throttled=0x0` (UPS con el cargador conectado).
+  - En el suelo frente a una pared a ~115 cm (03/10/2026, UPS HAT (B) sin cargador, suelo liso), dos veces:
+    se ve muy claro el cambio a la marcha lenta (0,6 basta para mover el robot), primera lectura amarilla a 58 cm,
+    lectura de parada a 27 cm y el robot **quieto a unos 20 cm** de la pared en las dos pruebas. Unos 3 cm (rápido) o 2,5 cm (lento) entre
+    dos lecturas; los ~7 cm restantes, desde la última lectura hasta pararse del todo. `dotnet` tarda ~3 s en
+    arrancar el programa en la Pi (motores parados). Sin caídas de tensión (`0x0`), baterías a 7,95 V como
+    mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
 - [x] 09 Robot autónomo (`Lesson09.Autonomous`): versión simplificada de ObstacleAvoidance, sin hilos ni clases.
@@ -332,21 +332,21 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       nuevas) y gira a pasos de 150 ms hacia el lado con más sitio hasta que el centro y el lado del que se aleja
       quedan libres (`||` y `&&`, `for` con `break`); tras 10 pasos sin salida, vuelve a retroceder. Velocidad 0,8,
       luces como en la 03. Probada con las ruedas en el aire (03/10/2026), registrando los pines cada 0,2 s:
-      - Mano en el sensor izquierdo (3 veces): retrocede (20 y 26 altos) y gira a la derecha (20 alto). En el derecho
-        (4 veces): gira a la izquierda (26 alto). Termina de girar al quitar la mano.
-      - Mano fija en el centro: gira hacia el lado con más sitio; tras 10 pasos (23 líneas entre dos `Obstacle!`)
-        retrocede y repite.
-      - Final por tiempo (`Time is up!`) y con Ctrl+C (`Parada de emergencia (SIGINT)`; el bucle aún escribe una
-        lectura): pines a nivel bajo, ningún proceso, `throttled=0x0` en toda la sesión.
-      - El sensor derecho da a veces 46 cm en lugar de ~76 cm, en parejas: probablemente un eco real que solo
-        detecta a veces. No afecta (es más de 30 cm).
-      - En el suelo (03/10/2026, 60 s, ~2 × 2 m con cajas y una pared, UPS HAT (B)): 15 obstáculos. Casi siempre los
-        ve a 20–30 cm y queda a ~15–25 cm; giros de 1 a 3 pasos; ~10–13 cm de avance entre dos miradas. El usuario lo
-        ve bien en general. Un par de choques con **esquinas de cajas**: el sensor no las ve hasta tenerlas encima
-        (centro de 115 a 8 cm, izquierda de 40 a 4 cm): la cara inclinada desvía el eco (reflexión especular) o la
-        esquina queda entre dos conos. Explicado en el README como límite del sensor; no se corrige en la lección.
-        Sin caídas de tensión (`0x0` en 857 muestras; baterías a 7,77 V como mínimo, 1,15 A como máximo) y pines a
-        nivel bajo al terminar.
+  - Mano en el sensor izquierdo (3 veces): retrocede (20 y 26 altos) y gira a la derecha (20 alto). En el derecho
+    (4 veces): gira a la izquierda (26 alto). Termina de girar al quitar la mano.
+  - Mano fija en el centro: gira hacia el lado con más sitio; tras 10 pasos (23 líneas entre dos `Obstacle!`)
+    retrocede y repite.
+  - Final por tiempo (`Time is up!`) y con Ctrl+C (`Parada de emergencia (SIGINT)`; el bucle aún escribe una
+    lectura): pines a nivel bajo, ningún proceso, `throttled=0x0` en toda la sesión.
+  - El sensor derecho da a veces 46 cm en lugar de ~76 cm, en parejas: probablemente un eco real que solo
+    detecta a veces. No afecta (es más de 30 cm).
+  - En el suelo (03/10/2026, 60 s, ~2 × 2 m con cajas y una pared, UPS HAT (B)): 15 obstáculos. Casi siempre los
+    ve a 20–30 cm y queda a ~15–25 cm; giros de 1 a 3 pasos; ~10–13 cm de avance entre dos miradas. El usuario lo
+    ve bien en general. Un par de choques con **esquinas de cajas**: el sensor no las ve hasta tenerlas encima
+    (centro de 115 a 8 cm, izquierda de 40 a 4 cm): la cara inclinada desvía el eco (reflexión especular) o la
+    esquina queda entre dos conos. Explicado en el README como límite del sensor; no se corrige en la lección.
+    Sin caídas de tensión (`0x0` en 857 muestras; baterías a 7,77 V como mínimo, 1,15 A como máximo) y pines a
+    nivel bajo al terminar.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
@@ -354,25 +354,25 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - [ ] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
       ópticos de horquilla en las entradas digitales del HAT (requiere Fase 6).
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
-      - [x] Comprados 10 sensores de velocidad LM393 (horquilla óptica con salida digital) para probarlos.
-      - [ ] Probar un LM393 con un disco en IN4 (GPIO 25, la única entrada libre): pulsos por vuelta, velocidad
-            máxima que se puede contar desde C# y rebotes.
-      - [ ] **Decidir dónde conectar el segundo sensor:** los ECHO de los tres HC-SR04 ocupan IN1–IN3 (GPIO 23, 22
-            y 24). Opciones: quitar un HC-SR04 en esa lección, llevar un ECHO o un LM393 a un GPIO libre de la Pi
-            que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
-      - [ ] Corregir la desviación en línea recta (regular la velocidad de cada motor con los pulsos) y programar
-            movimientos precisos: avanzar N cm, girar N grados.
+  - [x] Comprados 10 sensores de velocidad LM393 (horquilla óptica con salida digital) para probarlos.
+  - [ ] Probar un LM393 con un disco en IN4 (GPIO 25, la única entrada libre): pulsos por vuelta, velocidad
+        máxima que se puede contar desde C# y rebotes.
+  - [ ] **Decidir dónde conectar el segundo sensor:** los ECHO de los tres HC-SR04 ocupan IN1–IN3 (GPIO 23, 22
+        y 24). Opciones: quitar un HC-SR04 en esa lección, llevar un ECHO o un LM393 a un GPIO libre de la Pi
+        que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).
+  - [ ] Corregir la desviación en línea recta (regular la velocidad de cada motor con los pulsos) y programar
+        movimientos precisos: avanzar N cm, girar N grados.
 - [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
       variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
       obstáculos esquivados) para las pruebas en el suelo. `Iot.Device.Bindings` 4.2.0 trae `Lcd2004` y `Pcf8574`.
       Antes de conectarla:
-      - Dirección I2C: 0x27 (PCF8574T) o 0x3F (PCF8574AT), según el chip; los puentes A0–A2 la cambian. No choca con
-        0x28, 0x42 ni 0x48.
-      - **Tensión del bus I2C:** la pantalla necesita 5 V, y el adaptador suele llevar resistencias de pull-up de SDA y
-        SCL a su VCC: con VCC a 5 V, SDA y SCL de la Pi (3,3 V) quedarían por encima de 3,3 V. Medir esas resistencias
-        y decidir: quitarlas (la Pi ya tiene pull-ups a 3,3 V), un conversor de niveles o alimentar el adaptador a 3,3 V
-        (el contraste puede no bastar).
-      - Ver por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3) con el Explorer HAT encima.
+  - Dirección I2C: 0x27 (PCF8574T) o 0x3F (PCF8574AT), según el chip; los puentes A0–A2 la cambian. No choca con
+    0x28, 0x42 ni 0x48.
+  - **Tensión del bus I2C:** la pantalla necesita 5 V, y el adaptador suele llevar resistencias de pull-up de SDA y
+    SCL a su VCC: con VCC a 5 V, SDA y SCL de la Pi (3,3 V) quedarían por encima de 3,3 V. Medir esas resistencias
+    y decidir: quitarlas (la Pi ya tiene pull-ups a 3,3 V), un conversor de niveles o alimentar el adaptador a 3,3 V
+    (el contraste puede no bastar).
+  - Ver por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3) con el Explorer HAT encima.
 
 ### Componentes disponibles (03/10/2026)
 - 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
