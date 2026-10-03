@@ -25,9 +25,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   no tienen histéresis (leer cada ~1 ms lo evita); un corte de batería dejó un archivo vacío (las tareas de despliegue
   hacen `sync`); la fila lateral del HAT da GPIO libres de 3,3 V.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Siguiente paso propuesto:** los PR a dotnet/iot de la Fase 6 (arreglo de `Dispose` de `ExplorerHat`, lectura con
-  signo en `Ina219` y, si no está informado, el fallo de `UnregisterCallbackForPinValueChangedEvent`); o la lección 10
-  (siguelíneas) o la 07 (pads táctiles, que necesita un binding para el CAP1208).
+- **Siguiente paso decidido (03/10/2026): la Fase 6, los PR a dotnet/iot.** Punto de partida comprobado en la Fase 6
+  ("Preparar PR(s)"): sincronizar el fork, empezar por `Ina219` (es la incidencia abierta #1659) y seguir con el
+  `Dispose` de `ExplorerHat`. Después, la lección 10 (siguelíneas) o la 07 (pads táctiles, que necesita un binding
+  para el CAP1208).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
@@ -474,15 +475,36 @@ solo cubre motores y las 4 luces. Falta:
       cierra todos los pines. Los hilos de `SoftwarePwmChannel` de los motores siguen escribiendo y el
       proceso muere. Arreglo: pasar `shouldDispose: false` a los hijos, liberar los motores antes que las
       luces y el controlador el último. Comprobar también que al liberar un motor que iba marcha atrás no quede el pin de dirección en alto.
+      **Sigue igual en la rama `main` de dotnet/iot (03/10/2026):** `Motors`, `Lights` y `Led` tienen `internal ...
+      (GpioController? controller = null, bool shouldDispose = true)`, `ExplorerHat` los crea con `new Motors(_controller)`
+      y `new Lights(_controller)`, y en `Dispose` libera `Lights` antes que `Motors`; `DCMotor.Create(..., _controller)`
+      también usa `shouldDispose` por defecto. El último cambio del binding (PR #2586, 02/07/2026) solo movió las
+      asignaciones `= null` fuera del `if (_shouldDispose)`.
 - [ ] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
       `ReadCurrent()` leen el registro como número sin signo (`ReadRegister` devuelve `ushort`), así que las tensiones
       y corrientes negativas (por ejemplo, baterías descargándose en la UPS HAT (B)) salen como valores enormes.
-      Arreglo: convertir a `short` antes de escalar. No hay ninguna incidencia abierta: posible PR a dotnet/iot.
+      Arreglo: convertir a `short` antes de escalar. **Es la incidencia abierta #1659 de dotnet/iot** ("INA219 - strange
+      readings", 2021): sin carga, la corriente salta entre 0 y 799 mA. Con su calibración (12,2 µA por unidad),
+      −1 unidad leída sin signo da 65535 × 12,2 µA = 799,5 mA. Los mantenedores no tenían el chip para investigarla;
+      nosotros sí (UPS HAT (B), 0x42). El PR puede decir "Fixes #1659". Último cambio del binding: febrero de 2022.
 - [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
 - [ ] **Posible incidencia en `System.Device.Gpio` 4.2.0 (Pi 3, `RaspberryPi3Driver`):** quitar un aviso de eventos
       con `UnregisterCallbackForPinValueChangedEvent` lanza `GpiodException: Device or resource busy` (detalles en la
-      lección 11 de la Fase 5). Buscar si ya está abierta antes de informar.
-- [ ] Preparar PR(s) a dotnet/iot.
+      lección 11 de la Fase 5). Buscada el 03/10/2026: no hay ninguna igual (la más parecida, #1637, es de la Pi 4 y
+      está cerrada). Antes de informar, reproducirla con un programa mínimo y con la versión de `main`.
+- [ ] Preparar PR(s) a dotnet/iot. Punto de partida (03/10/2026):
+  - **Fork `Kash0321/iot`:** existe, pero está 374 commits por detrás y su rama es `master` (la de dotnet/iot es
+    `main`). Como las ramas se llaman distinto, lo más sencillo es clonar el fork, añadir
+    `upstream` (dotnet/iot), crear cada rama desde `upstream/main` y subirla al fork. Un PR por arreglo.
+  - **Versión publicada:** `Iot.Device.Bindings` 4.2.0 sigue siendo la última en NuGet. Los arreglos llegarán en la
+    siguiente; hasta entonces el robot sigue con `SafeExplorerHat` y con la lectura directa de registros en
+    UpsDashboard.
+  - **Orden propuesto:** 1) `Ina219` (cambio pequeño, con incidencia abierta y fácil de probar con la UPS);
+    2) `ExplorerHat` `Dispose` (con una prueba en la Pi: liberar con los motores en marcha y las ruedas en el aire);
+    3) el fallo de los eventos de GPIO, como incidencia, si se reproduce con `main`.
+  - **Antes de programar:** leer `CONTRIBUTING.md` y las normas de dotnet/iot (CLA de la .NET Foundation, estilo,
+    pruebas unitarias si el binding las tiene), compilar el binding en el PC y probar en la Pi con una referencia de
+    proyecto o un paquete local, sin tocar los programas del robot.
 
 ## Fase 7: Robot con IA (agente)
 Idea (02/10/2026): en los últimos talleres, el robot funciona como un agente. Entiende órdenes en lenguaje natural
