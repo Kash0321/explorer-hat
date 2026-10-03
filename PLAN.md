@@ -29,6 +29,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Abierto, sin revisión | Revisión de los mantenedores |
   | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta | La arregla el PR #2610 de pgrawehr (probado; le comentamos un fallo con dos avisos en un pin) |
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta | Solo incidencia |
+  | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, sin revisión | Revisión de los mantenedores |
 
   Los dos PR fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro): según raffaeler, pgrawehr y
   joperezr preparan el arreglo; es el PR [#2608](https://github.com/dotnet/iot/pull/2608) de pgrawehr (abierto). Si los mantenedores comentan, se responde en el PR y los cambios van en commits
@@ -40,8 +41,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   Fase 6.
 - **Siguiente paso: ampliar el binding `ExplorerHat`** con lo que le falta del HAT (entradas, salidas, entradas
   analógicas y pads táctiles). **Diseño acordado el 03/10/2026** (Fase 6, "Ampliar el binding: diseño acordado"):
-  primero el binding nuevo `Cap1208` (`src/devices/Cap1xxx`, no depende del #2613), después entradas y salidas,
-  analógico y pads en `ExplorerHat`. Después: la lección 07 (pads táctiles) y la 08 (analógico), que lo necesitan, o la
+  primero el binding nuevo `Cap1208` (`src/devices/Cap1xxx`, no depende del #2613; **PR #2616 abierto**), después
+  entradas y salidas, analógico y pads en `ExplorerHat`. Las entradas y salidas se programan sobre la rama
+  `explorerhat-dispose`; antes del analógico, medir en la Pi la tensión del ADS1015 (con un cable a 3,3 V y a 5 V). Después: la lección 07 (pads táctiles) y la 08 (analógico), que lo necesitan, o la
   10 (siguelíneas).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -483,7 +485,25 @@ solo cubre motores y las 4 luces. Falta:
 - [ ] 4 entradas digitales (GPIO 23, 22, 24, 25, tolerantes a 5 V).
 - [ ] 4 salidas de colector abierto (GPIO 6, 12, 13, 16).
 - [ ] 4 entradas analógicas (ADS1015, I2C 0x48). Comprobar si sirve el binding `Ads1115` existente.
-- [ ] 8 pads táctiles capacitivos (CAP1208, I2C 0x28). No hay binding CAP1xxx en dotnet/iot.
+- [~] 8 pads táctiles capacitivos (CAP1208, I2C 0x28). No había binding CAP1xxx en dotnet/iot.
+      **Binding nuevo `Cap1208`: PR abierto el 03/10/2026, [dotnet/iot#2616](https://github.com/dotnet/iot/pull/2616)**,
+      rama `cap1xxx-binding` del fork (`src/devices/Cap1xxx`). Pendiente: la revisión y, después, los pads en
+      `ExplorerHat` (PR 4 del orden acordado).
+  - API: `ReadTouchedInputs()` (lee el registro 0x03 y borra solo el bit INT: devuelve los toques desde la lectura
+    anterior más los que siguen), `MultipleTouchBlocking`, `Sensitivity` y `Recalibrate()`. El constructor comprueba los
+    ID (`0x6B`, `0x5D`) y no cambia la configuración. Entradas `SensorInputs.Input1`–`Input8` (`[Flags]`), numeradas
+    como en la hoja de datos (CS1–CS8).
+  - 19 pruebas unitarias con un CAP1208 simulado (`I2cSimulatedDeviceBase`). Con dos fallos metidos a propósito, fallan
+    1 y 3 pruebas. Lista de bindings regenerada con `tools/device-listing`.
+  - **Comportamiento del chip comprobado en el robot** (primero con `i2cget` en un bucle, después con el binding;
+    programa no versionado en `~/apps/Cap1208Check`, cada fase termina con Enter):
+    - Pads 1–4 = bits `0x10`–`0x80`; pads 5–8 = `0x01`–`0x08`, como dice Pimoroni.
+    - El bit de un pad sigue en 1 mientras el dedo está encima (0,3–0,6 s en un toque normal) y se borra al soltar y
+      borrar INT.
+    - **De fábrica, el chip solo admite un toque a la vez** (`MULT_BLK_EN`): con dos pads, solo sale uno y el registro
+      0x02 marca `MULT` (`0x05`). Con `MultipleTouchBlocking = false` salen 2 y 3 pads juntos.
+    - Con 32x (de fábrica) responden los 8 pads. **Con 1x no se detecta ningún toque**, ni apretando fuerte.
+    - Al terminar, el programa deja la configuración de fábrica (`0x2A` = `0x80`, `0x1F` = `0x2F`).
 - [~] **Prioritario, confirmado en 4.2.0:** `ExplorerHat` pasa su `GpioController` a `Motors`, `Lights`, cada
       `Led` y cada `DCMotor` con `shouldDispose = true` (valor por defecto), así que el primero que se libera
       cierra todos los pines. Los hilos de `SoftwarePwmChannel` de los motores siguen escribiendo y el
@@ -695,6 +715,7 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
    los pines que abrió.
 6. **Orden de los PR:**
    1. Binding `Cap1208` (`src/devices/Cap1xxx`). No toca `ExplorerHat`: se puede abrir sin esperar al #2613.
+      **Abierto el 03/10/2026: [dotnet/iot#2616](https://github.com/dotnet/iot/pull/2616).**
    2. Entradas y salidas en `ExplorerHat`: se programan sobre la rama del #2613 (`explorerhat-dispose`) y el PR se
       abre cuando lo fusionen.
    3. Analógico en `ExplorerHat`.
