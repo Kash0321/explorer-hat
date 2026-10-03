@@ -286,8 +286,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Calibrada en el suelo con un transportador (velocidad 0,8, UPS HAT (B)): 240 ms → ~85°, **250 ms → casi 90°**,
       320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
       90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
-- [ ] 05 Botones: entradas digitales (condiciones `if`). Solo queda libre IN4 (GPIO 25). Sin pulsador (03/10/2026):
-      el usuario tiene que comprarlo. Alternativas sin comprar: un LM393 de horquilla como "botón sin contacto" (meter
+- [ ] 05 Botones: entradas digitales (condiciones `if`). Solo queda libre IN4 (GPIO 25). El usuario tiene pulsadores de
+      12 mm, resistencias de 10 kΩ y 330 Ω y LED (03/10/2026). Alternativas si faltara algo: un LM393 de horquilla como "botón sin contacto" (meter
       una tarjeta en la ranura; además prepara la lección 11, que usa el mismo sensor en IN4) o dos cables dupont que
       se tocan (5V → IN4). Para comprar: módulo de botón con 3 pines (VCC, GND, salida; ya trae la resistencia) o
       botones arcade de 30 mm, más fáciles de pulsar para los niños.
@@ -363,7 +363,16 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
 - 2 módulos TCRT5000 (infrarrojo por reflexión, con potenciómetro; por confirmar): lección 10.
 - Pantalla LCD 2004A con adaptador I2C PCF8574: lección 12 (propuesta).
-- Sin pulsadores: comprar para la lección 05.
+- 4 pulsadores táctiles de 12 mm (4 patas, 2 contactos): lección 05.
+- Resistencias de 10 kΩ (pull-down si hiciera falta) y de 330 Ω (para LED), y LED rojos y amarillos de 5 mm.
+- 3 módulos láser KY-008 (650 nm, pines S, centro y −). **Peligro para los ojos:** solo con el monitor, nunca
+  apuntando a una persona ni a superficies que reflejen. Idea: alarma de haz cortado con una fotorresistencia (no hay).
+- Módulo L298N (HW-095): doble puente H para dos motores, con radiador y regulador de 5 V. El robot no lo necesita
+  (el Explorer HAT lleva un DRV8833) y necesitaría 6 GPIO que no hay libres. Pierde ~2 V (transistores bipolares).
+  Sirve para explicar qué es un puente H.
+- Falta comprobar si hay protoboard y cables dupont macho-hembra.
+- IN4 (GPIO 25) con nada conectado lee 0 en 50 de 50 lecturas (pull de la Pi desactivado): la entrada del HAT
+  parece tener pull-down o un búfer que la mantiene baja. Confirmar con el pulsador.
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
