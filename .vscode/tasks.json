@@ -86,7 +86,8 @@
                 "Lesson05.Buttons",
                 "Lesson06.Distance",
                 "Lesson09.Autonomous",
-                "Lesson11.Odometry"
+                "Lesson11.Odometry",
+                "Lesson11.Straight"
             ],
             "default": "Lesson01.Lights"
         }

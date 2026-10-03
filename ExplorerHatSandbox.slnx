@@ -8,6 +8,7 @@
     <Project Path="lessons/Lesson06.Distance/Lesson06.Distance.csproj" />
     <Project Path="lessons/Lesson09.Autonomous/Lesson09.Autonomous.csproj" />
     <Project Path="lessons/Lesson11.Odometry/Lesson11.Odometry.csproj" />
+    <Project Path="lessons/Lesson11.Straight/Lesson11.Straight.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />
