@@ -10,10 +10,11 @@ repositorio; cada lección tiene un README en español para el monitor.
 | [02 Semáforo](Lesson02.TrafficLight/README.md) | Variables, repetir un ciclo con `for` | No |
 | [03 Motores](Lesson03.Motors/README.md) | Velocidad de cada motor, avanzar, retroceder y girar | **Sí** |
 | [04 Cuadrado](Lesson04.Square/README.md) | Métodos propios, bucles con movimiento, `if`/`else`, calibrar un giro | **Sí** |
+| [05 Botones](Lesson05.Buttons/README.md) | Entradas y salidas digitales, `if` con un botón, contar pulsaciones; montar un pulsador y un LED en una protoboard | No |
 | [06 Distancia](Lesson06.Distance/README.md) | Un sensor que da números, `if`/`else if`/`else`, bucle `while` y `break` | **Sí**, con `moveMotors = true` |
 | [09 Robot autónomo](Lesson09.Autonomous/README.md) | Mirar, pensar y actuar; juntar condiciones con `\|\|` y `&&` | **Sí** |
 
-Las lecciones que faltan (05, 07, 08, 10 y 11) están en `PLAN.md` (Fase 5).
+Las lecciones que faltan (07, 08, 10 y 11) están en `PLAN.md` (Fase 5).
 
 ## Cómo ejecutar una lección
 

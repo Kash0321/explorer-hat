@@ -20,7 +20,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 ## 🔌 Hardware (Pimoroni Explorer HAT Pro)
 * **Motores:** motor 1 = GPIO 19 (velocidad) / 20 (dirección); motor 2 = GPIO 21 / 26. **El motor `One` es la rueda derecha** y `Two` la izquierda (girar a la derecha: `One` hacia atrás, `Two` hacia delante). Motores amarillos TT con reductora 1:48.
 * **Luces:** GPIO 4 (azul), 17 (amarilla), 27 (roja), 5 (verde).
-* **Sensores HC-SR04:** izquierda TRIG 13 / ECHO 24, centro 6 / 23, derecha 12 / 22. Libres: OUT4 (GPIO 16) e IN4 (GPIO 25).
+* **Sensores HC-SR04:** izquierda TRIG 13 / ECHO 24, centro 6 / 23, derecha 12 / 22. OUT4 (GPIO 16) e IN4 (GPIO 25): el LED y el pulsador de la lección 05, en una protoboard (se pueden quitar); IN4 tiene pull-down dentro del HAT.
 * **La velocidad de los motores es PWM por software** (un hilo del programa). Si el programa muere o un depurador lo detiene, cada motor se queda como estuviera: **parado o a toda velocidad**.
 
 ## ⛔ Restricciones Estrictas de Código
@@ -36,7 +36,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 ## 🦺 Seguridad física del robot (obligatorio para los agentes)
 * **Antes de cualquier ejecución que mueva los motores, pide confirmación explícita de que el robot tiene las ruedas en el aire**, aunque el usuario ya haya dicho "adelante".
 * Comprueba el estado real de los pines en vez de suponerlo: `pinctrl get 19,20,21,26,4,17,27,5` (`lo` = apagado).
-* **Parada de emergencia:** `bash tools/parar-robot.sh` en la Pi, o `ssh harlequin 'bash -s' < tools/parar-robot.sh` desde el PC.
+* **Parada de emergencia:** `bash tools/parar-robot.sh` en la Pi, o `ssh harlequin 'bash -s' < tools/parar-robot.sh` desde el PC. Los `.sh` tienen que estar con finales de línea LF también en Windows (lo obliga `.gitattributes`): con CRLF, la parada desde el PC no para nada (pasó el 03/10/2026).
 * Para registrar pruebas usa `tools/vigilar-pines.sh` y `tools/vigilar-tension.sh` lanzados con `setsid -f ... > /dev/null 2>&1 < /dev/null` (la línea exacta está al principio de cada script), para que sigan grabando aunque se corte la sesión. Con `setsid nohup ... &`, el `ssh` lanzado desde el PC no devuelve el control. Para pararlos por SSH, no uses `pkill -f` con un patrón que también aparezca en tu propio comando (por ejemplo, `vigilar-pines.sh`): mata la propia sesión. Por la misma razón, `pgrep -fc` cuenta tu propio comando si contiene el nombre del programa (por ejemplo, `Lesson03.Motors`): parte el nombre en una variable (`P=Lesson0; ... ${P}3.Motors`).
 * Al sugerir algoritmos de movimiento, asegura siempre un bloque de cierre que asigne `Speed = 0.0` a ambos motores al finalizar o al capturar una excepción.
 * La Pi está configurada para cerrar las sesiones SSH perdidas (ClientAlive y `tcp_retries2`, ver README): si se corta la wifi, los motores se paran en unos 15–30 s.

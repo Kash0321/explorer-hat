@@ -1,0 +1,4 @@
+# Shell scripts run on the Raspberry Pi, also sent from Windows with "ssh harlequin 'bash -s' < script".
+# With CRLF line endings bash fails (pinctrl rejects "dl" followed by a carriage return, pkill finds nothing),
+# so always check them out with LF.
+*.sh text eol=lf

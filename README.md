@@ -63,8 +63,8 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 | Sensor central, ECHO | IN1 | 23 | Entrada (admite 5 V) |
 | Sensor derecho, TRIG | OUT2 | 12 | Salida |
 | Sensor derecho, ECHO | IN2 | 22 | Entrada (admite 5 V) |
-| Libre | OUT4 | 16 | Salida |
-| Libre | IN4 | 25 | Entrada. Se probará con un sensor LM393 (lección 11) |
+| LED de la lección 05 (en la protoboard) | OUT4 | 16 | Salida. La parada de emergencia también la pone a nivel bajo |
+| Pulsador de la lección 05 (en la protoboard) | IN4 | 25 | Entrada, con pull-down dentro del HAT. Se usará también para un sensor LM393 (lección 11) |
 
 **Chips I2C** (bus `/dev/i2c-1`):
 
@@ -188,7 +188,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 
 ## 🎓 Lecciones del taller (`lessons/`)
 
-Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 06 Distancia y 09 Robot autónomo.
+Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia y 09 Robot autónomo.
 Cada lección es un proyecto pequeño con un único `Program.cs` y un README con retos. Índice y forma de
 ejecutarlas en [`lessons/README.md`](lessons/README.md).
 
@@ -284,7 +284,7 @@ sudo sysctl --system
 * **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige el programa. Para las lecciones, *Ejecutar una lección en la Pi*. Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir.
 * **Depurar BasicSample:** pestaña *Run and Debug*, configuración **Depurar BasicSample en la Pi** y F5.
 * **Depurar programas que leen el teclado** (como ObstacleAvoidance): primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
-* **Parar el robot:** la tarea **Parar el robot** para los programas del robot y pone a nivel bajo los pines de motores y luces.
+* **Parar el robot:** la tarea **Parar el robot** para los programas del robot y pone a nivel bajo los pines de motores y luces, y la salida OUT4.
 
 > ⚠️ **Puntos de interrupción y motores:** la velocidad de los motores se controla desde el propio programa (PWM por software). Cuando el depurador se detiene en un punto de interrupción congela todo el programa, y cada motor se queda como estuviera en ese instante: **parado o a toda velocidad**. Depura siempre con las ruedas en el aire.
 

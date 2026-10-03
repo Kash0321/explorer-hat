@@ -28,8 +28,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Lección 09 (Robot autónomo), 03/10/2026, rama `fase-5-leccion-09`:** probada con las ruedas en el aire (los
   tres sensores, 10 pasos de giro sin salida, final por tiempo y Ctrl+C) y en el suelo con cajas (15 obstáculos en
   60 s; solo choca con algunas esquinas, que el sensor no ve).
-- **Siguiente paso propuesto:** seguir con la Fase 5: lección 05 (botones:
-  entradas digitales con `if`; solo queda libre IN4, GPIO 25). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
+- **Lección 05 (Botones), 03/10/2026, rama `fase-5-leccion-05`:** pulsador y LED en una protoboard, probada; sin
+  rebotes. Arreglada la parada de emergencia desde el PC (finales de línea CRLF en los `.sh`).
+- **Siguiente paso propuesto:** lección 11 (probar un LM393 con un disco; IN4 está ahora ocupada por el pulsador,
+  que se puede quitar) o la propuesta 12 (pantalla LCD; antes, revisar la tensión del bus I2C). Alternativas: probar el primer LM393 en IN4 (lección 11) o los PR a dotnet/iot de la Fase 6 (arreglo de
   `Dispose` de `ExplorerHat` y lectura con signo en `Ina219`).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
@@ -286,8 +288,21 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Calibrada en el suelo con un transportador (velocidad 0,8, UPS HAT (B)): 240 ms → ~85°, **250 ms → casi 90°**,
       320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
       90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
-- [ ] 05 Botones: entradas digitales (condiciones `if`). Solo queda libre IN4 (GPIO 25). El usuario tiene pulsadores de
-      12 mm, resistencias de 10 kΩ y 330 Ω y LED (03/10/2026). Alternativas si faltara algo: un LM393 de horquilla como "botón sin contacto" (meter
+- [x] 05 Botones (`Lesson05.Buttons`, 03/10/2026): pulsador de 12 mm entre 5V e IN4 (GPIO 25) y LED rojo con 330 Ω
+      entre 5V y OUT4 (GPIO 16), en una protoboard (esquema SVG en el README). El programa lee y escribe con
+      `GpioController` (el binding no tiene entradas ni salidas: Fase 6). Tres partes: la luz roja y el LED siguen al
+      botón (10 s), contar pulsaciones (cambio de suelto a pulsado, `wasPressed`, 10 s) y el LED parpadea una vez por
+      pulsación. Bucles `for` que cuentan milisegundos (sin `while` ni `Stopwatch`, que llegan en la 06).
+      - Sin programa: IN4 lee 0 en 50 de 50 lecturas y sigue al botón (5 pulsaciones de ~0,2 s y una de 2,1 s): las
+        entradas del HAT tienen pull-down; no hace falta la resistencia de 10 kΩ. `pinctrl set 16 op dh` enciende el LED.
+      - Con la lección: el programa contó 16 y el usuario también. Rebotes: ninguno, ni leyendo cada 1 ms (copia de
+        diagnóstico con el tiempo entre pulsaciones: mínimo 475 ms). Pines a nivel bajo al terminar.
+      - `tools/parar-robot.sh` y la tarea *Parar el robot* ponen también OUT4 (16) a nivel bajo.
+      - **Fallo encontrado:** en el PC con Windows, git guardaba los `.sh` con CRLF y `ssh harlequin 'bash -s' <
+        tools/parar-robot.sh` no paraba nada (`pinctrl`: `Unknown argument "dl^M"`; el patrón de `pkill` no
+        coincide). Arreglado con `.gitattributes` (`*.sh text eol=lf`) y probado desde el PC. La tarea de VS Code no
+        estaba afectada (lleva el comando dentro).
+      Notas previas sobre el material. Alternativas si faltara algo: un LM393 de horquilla como "botón sin contacto" (meter
       una tarjeta en la ranura; además prepara la lección 11, que usa el mismo sensor en IN4) o dos cables dupont que
       se tocan (5V → IN4). Para comprar: módulo de botón con 3 pines (VCC, GND, salida; ya trae la resistencia) o
       botones arcade de 30 mm, más fáciles de pulsar para los niños.
