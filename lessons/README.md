@@ -15,6 +15,7 @@ repositorio; cada lección tiene un README en español para el monitor.
 | [09 Robot autónomo](Lesson09.Autonomous/README.md) | Mirar, pensar y actuar; juntar condiciones con `\|\|` y `&&` | **Sí** |
 | [11 Contar vueltas](Lesson11.Odometry/README.md) | Odometría con un sensor de velocidad, el número pi, `while` con dos condiciones | **Sí** |
 | [11 Ir recto](Lesson11.Straight/README.md) | Realimentación: dos sensores de velocidad y control proporcional | **Sí** |
+| [11 El cuadrado perfecto](Lesson11.Square/README.md) | Girar ángulos exactos con geometría y pulsos; calibrar lo que resbala | **Sí** |
 
 Las lecciones que faltan (07, 08 y 10) están en `PLAN.md` (Fase 5).
 
