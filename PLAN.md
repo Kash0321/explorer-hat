@@ -428,7 +428,12 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     SCL a su VCC: con VCC a 5 V, SDA y SCL de la Pi (3,3 V) quedarían por encima de 3,3 V. Medir esas resistencias
     y decidir: quitarlas (la Pi ya tiene pull-ups a 3,3 V), un conversor de niveles o alimentar el adaptador a 3,3 V
     (el contraste puede no bastar).
-  - Ver por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3) con el Explorer HAT encima.
+  - Por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3): la fila lateral del Explorer HAT marcada "3.3V ONLY".
+  - **Probada a 3,3 V (03/10/2026):** adaptador con VCC al pin 3v3 de esa fila, SDA y SCL a los suyos y GND al
+    nodo de GND. `i2cdetect` la ve en **0x27** (PCF8574T, A0–A2 sin puentear). Con `Lcd2004` + `Pcf8574` (RS 0,
+    RW 1, E 2, luz 3, datos 4–7) escribe bien las 4 líneas; al principio no se veían las letras y aparecieron,
+    perfectas, girando el potenciómetro de contraste. **No hace falta conversor de niveles ni quitar las
+    resistencias de 4,7 kΩ:** a 3,3 V el bus no pasa de 3,3 V. Programa de prueba aparte (no versionado).
 
 ### Componentes disponibles (03/10/2026)
 - 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
