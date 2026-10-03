@@ -388,7 +388,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - [x] **Dónde conectar el segundo sensor** (03/10/2026): de momento, en la lección se desconecta el HC-SR04
         izquierdo y su D0 va a IN3 (GPIO 24), con el VCC y el GND que deja libres. Más adelante: las entradas
         analógicas (ADS1015, ~500 lecturas/s por canal: bastaría para ranuras de ≥ 7 ms, pero necesita la Fase 6) o
-        un ESP32 que cuente los dos sensores. La Pi no tiene GPIO libres accesibles con el Explorer HAT encima.
+        un ESP32 que cuente los dos sensores. **Corrección (03/10/2026):** el Explorer HAT sí deja GPIO libres
+        accesibles, en la fila lateral marcada "3.3V ONLY": SDA (2), SCL (3), PWM (18), MOSI (10), MISO (9), SCK (11),
+        CS (8), RX (15), TX (14) y 3v3. Van directos a la Pi, sin protección: solo 3,3 V. Opción mejor: el LM393
+        izquierdo alimentado desde 3v3 y su D0 en PWM (GPIO 18), sin quitar el HC-SR04 izquierdo. Pendiente de
+        probar que el LM393 funciona bien a 3,3 V.
   - [x] Corregir la desviación en línea recta: `Lesson11.Straight` (03/10/2026). Cuenta los dos sensores cada ~1 ms
         y corrige con un control proporcional sobre la diferencia de pulsos (`speed ∓ difference * correction`,
         `correction` 0,02, `Math.Clamp` 0–1); `correct` permite compararlo sin corrección. Luces: verde = iguales,
