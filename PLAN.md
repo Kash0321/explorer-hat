@@ -552,9 +552,12 @@ solo cubre motores y las 4 luces. Falta:
     con el clon del fork, las pruebas y la prueba en la Pi: en `AGENTS.md` ("Contribuir a dotnet/iot"). Siguiente:
     el fallo de los eventos de GPIO, como incidencia, si se reproduce con `main`.
   - **Integración continua de dotnet/iot (Azure DevOps):** compila y prueba en Linux, macOS y Windows, en Debug y
-    Release. La prueba `ButtonTests.If_Button_Is_Held_Down_Longer_Than_Debouncing` falla a veces sola (mide tiempos):
-    falló en Linux Debug en el #2612 y en el #2605 de otro autor. Desde fuera no se puede repetir: se pide en un
-    comentario. El registro de la consola solo muestra el resultado de algunos proyectos de pruebas (8 de 30).
+    Release. `Button.Tests` (por ejemplo, `ButtonTests.If_Button_Is_Held_Down_Longer_Than_Debouncing`, que mide
+    tiempos) falla casi siempre en Linux Debug: en el #2612 (dos veces), en el #2613 y en el #2605 de otro autor.
+    Según raffaeler (mantenedor, 03/10/2026), pgrawehr y joperezr preparan un PR para arreglar esas pruebas. Desde
+    fuera no se puede repetir una compilación: se pide en un comentario, y raffaeler la repitió. El registro de la
+    consola solo muestra el resultado de algunos proyectos de pruebas; para saber cuál falla, el *binlog* (método en
+    `AGENTS.md`). En el *binlog* se ve que `Ina219.Tests`, `DCMotor.Tests` y `ExplorerHat.Tests` pasan.
   - **Fork `Kash0321/iot`:** existe, pero está 374 commits por detrás y su rama es `master` (la de dotnet/iot es
     `main`). Como las ramas se llaman distinto, lo más sencillo es clonar el fork, añadir
     `upstream` (dotnet/iot), crear cada rama desde `upstream/main` y subirla al fork. Un PR por arreglo.
