@@ -402,8 +402,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       rueda derecha y puso la izquierda a tope (el robot giraba sobre una rueda). Añadida una protección: con la
       corrección, si la diferencia pasa de `maxDifference` (10 pulsos), se para y avisa. Probada con el sensor fuera
       del disco y las ruedas en el aire: parada a los 11 pulsos con el aviso.
-  - [ ] Girar ángulos exactos con los pulsos (falta medir la distancia entre las ruedas; ahora es un reto de la
-        lección) y el cuadrado de la lección 04 con pulsos.
+  - [ ] Girar ángulos exactos con los pulsos (ahora es un reto de la lección) y el cuadrado de la lección 04 con
+        pulsos. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
+        cada rueda y 90° unos 10 pulsos.
 - [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
       variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
       obstáculos esquivados) para las pruebas en el suelo. `Iot.Device.Bindings` 4.2.0 trae `Lcd2004` y `Pcf8574`.

@@ -65,7 +65,7 @@ Velocidad 0,6, `correction` 0,02, UPS HAT (B), suelo liso. Las diferencias inclu
 sigue rodando después de parar, cuando ya no corrige.
 
 ¿Por qué no va perfectamente recto? Con una corrección proporcional siempre queda una pequeña diferencia: hace falta
-que una rueda vaya algo por delante para que exista la corrección. Si las ruedas están a unos 13 cm, 1 pulso de diferencia
+que una rueda vaya algo por delante para que exista la corrección. Nuestras ruedas están a 13 cm una de otra: 1 pulso de diferencia
 (1 cm) ya tuerce el robot unos 4 grados.
 
 ## Retos
@@ -74,6 +74,6 @@ que una rueda vaya algo por delante para que exista la corrección. Si las rueda
 * **Más o menos corrección.** Prueba `correction` a 0,005 y a 0,1. ¿Con cuál va más recto? ¿Con cuál hace eses?
 * **Más lejos.** Cambia `distance` a 200. ¿Sigue recto?
 * **Girar un ángulo exacto.** Para girar sin moverse del sitio, una rueda va hacia delante y la otra hacia atrás.
-  Mide la distancia entre las ruedas: en una vuelta entera, cada rueda recorre un círculo de ese diámetro
-  (diámetro × pi). ¿Cuántos pulsos hacen falta para 90 grados?
+  En una vuelta entera, cada rueda recorre un círculo con la distancia entre las ruedas como diámetro: 13 × 3,14 =
+  40,8 cm. ¿Cuántos pulsos hacen falta para 90 grados? (Pista: un cuarto de vuelta, 10,2 cm, unos 10 pulsos.)
 * **El cuadrado perfecto.** Usa los pulsos en lugar del tiempo para el cuadrado de la lección 04.
