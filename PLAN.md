@@ -7,38 +7,27 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (03/10/2026)
-- **Fase 5 en curso:** lecciones 01 a 04 en `lessons/` (luces, semáforo, motores y cuadrado; PR #15).
-  Las cuatro están probadas en la Pi (la 03 y la 04, también con las ruedas en el aire) y la 04 está calibrada en el
-  suelo con transportador (250 ms = 90°; tiene un modo calibración que se para tras cada giro).
-- **Lección 06 (Distancia), 03/10/2026, rama `fase-5-leccion-06`:** probada sin motores, con las ruedas en el
-  aire y en el suelo (frena a 58 cm, lee 27 cm y queda a ~20 cm de la pared).
-- **Nueva Fase 7 (02/10/2026, PR #14):** robot con IA. El robot es el cuerpo y un portátil con un LLM local es el
-  cerebro. Análisis, decisiones y pasos en la Fase 7. Va después de la Fase 5.
-- **Cerradas:** fases 0 a 4. Solo queda abierta en la Fase 3 la guía de compilación ligera en la Pi (poco urgente:
-  se compila en el PC). *Ejecutar en la Pi* se usa a diario con todos los programas (probado ya en el PR #7).
-- **Alimentación resuelta (01/10/2026):** la Waveshare UPS HAT (B) está instalada y probada: ninguna caída de
-  tensión, ni con los motores (comparativa de todas las fuentes en la Fase 2).
-- **Montaje terminado (01/10/2026):** la UPS y la Pi forman un bloque (con el montaje que trae la UPS) que encaja
-  en el hueco del chasis entre los soportes de los motores y se atornilla en dos ranuras. Ya están los 10 sensores
-  LM393 para la lección 11.
-- **Fase 4 cerrada (01/10/2026):** README de montaje, pinout, I2C y seguridad, y README de cada ejemplo.
-- **Depuración (Fase 3, 01/10/2026):** la depuración paso a paso funciona deshabilitando C# Dev Kit en este repositorio,
-  y Shift+F5 para los motores aunque se hayan congelado a toda velocidad.
-- **Nuevo ejemplo:** `ExplorerHat.UpsDashboard`, panel con los datos de la UPS (PR #11).
-- **Lección 09 (Robot autónomo), 03/10/2026, rama `fase-5-leccion-09`:** probada con las ruedas en el aire (los
-  tres sensores, 10 pasos de giro sin salida, final por tiempo y Ctrl+C) y en el suelo con cajas (15 obstáculos en
-  60 s; solo choca con algunas esquinas, que el sensor no ve).
-- **Lección 05 (Botones), 03/10/2026, rama `fase-5-leccion-05`:** pulsador y LED en una protoboard, probada; sin
-  rebotes. Arreglada la parada de emergencia desde el PC (finales de línea CRLF en los `.sh`).
-- **Lección 11 (Contar vueltas), 03/10/2026, rama `fase-5-leccion-11`:** primera parte, con un LM393 en la rueda
-  derecha (IN4): mide la velocidad y avanza una distancia exacta; probada en el aire y en el suelo. El sensor salta
-  unos µs en cada borde de ranura: leer cada ~1 ms lo evita.
-- **Lección 11, segunda parte (Ir recto), 03/10/2026, rama `fase-5-leccion-11-recto`:** dos sensores de velocidad
-  (el izquierdo en IN3, en lugar del ECHO del HC-SR04 izquierdo) y control proporcional: de más de 45 cm de desvío
-  en 1 m a 2–10 cm. Protección si un sensor deja de contar. **Al terminar, volver a conectar el HC-SR04 izquierdo.**
-- **Siguiente paso propuesto:** la propuesta 12 (pantalla LCD; antes, revisar la tensión del bus I2C), girar ángulos
-  exactos con los pulsos, o los PR a dotnet/iot de la Fase 6 (arreglo de `Dispose` de `ExplorerHat` y lectura con
-  signo en `Ina219`).
+- **Fase 5, lecciones hechas y probadas** (`lessons/`, detalles en la Fase 5): 01 Luces, 02 Semáforo, 03 Motores,
+  04 Cuadrado (PR #15), 05 Botones (PR #19), 06 Distancia (PR #17), 09 Robot autónomo (PR #18), 11 Contar vueltas en
+  tres partes: odometría, ir recto con realimentación y el cuadrado con pulsos (PR #21, #22 y #23), y 12 La pantalla
+  (rama `fase-5-leccion-12`). Todas con las ruedas en el aire y, las que se mueven, también en el suelo.
+- **Faltan de la Fase 5:** 07 Pads táctiles y 08 Sensores analógicos (necesitan la Fase 6) y 10 Siguelíneas (dos
+  TCRT5000; las entradas se pueden sacar de la fila lateral de 3,3 V del HAT).
+- **Montaje actual (PR #24):** todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V),
+  LM393 izquierdo a **3,3 V** en GPIO 18 (pin PWM de la fila lateral "3.3V ONLY" del HAT) y pantalla LCD 2004 en I2C
+  0x27 (a 3,3 V). El pulsador de la lección 05 necesita IN4: idea, moverlo a un pin de la fila lateral (por ejemplo
+  CS, GPIO 8) con el pull-down interno de la Pi.
+- **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
+  Alimentación con la Waveshare UPS HAT (B), sin caídas de tensión. Ejemplos en `src/`: BasicSample,
+  ObstacleAvoidance, SonarDashboard y UpsDashboard.
+- **Hallazgos de esta sesión:** la parada de emergencia desde el PC fallaba por los finales de línea CRLF de los `.sh`
+  (arreglado con `.gitattributes`); los sensores de velocidad saltan en cada borde de ranura y las entradas IN del HAT
+  no tienen histéresis (leer cada ~1 ms lo evita); un corte de batería dejó un archivo vacío (las tareas de despliegue
+  hacen `sync`); la fila lateral del HAT da GPIO libres de 3,3 V.
+- **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
+- **Siguiente paso propuesto:** los PR a dotnet/iot de la Fase 6 (arreglo de `Dispose` de `ExplorerHat`, lectura con
+  signo en `Ina219` y, si no está informado, el fallo de `UnregisterCallbackForPinValueChangedEvent`); o la lección 10
+  (siguelíneas) o la 07 (pads táctiles, que necesita un binding para el CAP1208).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
@@ -431,7 +420,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       con `runtimeconfig.json` vacío (el corte llegó antes de escribir la caché en la microSD): las tareas de
       despliegue de VS Code ejecutan ahora `sync` después de copiar. `git fsck` en la Pi, sin daños. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
         cada rueda y 90° unos 10 pulsos.
-- [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
+- [x] 12 Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
       variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
       obstáculos esquivados) para las pruebas en el suelo. `Iot.Device.Bindings` 4.2.0 trae `Lcd2004` y `Pcf8574`.
       Antes de conectarla:
@@ -447,6 +436,12 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     RW 1, E 2, luz 3, datos 4–7) escribe bien las 4 líneas; al principio no se veían las letras y aparecieron,
     perfectas, girando el potenciómetro de contraste. **No hace falta conversor de niveles ni quitar las
     resistencias de 4,7 kΩ:** a 3,3 V el bus no pasa de 3,3 V. Programa de prueba aparte (no versionado).
+  - **Lección `Lesson12.Screen` (03/10/2026, rama `fase-5-leccion-12`):** clase `Screen` en `ExplorerHat.Common`
+    (`Clear()` y `Write(línea, texto)`, que corta o rellena a 20 caracteres). Tres partes, sin motores: texto con el
+    nombre del niño y una línea demasiado larga, contar del 1 al 10 con su doble y un panel de 20 s con la distancia
+    del sensor central (filtro de la 06) y una barra de `#` (uno por cada 10 cm) y "Too near!" a menos de 30 cm.
+    Probada en la Pi: código 0; el usuario vio la línea cortada en 20 caracteres, la cuenta, la barra siguiendo a
+    la mano con fluidez, "Too near!" y la despedida.
 
 ### Componentes disponibles (03/10/2026)
 - 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
