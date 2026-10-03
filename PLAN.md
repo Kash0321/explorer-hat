@@ -21,7 +21,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   Alimentación con la Waveshare UPS HAT (B), sin caídas de tensión. Ejemplos en `src/`: BasicSample,
   ObstacleAvoidance, SonarDashboard y UpsDashboard.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, sesión del 03/10/2026 (noche), en dotnet/iot:**
+- **Fase 6, en dotnet/iot (al cierre del 03/10/2026):**
 
   | Qué | Estado | Pendiente |
   |---|---|---|
@@ -30,21 +30,29 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta | La arregla el PR #2610 de pgrawehr (probado; le comentamos un fallo con dos avisos en un pin) |
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta | Solo incidencia |
   | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, sin revisión | Revisión de los mantenedores |
+  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Abierto (no es nuestro) | Ver si responde a [nuestro comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665) (dos avisos en un pin) |
 
-  Los dos PR fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro): según raffaeler, pgrawehr y
-  joperezr preparan el arreglo; es el PR [#2608](https://github.com/dotnet/iot/pull/2608) de pgrawehr (abierto). Si los mantenedores comentan, se responde en el PR y los cambios van en commits
-  nuevos (sin *force push*). Para mirar el estado: `gh pr checks <PR> -R dotnet/iot` y los comentarios con
+  Los PR #2612 y #2613 fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro); seguramente le
+  pasará lo mismo al #2616. Lo arregla el PR [#2608](https://github.com/dotnet/iot/pull/2608) de pgrawehr (abierto).
+  Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*). Para mirar el estado: `gh pr checks <PR> -R dotnet/iot` y los comentarios con
   `gh api repos/dotnet/iot/issues/<n>/comments`.
 - **Hallazgos de esta sesión:** con 4.2.0, liberar un `DCMotor` marcha atrás deja la rueda **a toda velocidad**
   (`SafeExplorerHat` lo evita porque para antes); `ExplorerHat.Dispose` tumba el proceso; el INA219 de la UPS lee la
-  corriente sin signo; en la Pi 3 con libgpiod v2 solo se puede registrar un aviso de GPIO por pin. Detalles en la
-  Fase 6.
+  corriente sin signo; en la Pi 3 con libgpiod v2 solo se puede registrar un aviso de GPIO por pin; de fábrica, el
+  CAP1208 solo admite un toque a la vez y con sensibilidad 1x no detecta los pads. Detalles en la Fase 6.
 - **Siguiente paso: ampliar el binding `ExplorerHat`** con lo que le falta del HAT (entradas, salidas, entradas
   analógicas y pads táctiles). **Diseño acordado el 03/10/2026** (Fase 6, "Ampliar el binding: diseño acordado"):
   primero el binding nuevo `Cap1208` (`src/devices/Cap1xxx`, no depende del #2613; **PR #2616 abierto**), después
   entradas y salidas, analógico y pads en `ExplorerHat`. Las entradas y salidas se programan sobre la rama
-  `explorerhat-dispose`; antes del analógico, medir en la Pi la tensión del ADS1015 (con un cable a 3,3 V y a 5 V). Después: la lección 07 (pads táctiles) y la 08 (analógico), que lo necesitan, o la
-  10 (siguelíneas).
+  `explorerhat-dispose`; antes del analógico, medir en la Pi la tensión del ADS1015 (con un cable a 3,3 V y a 5 V).
+  Después: la lección 07 (pads táctiles) y la 08 (analógico), que lo necesitan, o la 10 (siguelíneas).
+- **Al retomar (siguiente sesión):**
+  1. Mirar las comprobaciones y los comentarios del #2616 (primer binding nuevo: pueden pedir cambios) y si
+     pgrawehr responde en el #2610.
+  2. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
+     `explorerhat-dispose`; cada pin se abre la primera vez que se usa; pruebas con `FakeGpioDriver`. Prueba en la Pi
+     sin motores: IN4 con el LM393 derecho (girar la rueda con la mano) y OUT4 con el LED de la lección 05 (si sigue
+     en la protoboard). El PR se abre cuando fusionen el #2613.
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
