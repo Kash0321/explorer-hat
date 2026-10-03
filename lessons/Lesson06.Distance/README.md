@@ -60,9 +60,15 @@ la otra la corrige. El precio es pequeño: cuando el obstáculo se aparta, el ro
 
 ## Frenar a tiempo
 
-El robot no se para en el acto. Desde que el obstáculo está a 30 cm hasta que el robot se para pasan varias
-cosas: el sensor tarda en medir, el filtro espera una lectura más y el robot sigue un poco por la inercia. Por eso
-`stopDistance` no puede ser muy pequeño. Mide en el suelo dónde se para de verdad.
+El robot no se para en el acto. Entre dos lecturas el robot sigue avanzando, y al cortar la corriente sigue un poco
+por la inercia. Por eso `stopDistance` no puede ser muy pequeño. Mide en el suelo dónde se para de verdad.
+
+Nuestra prueba (velocidades 0,8 y 0,6, UPS HAT (B), suelo liso, pared a 115 cm): el robot empezó a ir despacio al
+leer 58 cm, leyó 27 cm, se paró y quedó a unos **20 cm** de la pared, igual en las dos pruebas. Entre dos lecturas
+avanzaba unos 3 cm (rápido) o 2,5 cm (despacio). Los 7 cm que faltan son lo que recorre desde la última lectura hasta pararse del todo.
+
+El filtro no retrasa la frenada: cuando el robot se acerca, la lectura nueva es la más cercana de las dos. Solo
+tarda una lectura más en dar el camino por libre cuando el obstáculo se aparta.
 
 ## Retos
 
