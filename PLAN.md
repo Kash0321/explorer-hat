@@ -379,8 +379,10 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         medir con la cinta; parte 2 avanza 50 cm (`while` con distancia `&&` tiempo máximo de 5 s, por si falla el
         sensor); después de cada parte cuenta 0,5 s más lo que resbala. Con las ruedas en el aire (versión sin tecla):
         85 pulsos en 2 s (43 cm/s), parada a 49 pulsos (50 cm) y 4 pulsos más por la inercia; código 0 y pines a nivel
-        bajo. En el suelo: se desvía a menudo de la línea recta; cuando va recto, la distancia contada coincide con la
-        de la cinta.
+        bajo. En el suelo (7 pruebas a 0,6): parte 1 de 72 a 77 pulsos (37–39 cm/s; una vez 58, quizá un roce);
+        parte 2 siempre parada a 49 pulsos y 4–7 pulsos más al frenar (una vez 0), unos 55 cm en total; con la cinta,
+        cuando fue recto, 55 cm, igual que lo contado (55,1 cm). **Se desvía a la izquierda** a menudo: la rueda
+        derecha gira más rápido que la izquierda.
   - [ ] **Decidir dónde conectar el segundo sensor:** los ECHO de los tres HC-SR04 ocupan IN1–IN3 (GPIO 23, 22
         y 24). Opciones: quitar un HC-SR04 en esa lección, llevar un ECHO o un LM393 a un GPIO libre de la Pi
         que el HAT no use, o las entradas analógicas (ADS1015, probablemente demasiado lentas para contar pulsos).

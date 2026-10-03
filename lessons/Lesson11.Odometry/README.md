@@ -54,9 +54,15 @@ Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC
 Con las ruedas en el aire (velocidad 0,6): 85 pulsos en 2 s, unos 43 cm por segundo. En la parte 2 se paró a los
 49 pulsos (50 cm) y la rueda siguió 4 pulsos más (4 cm).
 
-En el suelo, cuando el robot fue recto, la distancia que contó coincidió con la de la cinta. Pero a menudo se
-desvía: los dos motores no giran exactamente igual, y solo medimos la rueda derecha. Para ir recto hace falta un
-sensor en cada rueda (segunda parte de la lección).
+En el suelo (7 pruebas, velocidad 0,6, UPS HAT (B), suelo liso):
+
+* **Parte 1:** casi siempre de 72 a 77 pulsos, **37–39 cm por segundo**. Va más despacio que en el aire, porque las
+  ruedas mueven todo el peso del robot.
+* **Parte 2:** siempre se paró a los 49 pulsos (50 cm) y la rueda siguió de **4 a 7 pulsos más**. En total, unos
+  **55 cm**. En el suelo resbala más que en el aire: la inercia de todo el robot empuja la rueda.
+* **Con la cinta:** cuando el robot fue recto, midió 55 cm, igual que lo que contó (55,1 cm).
+* **Se desvía a la izquierda:** la rueda derecha gira más rápido que la izquierda. Solo medimos la derecha, así que
+  el robot no se entera. Para ir recto hace falta un sensor en cada rueda (segunda parte de la lección).
 
 Velocidad de la rueda en el aire según `Speed`:
 
