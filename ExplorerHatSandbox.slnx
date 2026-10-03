@@ -10,6 +10,7 @@
     <Project Path="lessons/Lesson11.Odometry/Lesson11.Odometry.csproj" />
     <Project Path="lessons/Lesson11.Straight/Lesson11.Straight.csproj" />
     <Project Path="lessons/Lesson11.Square/Lesson11.Square.csproj" />
+    <Project Path="lessons/Lesson12.Screen/Lesson12.Screen.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />

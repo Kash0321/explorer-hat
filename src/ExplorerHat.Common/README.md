@@ -1,7 +1,15 @@
 # Código compartido (Common)
 
-Biblioteca con `SafeExplorerHat`, que usan los ejemplos que mueven los motores
-(`BasicSample` y `ObstacleAvoidance`). No es un programa: no se ejecuta sola.
+Biblioteca con `SafeExplorerHat`, que usan los ejemplos y las lecciones que mueven los motores o encienden las
+luces, y con `Screen`, para la pantalla LCD. No es un programa: no se ejecuta sola.
+
+## `Screen`: la pantalla LCD
+
+Pantalla LCD 2004 (20 columnas × 4 líneas) con adaptador I2C PCF8574 en la dirección 0x27, alimentada a 3,3 V
+desde la fila lateral del Explorer HAT. Esconde la configuración del adaptador (qué pin del PCF8574 va a cada pin de
+la pantalla) para que las lecciones solo usen `Clear()` y `Write(línea, texto)`. `Write` escribe la línea entera:
+corta el texto a 20 caracteres o lo rellena con espacios. La pantalla guarda el último texto al terminar el programa.
+La usa la lección 12.
 
 ## Para qué sirve `SafeExplorerHat`
 
