@@ -51,6 +51,12 @@ girando unos pulsos. En nuestra primera prueba en el suelo (`brakePulses` = 1), 
 Las cuentas encajaban; sobraba lo que resbala.
 
 Por eso cada rueda se para `brakePulses` pulsos antes: 10 − 3 = 7 pulsos, y los 3 que resbala la llevan a 10.
+Con `brakePulses` = 3, en la segunda prueba **las cuatro esquinas midieron casi 90 grados**: cada rueda se paró a
+los 7 pulsos (una vez, 8) y resbaló de 1 a 3 más.
+
+Fíjate en que la primera esquina sumó solo 8 pulsos y también midió unos 90 grados. El sensor solo cuenta cuando
+empieza una ranura: al empezar y al terminar, el disco puede estar a mitad de un pulso. Por eso hay un margen de
+más o menos un pulso, unos 9 grados.
 
 1. Ejecuta la lección en modo calibración (`y`).
 2. Mide cada esquina con el transportador.

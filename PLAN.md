@@ -406,7 +406,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       rueda derecha y puso la izquierda a tope (el robot giraba sobre una rueda). Añadida una protección: con la
       corrección, si la diferencia pasa de `maxDifference` (10 pulsos), se para y avisa. Probada con el sensor fuera
       del disco y las ruedas en el aire: parada a los 11 pulsos con el aviso.
-  - [~] Girar ángulos exactos con los pulsos y el cuadrado de la lección 04 con pulsos: `Lesson11.Square`
+  - [x] Girar ángulos exactos con los pulsos y el cuadrado de la lección 04 con pulsos: `Lesson11.Square`
         (03/10/2026, rama `fase-5-giros-exactos`). Lados de 30 cm con la corrección de la parte 2; giros sobre sí
         mismo en los que cada rueda se para por separado al llegar a sus pulsos, menos `brakePulses` por lo que resbala;
         modo calibración (se para tras cada giro y muestra lo que ha resbalado cada rueda). 90° = 10 pulsos (9° por
@@ -415,8 +415,13 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       otra llega) y 1–3 más de inercia; lados de 29 pulsos y 4–5 de inercia. Código 0, pines a nivel bajo.
     - En el suelo (`brakePulses` 1): cada rueda 9–10 pulsos y **3–4 resbalando** (~12,5 en total ≈ 112°); el usuario
       midió **~115°**: el cálculo con la distancia entre ruedas encaja, sobra lo que resbala. Lados: 29 pulsos y 5–7
-      más (~36 cm en lugar de 30). Cambiado a `brakePulses` 3 (objetivo 7 pulsos): pendiente de probar.
-    - La UPS se quedó sin batería durante las pruebas (la Pi se reinició): cargar antes de seguir. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
+      más (~36 cm en lugar de 30). Cambiado a `brakePulses` 3 (objetivo 7 pulsos).
+    - En el suelo (`brakePulses` 3, batería al ~70 %): **las cuatro esquinas, casi 90°** según el usuario; cada rueda
+      7 pulsos (una vez 8) y 1–3 resbalando; un lado se desvió muy poco. Margen de ±1 pulso (~9°): el sensor solo
+      cuenta el inicio de cada ranura.
+    - La UPS se quedó sin batería durante las pruebas (la Pi se reinició). El programa desplegado justo antes quedó
+      con `runtimeconfig.json` vacío (el corte llegó antes de escribir la caché en la microSD): las tareas de
+      despliegue de VS Code ejecutan ahora `sync` después de copiar. `git fsck` en la Pi, sin daños. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
         cada rueda y 90° unos 10 pulsos.
 - [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
       variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
