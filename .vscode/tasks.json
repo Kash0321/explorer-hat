@@ -16,14 +16,14 @@
             "label": "Desplegar en la Pi",
             "detail": "Compila el programa en el PC y lo copia a ~/apps en la Raspberry Pi",
             "type": "shell",
-            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program}\"",
+            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program} && sync\"",
             "problemMatcher": "$msCompile"
         },
         {
             "label": "Ejecutar en la Pi",
             "detail": "Despliega el programa y lo ejecuta en la Raspberry Pi (Ctrl+C para pararlo)",
             "type": "shell",
-            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program} && dotnet ~/apps/${input:program}/${input:program}.dll\"",
+            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program} && sync && dotnet ~/apps/${input:program}/${input:program}.dll\"",
             "problemMatcher": "$msCompile",
             "presentation": {
                 "focus": true,
@@ -35,7 +35,7 @@
             "label": "Ejecutar una lección en la Pi",
             "detail": "Despliega una lección de lessons/ y la ejecuta en la Raspberry Pi (Ctrl+C para pararla)",
             "type": "shell",
-            "command": "dotnet publish lessons/${input:lesson}/${input:lesson}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:lesson} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:lesson} && mkdir -p ~/apps\" && scp -r -q publish/${input:lesson} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:lesson} && dotnet ~/apps/${input:lesson}/${input:lesson}.dll\"",
+            "command": "dotnet publish lessons/${input:lesson}/${input:lesson}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:lesson} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:lesson} && mkdir -p ~/apps\" && scp -r -q publish/${input:lesson} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:lesson} && sync && dotnet ~/apps/${input:lesson}/${input:lesson}.dll\"",
             "problemMatcher": "$msCompile",
             "presentation": {
                 "focus": true,
@@ -47,7 +47,7 @@
             "label": "Desplegar BasicSample",
             "detail": "Usada por la configuración de depuración de BasicSample",
             "type": "shell",
-            "command": "dotnet publish src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj -c Debug -r linux-arm64 --self-contained false -o publish/ExplorerHat.BasicSample && ssh ${config:explorerHat.host} \"rm -rf ~/apps/ExplorerHat.BasicSample && mkdir -p ~/apps\" && scp -r -q publish/ExplorerHat.BasicSample ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/ExplorerHat.BasicSample\"",
+            "command": "dotnet publish src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj -c Debug -r linux-arm64 --self-contained false -o publish/ExplorerHat.BasicSample && ssh ${config:explorerHat.host} \"rm -rf ~/apps/ExplorerHat.BasicSample && mkdir -p ~/apps\" && scp -r -q publish/ExplorerHat.BasicSample ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/ExplorerHat.BasicSample && sync\"",
             "problemMatcher": "$msCompile"
         },
         {
@@ -87,7 +87,8 @@
                 "Lesson06.Distance",
                 "Lesson09.Autonomous",
                 "Lesson11.Odometry",
-                "Lesson11.Straight"
+                "Lesson11.Straight",
+                "Lesson11.Square"
             ],
             "default": "Lesson01.Lights"
         }

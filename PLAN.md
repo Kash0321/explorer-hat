@@ -388,7 +388,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - [x] **Dónde conectar el segundo sensor** (03/10/2026): de momento, en la lección se desconecta el HC-SR04
         izquierdo y su D0 va a IN3 (GPIO 24), con el VCC y el GND que deja libres. Más adelante: las entradas
         analógicas (ADS1015, ~500 lecturas/s por canal: bastaría para ranuras de ≥ 7 ms, pero necesita la Fase 6) o
-        un ESP32 que cuente los dos sensores. La Pi no tiene GPIO libres accesibles con el Explorer HAT encima.
+        un ESP32 que cuente los dos sensores. **Corrección (03/10/2026):** el Explorer HAT sí deja GPIO libres
+        accesibles, en la fila lateral marcada "3.3V ONLY": SDA (2), SCL (3), PWM (18), MOSI (10), MISO (9), SCK (11),
+        CS (8), RX (15), TX (14) y 3v3. Van directos a la Pi, sin protección: solo 3,3 V. Opción mejor: el LM393
+        izquierdo alimentado desde 3v3 y su D0 en PWM (GPIO 18), sin quitar el HC-SR04 izquierdo. Pendiente de
+        probar que el LM393 funciona bien a 3,3 V.
   - [x] Corregir la desviación en línea recta: `Lesson11.Straight` (03/10/2026). Cuenta los dos sensores cada ~1 ms
         y corrige con un control proporcional sobre la diferencia de pulsos (`speed ∓ difference * correction`,
         `correction` 0,02, `Math.Clamp` 0–1); `correct` permite compararlo sin corrección. Luces: verde = iguales,
@@ -402,8 +406,22 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       rueda derecha y puso la izquierda a tope (el robot giraba sobre una rueda). Añadida una protección: con la
       corrección, si la diferencia pasa de `maxDifference` (10 pulsos), se para y avisa. Probada con el sensor fuera
       del disco y las ruedas en el aire: parada a los 11 pulsos con el aviso.
-  - [ ] Girar ángulos exactos con los pulsos (ahora es un reto de la lección) y el cuadrado de la lección 04 con
-        pulsos. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
+  - [x] Girar ángulos exactos con los pulsos y el cuadrado de la lección 04 con pulsos: `Lesson11.Square`
+        (03/10/2026, rama `fase-5-giros-exactos`). Lados de 30 cm con la corrección de la parte 2; giros sobre sí
+        mismo en los que cada rueda se para por separado al llegar a sus pulsos, menos `brakePulses` por lo que resbala;
+        modo calibración (se para tras cada giro y muestra lo que ha resbalado cada rueda). 90° = 10 pulsos (9° por
+        pulso: la resolución es gruesa).
+    - En el aire (`brakePulses` 1, objetivo 9): la rueda que va hacia delante cuenta 11–12 (sigue rodando mientras la
+      otra llega) y 1–3 más de inercia; lados de 29 pulsos y 4–5 de inercia. Código 0, pines a nivel bajo.
+    - En el suelo (`brakePulses` 1): cada rueda 9–10 pulsos y **3–4 resbalando** (~12,5 en total ≈ 112°); el usuario
+      midió **~115°**: el cálculo con la distancia entre ruedas encaja, sobra lo que resbala. Lados: 29 pulsos y 5–7
+      más (~36 cm en lugar de 30). Cambiado a `brakePulses` 3 (objetivo 7 pulsos).
+    - En el suelo (`brakePulses` 3, batería al ~70 %): **las cuatro esquinas, casi 90°** según el usuario; cada rueda
+      7 pulsos (una vez 8) y 1–3 resbalando; un lado se desvió muy poco. Margen de ±1 pulso (~9°): el sensor solo
+      cuenta el inicio de cada ranura.
+    - La UPS se quedó sin batería durante las pruebas (la Pi se reinició). El programa desplegado justo antes quedó
+      con `runtimeconfig.json` vacío (el corte llegó antes de escribir la caché en la microSD): las tareas de
+      despliegue de VS Code ejecutan ahora `sync` después de copiar. `git fsck` en la Pi, sin daños. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
         cada rueda y 90° unos 10 pulsos.
 - [ ] 12 (propuesta) Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
       variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
@@ -415,7 +433,12 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     SCL a su VCC: con VCC a 5 V, SDA y SCL de la Pi (3,3 V) quedarían por encima de 3,3 V. Medir esas resistencias
     y decidir: quitarlas (la Pi ya tiene pull-ups a 3,3 V), un conversor de niveles o alimentar el adaptador a 3,3 V
     (el contraste puede no bastar).
-  - Ver por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3) con el Explorer HAT encima.
+  - Por dónde se llega a SDA (GPIO 2) y SCL (GPIO 3): la fila lateral del Explorer HAT marcada "3.3V ONLY".
+  - **Probada a 3,3 V (03/10/2026):** adaptador con VCC al pin 3v3 de esa fila, SDA y SCL a los suyos y GND al
+    nodo de GND. `i2cdetect` la ve en **0x27** (PCF8574T, A0–A2 sin puentear). Con `Lcd2004` + `Pcf8574` (RS 0,
+    RW 1, E 2, luz 3, datos 4–7) escribe bien las 4 líneas; al principio no se veían las letras y aparecieron,
+    perfectas, girando el potenciómetro de contraste. **No hace falta conversor de niveles ni quitar las
+    resistencias de 4,7 kΩ:** a 3,3 V el bus no pasa de 3,3 V. Programa de prueba aparte (no versionado).
 
 ### Componentes disponibles (03/10/2026)
 - 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
