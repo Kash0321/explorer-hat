@@ -18,10 +18,10 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #31, cuyas descripciones resumen cada fase y cada lección.
+     sobre todo los #4 a #36, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
-     actual" de PLAN.md (el 03/10/2026: PR #2612, #2613 y #2616, incidencias #2614 y #2615, y el
-     PR #2610 de pgrawehr, donde comentamos), con sus comprobaciones y comentarios nuevos
+     actual" de PLAN.md (el 04/10/2026: PR #2612, #2613 y #2616, incidencias #2614, #2615 y #2617,
+     y el PR #2610 de pgrawehr, donde comentamos), con sus comprobaciones y comentarios nuevos
      (gh pr checks <n> -R dotnet/iot y gh api repos/dotnet/iot/issues/<n>/comments). Si hay
      comentarios, dímelo antes de responder.
 
@@ -31,7 +31,8 @@ Antes de hacer nada más:
    indica AGENTS.md. Comprueba también que el autor de los commits es el correcto:
    git var GIT_AUTHOR_IDENT
    En el PC, revisa también el clon del fork de dotnet/iot (C:\work\iot, ver AGENTS.md): sus
-   ramas, que no haya cambios sin confirmar y lo que ha cambiado en upstream/main.
+   ramas (las de entradas y salidas y la del analógico van apiladas sobre la del #2613), que no
+   haya cambios sin confirmar y lo que ha cambiado en upstream/main.
 
 3. Ya en la Pi, sin mover nada, revisa su estado: rama y estado de git en ~/work/explorer-hat
    (que esté en main y al día), vcgencmd get_throttled, pinctrl get 19,20,21,26,4,17,27,5 y que

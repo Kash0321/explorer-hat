@@ -6,82 +6,70 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (04/10/2026)
-- **Sesión del 04/10/2026 (rama `motores-pwm-dos-pines`):**
+## Estado actual (al cierre del 04/10/2026)
+- **Sesión del 04/10/2026** (PR #33 a #36 de este repositorio; detalles en las fases):
   - El usuario desmontó y volvió a montar todo el cableado. Revisado con `tools/probar-cableado.sh` (nuevo): todo
-    bien salvo los motores, que estaban cambiados de borna y con el derecho al revés. Cables, en el README (montaje).
-  - **Marcha atrás más lenta:** con el `DCMotor` del binding, a 0,4 las ruedas iban hacia atrás al ~36 % de la
-    velocidad hacia delante. Causa: en la parte apagada del PWM, marcha atrás el DRV8833 frena (los dos pines en
-    alto). La frecuencia no lo arregla. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos pines, como
-    Pimoroni): los dos sentidos al 93–102 %. Detalles en la Fase 6 ("Marcha atrás más lenta").
-  - **Sin cable micro-USB:** la Pi funciona igual solo con los contactos de la UPS (Fase 2). Al compilar en la Pi,
-    la CPU llega a 60 °C y baja su frecuencia (`0x80000`). Pin de 5 V medido con el ADS1015 del HAT: 5,30 V en
-    reposo y 5,22 V como mínimo con los motores (0,6 V de margen).
-  - **ADS1015 del HAT a 5 V:** las entradas analógicas admiten de 0 a 5 V, sin divisor; `Ads1115` lo lee bien (Fase 6).
-  - **Recalibrado en el suelo con `HatMotor`** (los giros sobre sí mismo son más fuertes): lección 04, `turnTime`
-    de 250 a **200 ms**; `Lesson11.Square`, `brakePulses` de 3 a **4**. La lección 09 y ObstacleAvoidance no cambian
-    (giran a pasos y miran después de cada uno): esquivan igual o mejor, con giros de 1 paso casi siempre. El usuario
-    decidió dejar el límite de obstáculo en 30 cm. Detalles en la Fase 5 (lecciones 04, 09 y 11) y en la Fase 2.
-- **Fase 5, lecciones hechas y probadas** (`lessons/`, detalles en la Fase 5): 01 Luces, 02 Semáforo, 03 Motores,
-  04 Cuadrado (PR #15), 05 Botones (PR #19), 06 Distancia (PR #17), 09 Robot autónomo (PR #18), 11 Contar vueltas en
-  tres partes: odometría, ir recto con realimentación y el cuadrado con pulsos (PR #21, #22 y #23), y 12 La pantalla
-  (rama `fase-5-leccion-12`). Todas con las ruedas en el aire y, las que se mueven, también en el suelo.
-- **Faltan de la Fase 5:** 07 Pads táctiles y 08 Sensores analógicos (necesitan la Fase 6) y 10 Siguelíneas (dos
-  TCRT5000; las entradas se pueden sacar de la fila lateral de 3,3 V del HAT).
-- **Montaje actual (PR #24):** todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V),
-  LM393 izquierdo a **3,3 V** en GPIO 18 (pin PWM de la fila lateral "3.3V ONLY" del HAT) y pantalla LCD 2004 en I2C
-  0x27 (a 3,3 V). El pulsador de la lección 05 necesita IN4: idea, moverlo a un pin de la fila lateral (por ejemplo
-  CS, GPIO 8) con el pull-down interno de la Pi.
+    bien salvo los motores, cambiados de borna y con el derecho al revés. Colores de los cables, en el README.
+  - **Marcha atrás más lenta** con el `DCMotor` del binding (a 0,4, al ~36 % de la velocidad hacia delante): marcha
+    atrás, el DRV8833 frena en la parte apagada del PWM. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos
+    pines, como Pimoroni): los dos sentidos al 93–102 %. Informado en dotnet/iot (#2617). Fase 6.
+  - **Giros recalibrados en el suelo:** lección 04, `turnTime` 200 ms; `Lesson11.Square`, `brakePulses` 4. La 09 y
+    ObstacleAvoidance, sin cambios (límite de obstáculo en 30 cm, decisión del usuario). Fase 5.
+  - **Alimentación:** la Pi va solo por los contactos de la UPS, **sin cable micro-USB** (con y sin cable, igual).
+    Pin de 5 V: 5,30 V en reposo y 5,22 V como mínimo con los motores (0,6 V de margen). Al compilar en la Pi, la CPU
+    llega a 60 °C y baja su frecuencia (`0x80000`). Fase 2.
+  - **ADS1015 del HAT a 5 V:** entradas analógicas de 0 a 5 V, sin divisor; `Ads1115` lo lee bien. Fase 6.
+  - **Binding `ExplorerHat` ampliado** en dos ramas del fork, probadas en la Pi: entradas y salidas digitales
+    (`explorerhat-inputs-outputs`) y entradas analógicas (`explorerhat-analog`). Esperan al #2613. Fase 6.
+  - Todos los programas de `~/apps` están desplegados desde `main` con `HatMotor`.
+- **Fase 5, lecciones hechas y probadas** (`lessons/`): 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones,
+  06 Distancia, 09 Robot autónomo, 11 Contar vueltas (odometría, ir recto y el cuadrado con pulsos) y 12 La pantalla.
+  Todas con las ruedas en el aire y, las que se mueven, también en el suelo.
+- **Faltan de la Fase 5:** 07 Pads táctiles y 08 Sensores analógicos (necesitan una versión de `Iot.Device.Bindings`
+  con la Fase 6, o el binding compilado desde el fork) y 10 Siguelíneas (dos TCRT5000, por confirmar).
+- **Montaje actual:** todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
+  a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
+  no está montado. El pulsador de la lección 05 necesita IN4: idea, moverlo al GPIO 8 (CS) con el pull-down de la Pi.
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
-  Alimentación con la Waveshare UPS HAT (B), sin caídas de tensión. Ejemplos en `src/`: BasicSample,
-  ObstacleAvoidance, SonarDashboard y UpsDashboard.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, en dotnet/iot (al cierre del 03/10/2026; el 04/10/2026, sin comentarios nuevos):**
+- **Fase 6, en dotnet/iot (al cierre del 04/10/2026):**
 
   | Qué | Estado | Pendiente |
   |---|---|---|
-  | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | Abierto, sin revisión | Revisión de los mantenedores |
-  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Abierto, sin revisión | Revisión de los mantenedores |
-  | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta | La arregla el PR #2610 de pgrawehr (probado; le comentamos un fallo con dos avisos en un pin) |
-  | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta | Solo incidencia |
-  | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, sin revisión | Revisión de los mantenedores |
-  | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás más lenta con `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas (04/10/2026) | Abierta | Respuesta de los mantenedores a las tres preguntas (forma de la API, variante que frena y si `ExplorerHat` la usa) |
-  | Rama `explorerhat-inputs-outputs` del fork: entradas y salidas en `ExplorerHat` (PR 2 del orden acordado, 04/10/2026) | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2613 |
-  | Rama `explorerhat-analog` del fork: entradas analógicas en `ExplorerHat` (PR 3, 04/10/2026), encima de `explorerhat-inputs-outputs` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el de entradas y salidas |
-  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Abierto (no es nuestro) | Ver si responde a [nuestro comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665) (dos avisos en un pin) |
+  | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | Abierto, etiqueta `area-device-bindings`, sin revisión | Revisión de los mantenedores |
+  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Abierto, etiqueta `area-device-bindings`, sin revisión | Revisión. De él dependen las dos ramas de abajo |
+  | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, etiqueta `area-device-bindings`, sin revisión | Revisión (primer binding nuevo: pueden pedir cambios) |
+  | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta (`untriaged`) | La arregla el PR #2610 de pgrawehr (probado; le comentamos un fallo con dos avisos en un pin) |
+  | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`) | Solo incidencia |
+  | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`) | Respuesta a sus tres preguntas (forma de la API, variante que frena, si `ExplorerHat` la usa) |
+  | Rama `explorerhat-inputs-outputs` del fork (`ff7d5868`): entradas y salidas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2613 |
+  | Rama `explorerhat-analog` del fork (`21633ffa`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el de entradas y salidas |
+  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Abierto (no es nuestro) | Ver si responde a [nuestro comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665) |
 
-  Los PR #2612 y #2613 fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro); seguramente le
-  pasará lo mismo al #2616. Lo arregla el PR [#2608](https://github.com/dotnet/iot/pull/2608) de pgrawehr (abierto).
-  Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*). Para mirar el estado: `gh pr checks <PR> -R dotnet/iot` y los comentarios con
+  Los PR #2612, #2613 y #2616 fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro); lo arregla
+  el PR [#2608](https://github.com/dotnet/iot/pull/2608) de pgrawehr (abierto). `upstream/main` no ha cambiado desde
+  el 01/10/2026 (`95384e77`). Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos
+  (sin *force push*). Para mirar el estado: `gh pr checks <PR> -R dotnet/iot` y los comentarios con
   `gh api repos/dotnet/iot/issues/<n>/comments`.
-- **Hallazgos de esta sesión:** con 4.2.0, liberar un `DCMotor` marcha atrás deja la rueda **a toda velocidad**
-  (`SafeExplorerHat` lo evita porque para antes); `ExplorerHat.Dispose` tumba el proceso; el INA219 de la UPS lee la
-  corriente sin signo; en la Pi 3 con libgpiod v2 solo se puede registrar un aviso de GPIO por pin; de fábrica, el
-  CAP1208 solo admite un toque a la vez y con sensibilidad 1x no detecta los pads. Detalles en la Fase 6.
-- **Siguiente paso: ampliar el binding `ExplorerHat`** con lo que le falta del HAT (entradas, salidas, entradas
-  analógicas y pads táctiles). **Diseño acordado el 03/10/2026** (Fase 6, "Ampliar el binding: diseño acordado"):
-  primero el binding nuevo `Cap1208` (`src/devices/Cap1xxx`, no depende del #2613; **PR #2616 abierto**), después
-  entradas y salidas, analógico y pads en `ExplorerHat`. Las entradas y salidas se programan sobre la rama
-  `explorerhat-dispose`; antes del analógico, medir en la Pi la tensión del ADS1015 (con un cable a 3,3 V y a 5 V).
-  Después: la lección 07 (pads táctiles) y la 08 (analógico), que lo necesitan, o la 10 (siguelíneas).
 - **Al retomar (siguiente sesión):**
-  1. Mirar las comprobaciones y los comentarios del #2616 (primer binding nuevo: pueden pedir cambios) y si
-     pgrawehr responde en el #2610.
-  2. Mirar si responden en la incidencia #2617 (motor con PWM en las dos entradas). El código va en su propio PR,
-     cuando fusionen el #2613 y según lo que respondan. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena
-     con los dos pines en alto: paradas más cortas), medir la corriente de cada motor con el INA219 (Pimoroni dice
-     200 mA por canal), condensadores de 100 nF en los motores y un disipador o ventilador para la Pi.
-  3. Cuando fusionen el #2613: llevar la rama `explorerhat-inputs-outputs` encima de `upstream/main`
+  1. Mirar comentarios y revisiones en los PR #2612, #2613 y #2616, en las incidencias #2614, #2615 y #2617 y en el
+     PR #2610. Si hay comentarios, contárselos al usuario antes de responder.
+  2. Cuando fusionen el #2613: llevar la rama `explorerhat-inputs-outputs` encima de `upstream/main`
      (`git rebase --onto upstream/main explorerhat-dispose explorerhat-inputs-outputs`, porque su base es la rama del
-     #2613), volver a pasar las pruebas y abrir el PR de entradas y salidas. Con *force push* solo antes de abrir el PR.
-  4. Las ramas van apiladas: `explorerhat-dispose` (#2613) → `explorerhat-inputs-outputs` → `explorerhat-analog`.
+     #2613), volver a pasar las pruebas y abrir el PR de entradas y salidas. *Force push* solo antes de abrir el PR.
+  3. Las ramas van apiladas: `explorerhat-dispose` (#2613) → `explorerhat-inputs-outputs` → `explorerhat-analog`.
      Cuando fusionen el PR de entradas y salidas, llevar la del analógico encima de `upstream/main` igual (`git rebase
-     --onto upstream/main explorerhat-inputs-outputs explorerhat-analog`) y abrir su PR. Si los mantenedores piden
-     cambios en un PR de abajo, rehacer encima las ramas de arriba.
-  5. Siguiente pieza: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el binding `Cap1208` (#2616), en una
-     rama encima de `explorerhat-analog`. Después, las lecciones 07 (pads) y 08 (analógico).
-- **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
-  resistencia de la placa o la interna del chip (método en el README).
+     --onto upstream/main explorerhat-inputs-outputs explorerhat-analog`) y abrir su PR. Si piden cambios en un PR de
+     abajo, rehacer encima las ramas de arriba.
+  4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
+     **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa:
+     la lección 10 (siguelíneas, si están los dos TCRT5000), la Fase 7 (medir el LLM en el portátil) u otra tarea.
+  5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
+     medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
+     motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V.
+- **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); con un multímetro, medir si la pull-up del Trig de
+  los HC-SR04P es una resistencia de la placa o la interna del chip (método en el README); repetir con carga completa
+  la batería Xiaomi (Fase 2).
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
