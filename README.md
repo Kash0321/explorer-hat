@@ -83,7 +83,7 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 |---|---|---|
 | `0x28` | CAP1208 | Pads táctiles del Explorer HAT Pro |
 | `0x42` | INA219 | Mide la tensión y la corriente de las baterías de la UPS HAT (B) |
-| `0x48` | ADS1015 | Entradas analógicas del Explorer HAT Pro |
+| `0x48` | ADS1015 | Entradas analógicas del Explorer HAT Pro (de 0 a 5 V: el chip va alimentado a 5 V) |
 | `0x27` | PCF8574T | Adaptador I2C de la pantalla LCD 2004 (funciona a 3,3 V; el contraste se ajusta con su potenciómetro azul) |
 
 > ℹ️ Cada sensor HC-SR04 tiene cuatro cables: **VCC** (alimentación), **TRIG**, **ECHO** y **GND** (masa). **VCC va al pin 5V del HAT** y **GND al pin GND del HAT**. TRIG va a una salida OUT del HAT y ECHO a una entrada IN. Todos los GND (Pi, HAT y sensores) tienen que estar unidos: es la *masa común*, la referencia de 0 V con la que se miden todas las señales.

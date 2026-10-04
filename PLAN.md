@@ -15,7 +15,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     alto). La frecuencia no lo arregla. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos pines, como
     Pimoroni): los dos sentidos al 93–102 %. Detalles en la Fase 6 ("Marcha atrás más lenta").
   - **Sin cable micro-USB:** la Pi funciona igual solo con los contactos de la UPS (Fase 2). Al compilar en la Pi,
-    la CPU llega a 60 °C y baja su frecuencia (`0x80000`).
+    la CPU llega a 60 °C y baja su frecuencia (`0x80000`). Pin de 5 V medido con el ADS1015 del HAT: 5,30 V en
+    reposo y 5,22 V como mínimo con los motores (0,6 V de margen).
+  - **ADS1015 del HAT a 5 V:** las entradas analógicas admiten de 0 a 5 V, sin divisor; `Ads1115` lo lee bien (Fase 6).
   - **Recalibrado en el suelo con `HatMotor`** (los giros sobre sí mismo son más fuertes): lección 04, `turnTime`
     de 250 a **200 ms**; `Lesson11.Square`, `brakePulses` de 3 a **4**. La lección 09 y ObstacleAvoidance no cambian
     (giran a pasos y miran después de cada uno): esquivan igual o mejor, con giros de 1 paso casi siempre. El usuario
@@ -45,6 +47,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, sin revisión | Revisión de los mantenedores |
   | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás más lenta con `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas (04/10/2026) | Abierta | Respuesta de los mantenedores a las tres preguntas (forma de la API, variante que frena y si `ExplorerHat` la usa) |
   | Rama `explorerhat-inputs-outputs` del fork: entradas y salidas en `ExplorerHat` (PR 2 del orden acordado, 04/10/2026) | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2613 |
+  | Rama `explorerhat-analog` del fork: entradas analógicas en `ExplorerHat` (PR 3, 04/10/2026), encima de `explorerhat-inputs-outputs` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el de entradas y salidas |
   | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Abierto (no es nuestro) | Ver si responde a [nuestro comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665) (dos avisos en un pin) |
 
   Los PR #2612 y #2613 fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro); seguramente le
@@ -71,8 +74,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   3. Cuando fusionen el #2613: llevar la rama `explorerhat-inputs-outputs` encima de `upstream/main`
      (`git rebase --onto upstream/main explorerhat-dispose explorerhat-inputs-outputs`, porque su base es la rama del
      #2613), volver a pasar las pruebas y abrir el PR de entradas y salidas. Con *force push* solo antes de abrir el PR.
-  4. Siguiente pieza: las entradas analógicas (PR 3). Antes, medir en la Pi la tensión del ADS1015 (el usuario pone un
-     cable de una entrada analógica a 3,3 V y después a 5 V).
+  4. Las ramas van apiladas: `explorerhat-dispose` (#2613) → `explorerhat-inputs-outputs` → `explorerhat-analog`.
+     Cuando fusionen el PR de entradas y salidas, llevar la del analógico encima de `upstream/main` igual (`git rebase
+     --onto upstream/main explorerhat-inputs-outputs explorerhat-analog`) y abrir su PR. Si los mantenedores piden
+     cambios en un PR de abajo, rehacer encima las ramas de arriba.
+  5. Siguiente pieza: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el binding `Cap1208` (#2616), en una
+     rama encima de `explorerhat-analog`. Después, las lecciones 07 (pads) y 08 (analógico).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
@@ -192,7 +199,18 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   a otra por la descarga. Decisión: **sin cable**. Los dos caminos salen del mismo regulador, así que tenerlos a
   la vez no es peligroso; el micro-USB de la Pi tiene un fusible rearmable y los 5 V del GPIO no (es lo normal en
   las placas que alimentan la Pi por el GPIO). La prueba no mide el margen: la Pi solo avisa por debajo de ~4,63 V.
-  Con multímetro, se podría medir entre 5 V y GND del GPIO con los motores en marcha.
+  - **Margen del pin de 5 V (04/10/2026, sin cable, solo baterías):** medido con el ADS1015 del HAT (Analog 1 → 10 kΩ
+    → pin 5V; programa aparte `~/apps/RailLogger`, ~640 medidas por segundo con `DataRate.SPS860`) y
+    `tools/vigilar-tension.sh` a la vez:
+
+    | Tramo | 5 V: media | 5 V: mínimo | Medidas < 5,0 V | Baterías (mín.) | Corriente máx. |
+    |---|---|---|---|---|---|
+    | Reposo (30 s) | 5,302 V | 5,292 V | 0 de 17 841 | 8,24 V | 0,52 A |
+    | ObstacleAvoidance N, ruedas en el aire (1 min) | 5,295 V | 5,220 V | 0 de 37 845 | 8,06 V | 1,18 A |
+    | ObstacleAvoidance S, ruedas en el aire (1 min) | 5,296 V | 5,226 V | 0 de 37 771 | 8,00 V | 1,05 A |
+
+    La caída mayor es de ~80 mV, al arrancar o frenar los motores: ~0,6 V de margen hasta el aviso de la Pi. Falta,
+    si hiciera falta, repetirlo en el suelo (los motores piden más corriente al arrancar con el robot parado).
   - **Temperatura:** al compilar, en los dos casos, `get_throttled` = `0x80000` (bit 19): la CPU llegó al límite
     suave de 60 °C y bajó su frecuencia (52,6 °C al terminar; 46,7 °C al arrancar en frío). Compilar en la Pi tarda
     más por eso. Un disipador o un ventilador lo evitaría; importa también para la Fase 7. Además, con 1 GB de RAM la
@@ -565,7 +583,30 @@ solo cubre motores y las 4 luces. Falta:
     pin 16 `hi`, `Off()` → `lo`, y al liberar con la salida encendida, `lo` y los 8 pines cerrados. El LED de la
     lección 05 no estaba montado: el programa mostraba `pinctrl get 16` tras cada paso (que el pin 16 en alto
     enciende ese LED se comprobó el 03/10/2026).
-- [ ] 4 entradas analógicas (ADS1015, I2C 0x48). Comprobar si sirve el binding `Ads1115` existente.
+- [~] 4 entradas analógicas (ADS1015, I2C 0x48). **Hechas el 04/10/2026** en la rama `explorerhat-analog` del fork
+      (encima de `explorerhat-inputs-outputs`). Pendiente: abrir el PR cuando fusionen el de entradas y salidas.
+  - API: `hat.Analog.One`…`Four` (`AnalogInput.ReadVoltage()` → `ElectricPotential`); Analog 1–4 = canales 3, 2, 1 y 0
+    del ADS1015. Usa `Ads1115` con ±6,144 V, una medida cada vez y `DataRate.SPS128` (en el ADS1015, 1600 por segundo, su
+    velocidad de fábrica; en modo de una medida, `Ads1115` consulta el chip hasta que acaba, sin esperar según la
+    velocidad). Constructor nuevo `ExplorerHat(GpioController?, I2cBus?, bool shouldDispose)`: sin bus, abre el bus 1 la
+    primera vez que se lee una entrada analógica (servirá también para el CAP1208 de los pads, en el mismo bus).
+    El constructor anterior se mantiene. README y ejemplo del binding al día.
+  - 6 pruebas nuevas con un ADS1015 y un bus I2C simulados (`SimulatedAds1015`, `SimulatedI2cBus`); pasan las 14 de
+    `ExplorerHat`. Con cuatro fallos metidos a propósito (canales en el orden del chip, el chip creado al crear el HAT,
+    rango de 4,096 V y liberar siempre el bus del que llama), falla alguna prueba en cada caso.
+  - Prueba en la Pi sin motores (programa aparte `~/apps/AnalogHatCheck`, no versionado; Analog 1 al nodo de 3,3 V):
+    3,294 V en las 1000 lecturas seguidas, **508 lecturas por segundo**, las entradas sueltas a 0,52–0,57 V, y un
+    segundo `ExplorerHat` después de liberar el primero lee bien (el bus y el chip quedan liberados).
+  - **Medido en la Pi (04/10/2026)** con `Ads1115` de 4.2.0 (±6,144 V, una medida cada vez; programa aparte
+    `~/apps/AnalogCheck`) y una resistencia de 10 kΩ en serie, para no dañar el chip si fuera a 3,3 V (con 5 V, la
+    corriente por sus diodos de protección no pasaría de ~0,14 mA). Analog 1 → 10 kΩ → 3,3 V: **3,294 V**; → 5 V:
+    **5,301 V**, sin recortar. **El ADS1015 va alimentado a 5 V: las entradas admiten de 0 a 5 V**, y no hay divisor de
+    tensión (lo que llega al conector es lo que mide el chip). Pimoroni no lo documenta.
+  - **`Ads1115` lee bien el ADS1015:** los 12 bits van en la parte alta (`0x6E70` = 28 272 / 32 768 × 6,144 V =
+    5,301 V; los 4 bits bajos, a 0). Con ±6,144 V, 3 mV por paso.
+  - Una entrada sin nada conectado marca ~0,6 V (flota), no 0; con un cable suelto, entre 0,3 y 1,1 V.
+  - Al escribir la configuración, el chip hace una medida (bit OS = 1) y, mientras mide, el bit 15 se lee como 0
+    (`0x0583` justo después de escribir `0x8583`). Configuración de fábrica: `0x8583`.
 - [~] 8 pads táctiles capacitivos (CAP1208, I2C 0x28). No había binding CAP1xxx en dotnet/iot.
       **Binding nuevo `Cap1208`: PR abierto el 03/10/2026, [dotnet/iot#2616](https://github.com/dotnet/iot/pull/2616)**,
       rama `cap1xxx-binding` del fork (`src/devices/Cap1xxx`). Pendiente: la revisión y, después, los pads en
@@ -842,9 +883,8 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
    `hat.Inputs.Four.Pin`). Los eventos, más adelante, cuando estén arreglados #2614 y el fallo de dos avisos del #2610.
 3. **Analógico:** `ExplorerHat` usa `Ads1115` por dentro, con ±6,144 V, una medida cada vez, el canal correcto y un
    código de velocidad elegido por nosotros. API: `hat.Analog.One.ReadVoltage()` → `ElectricPotential`. El soporte del
-   ADS1015 en `Ads1115` (velocidades y nombres correctos), en un PR aparte y opcional. **Antes, medir en la Pi** con qué
-   tensión funciona el ADS1015 del HAT y si llegan bien 5 V (el usuario pone un cable de una entrada analógica a 3,3 V
-   y después a 5 V).
+   ADS1015 en `Ads1115` (velocidades y nombres correctos), en un PR aparte y opcional. **Medido en la Pi el 04/10/2026:** el
+   ADS1015 del HAT va a 5 V y sus entradas admiten de 0 a 5 V.
 4. **Pads táctiles:** binding nuevo `Cap1xxx` con la clase `Cap1208`, por sondeo (sin pin de alerta), en su propio PR y
    con pruebas con `I2cSimulatedDeviceBase`. Después, `hat.Touch.One`…`Eight` con `IsTouched()`. El CAP1188 y el
    CAP1166 (con LED) se podrían añadir más adelante sobre la misma base.
@@ -856,7 +896,7 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
       **Abierto el 03/10/2026: [dotnet/iot#2616](https://github.com/dotnet/iot/pull/2616).**
    2. Entradas y salidas en `ExplorerHat`: se programan sobre la rama del #2613 (`explorerhat-dispose`) y el PR se
       abre cuando lo fusionen. **Hecho y probado el 04/10/2026** (rama `explorerhat-inputs-outputs`).
-   3. Analógico en `ExplorerHat`.
+   3. Analógico en `ExplorerHat`. **Hecho y probado el 04/10/2026** (rama `explorerhat-analog`).
    4. Pads en `ExplorerHat`.
    5. Según lo que respondan en la #2617 (04/10/2026): motor con PWM en las dos entradas en `DCMotor` y en
       `ExplorerHat.Motors`, después del #2613.
