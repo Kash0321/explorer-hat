@@ -44,6 +44,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta | Solo incidencia |
   | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, sin revisión | Revisión de los mantenedores |
   | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás más lenta con `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas (04/10/2026) | Abierta | Respuesta de los mantenedores a las tres preguntas (forma de la API, variante que frena y si `ExplorerHat` la usa) |
+  | Rama `explorerhat-inputs-outputs` del fork: entradas y salidas en `ExplorerHat` (PR 2 del orden acordado, 04/10/2026) | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2613 |
   | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Abierto (no es nuestro) | Ver si responde a [nuestro comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665) (dos avisos en un pin) |
 
   Los PR #2612 y #2613 fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro); seguramente le
@@ -67,10 +68,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      cuando fusionen el #2613 y según lo que respondan. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena
      con los dos pines en alto: paradas más cortas), medir la corriente de cada motor con el INA219 (Pimoroni dice
      200 mA por canal), condensadores de 100 nF en los motores y un disipador o ventilador para la Pi.
-  3. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
-     `explorerhat-dispose`; cada pin se abre la primera vez que se usa; pruebas con `FakeGpioDriver`. Prueba en la Pi
-     sin motores: IN4 con el LM393 derecho (girar la rueda con la mano) y OUT4 con el LED de la lección 05 (si sigue
-     en la protoboard). El PR se abre cuando fusionen el #2613.
+  3. Cuando fusionen el #2613: llevar la rama `explorerhat-inputs-outputs` encima de `upstream/main`
+     (`git rebase --onto upstream/main explorerhat-dispose explorerhat-inputs-outputs`, porque su base es la rama del
+     #2613), volver a pasar las pruebas y abrir el PR de entradas y salidas. Con *force push* solo antes de abrir el PR.
+  4. Siguiente pieza: las entradas analógicas (PR 3). Antes, medir en la Pi la tensión del ADS1015 (el usuario pone un
+     cable de una entrada analógica a 3,3 V y después a 5 V).
 - **Sin prisa:** cuando el usuario tenga un multímetro, medir si la pull-up del Trig de los HC-SR04P es una
   resistencia de la placa o la interna del chip (método en el README).
 - Actualiza esta sección al final de cada sesión de trabajo.
@@ -546,8 +548,23 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
 solo cubre motores y las 4 luces. Falta:
-- [ ] 4 entradas digitales (GPIO 23, 22, 24, 25, tolerantes a 5 V).
-- [ ] 4 salidas de colector abierto (GPIO 6, 12, 13, 16).
+- [~] 4 entradas digitales (GPIO 23, 22, 24, 25, tolerantes a 5 V) y 4 salidas de colector abierto (GPIO 6, 12, 13,
+      16). **Hechas el 04/10/2026** en la rama `explorerhat-inputs-outputs` del fork (sobre `explorerhat-dispose`, la
+      del #2613). Pendiente: abrir el PR cuando fusionen el #2613.
+  - API: `hat.Inputs.One`…`Four` (`DigitalInput`: `Read()` → `PinValue`, `Pin`) y `hat.Outputs.One`…`Four`
+    (`DigitalOutput`: `On()`, `Off()`, `IsOn`, `Pin`). `On()` = la salida une el cable a 0 V (ULN2003A), como Pimoroni.
+    Cada pin se abre la primera vez que se usa (`Read`, `On` u `Off`), no al crear `ExplorerHat`; `Dispose` apaga las
+    salidas usadas y cierra solo los pines que abrió. Usarlas después de `Dispose` lanza `ObjectDisposedException`.
+    Quitadas del `.csproj` las carpetas que no existían. README y ejemplo del binding al día.
+  - 6 pruebas nuevas (`InputsOutputsTests`, con `SetInputValue` nuevo en `FakeGpioDriver`); las 8 de `ExplorerHat` y
+    las 7 de `DCMotor` pasan. Con tres fallos metidos a propósito (la salida no se apaga al liberar, las entradas se
+    abren al crear el HAT, se cierra un pin abierto por otro), falla alguna prueba en cada caso.
+  - Prueba en la Pi sin motores (programa aparte `~/apps/IoCheck`, no versionado): al crear el HAT, ninguno de los 8
+    pines abierto; el HC-SR04 central (`Hcsr04` con su propio controlador en OUT1 + IN1) mide bien con el HAT creado
+    (51 cm y ~7 cm con la mano); IN4 contó 48 pulsos del LM393 derecho girando la rueda a mano 10 s; OUT4: `On()` →
+    pin 16 `hi`, `Off()` → `lo`, y al liberar con la salida encendida, `lo` y los 8 pines cerrados. El LED de la
+    lección 05 no estaba montado: el programa mostraba `pinctrl get 16` tras cada paso (que el pin 16 en alto
+    enciende ese LED se comprobó el 03/10/2026).
 - [ ] 4 entradas analógicas (ADS1015, I2C 0x48). Comprobar si sirve el binding `Ads1115` existente.
 - [~] 8 pads táctiles capacitivos (CAP1208, I2C 0x28). No había binding CAP1xxx en dotnet/iot.
       **Binding nuevo `Cap1208`: PR abierto el 03/10/2026, [dotnet/iot#2616](https://github.com/dotnet/iot/pull/2616)**,
@@ -838,7 +855,7 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
    1. Binding `Cap1208` (`src/devices/Cap1xxx`). No toca `ExplorerHat`: se puede abrir sin esperar al #2613.
       **Abierto el 03/10/2026: [dotnet/iot#2616](https://github.com/dotnet/iot/pull/2616).**
    2. Entradas y salidas en `ExplorerHat`: se programan sobre la rama del #2613 (`explorerhat-dispose`) y el PR se
-      abre cuando lo fusionen.
+      abre cuando lo fusionen. **Hecho y probado el 04/10/2026** (rama `explorerhat-inputs-outputs`).
    3. Analógico en `ExplorerHat`.
    4. Pads en `ExplorerHat`.
    5. Según lo que respondan en la #2617 (04/10/2026): motor con PWM en las dos entradas en `DCMotor` y en
