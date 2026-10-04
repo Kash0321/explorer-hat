@@ -43,6 +43,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta | La arregla el PR #2610 de pgrawehr (probado; le comentamos un fallo con dos avisos en un pin) |
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta | Solo incidencia |
   | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, sin revisión | Revisión de los mantenedores |
+  | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás más lenta con `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas (04/10/2026) | Abierta | Respuesta de los mantenedores a las tres preguntas (forma de la API, variante que frena y si `ExplorerHat` la usa) |
   | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Abierto (no es nuestro) | Ver si responde a [nuestro comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665) (dos avisos en un pin) |
 
   Los PR #2612 y #2613 fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro); seguramente le
@@ -62,8 +63,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Al retomar (siguiente sesión):**
   1. Mirar las comprobaciones y los comentarios del #2616 (primer binding nuevo: pueden pedir cambios) y si
      pgrawehr responde en el #2610.
-  2. Decidir si se informa en dotnet/iot de la marcha atrás de `DCMotor2PinNoEnable` (Fase 6) y si `ExplorerHat`
-     debe mover sus motores con PWM en los dos pines. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena
+  2. Mirar si responden en la incidencia #2617 (motor con PWM en las dos entradas). El código va en su propio PR,
+     cuando fusionen el #2613 y según lo que respondan. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena
      con los dos pines en alto: paradas más cortas), medir la corriente de cada motor con el INA219 (Pimoroni dice
      200 mA por canal), condensadores de 100 nF en los motores y un disipador o ventilador para la Pi.
   3. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
@@ -685,8 +686,13 @@ solo cubre motores y las 4 luces. Falta:
     emergencia con SIGINT, SIGTERM y SIGHUP a −0,6 (los 9 pines en `lo`, el mensaje de parada y ningún proceso) y la
     lección 01 (código 0). CPU del proceso: ~7 % de un núcleo con los motores parados y ~20–25 % en marcha (antes,
     ~15 %).
-  - **Pendiente de decidir:** informar en dotnet/iot (incidencia de `DCMotor2PinNoEnable`; un arreglo necesita PWM en
-    los dos pines) y si el PR de entradas y salidas de `ExplorerHat` (o uno aparte) mueve los motores como `HatMotor`.
+  - **Informado el 04/10/2026: [dotnet/iot#2617](https://github.com/dotnet/iot/issues/2617)** (plantilla *Feature
+    request*, con encabezados propios). Propone `DCMotor.Create(PwmChannel forwardChannel, PwmChannel backwardChannel)`
+    en el binding `DCMotor` (sirve para cualquier puente en H de dos entradas: DRV8833, L9110S, MX1508...) y que
+    `ExplorerHat` lo use en `Motors`. Cita la #844 (2019, cerrada): alguien vio la marcha atrás más lenta y el
+    mantenedor respondió que el cálculo `1.0 + val` era correcto; lo es, lo que cambia es la parte apagada del ciclo.
+    Pregunta la forma de la API, si se añade la variante que frena en los dos sentidos (*slow decay*) y si
+    `ExplorerHat` debe cambiar. El código, en su propio PR después del #2613 (toca `DCMotor.cs` y `Motors.cs`).
   - Especificación de Pimoroni: *"Two H-bridge motor drivers (up to 200mA per channel; soft PWM control)"*. El
     DRV8833 admite 1,5 A por canal y se protege solo; un motor TT gasta ~100–200 mA en el aire y más al arrancar.
     Si hace falta, se puede medir con el INA219 de la UPS (motores parados frente a en marcha).
@@ -835,6 +841,8 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
       abre cuando lo fusionen.
    3. Analógico en `ExplorerHat`.
    4. Pads en `ExplorerHat`.
+   5. Según lo que respondan en la #2617 (04/10/2026): motor con PWM en las dos entradas en `DCMotor` y en
+      `ExplorerHat.Motors`, después del #2613.
 
    Cada uno con pruebas unitarias (`FakeGpioDriver`, `I2cSimulatedDeviceBase`), prueba en la Pi y el README del binding
    al día. De paso, quitar del `.csproj` de `ExplorerHat` las carpetas que no existen.
