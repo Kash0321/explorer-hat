@@ -12,7 +12,7 @@ sensores antes de probar `ExplorerHat.ObstacleAvoidance` y para ver cómo "ve" e
 dotnet run --project src/ExplorerHat.SonarDashboard/ExplorerHat.SonarDashboard.csproj
 ```
 
-**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `ExplorerHat.SonarDashboard`
+**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `src/ExplorerHat.SonarDashboard`
 (preparación en el [README del repositorio](../../README.md)).
 
 Pulsa **Ctrl+C** para salir; los pines de los sensores se liberan antes de terminar. El panel se actualiza

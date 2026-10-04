@@ -22,7 +22,8 @@ Las lecciones que faltan (07, 08 y 10) están en `PLAN.md` (Fase 5).
 
 ## Cómo ejecutar una lección
 
-**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar una lección en la Pi` y elige la lección.
+**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige la lección (`lessons/...`).
+Para depurarla, abre su `Program.cs` y pulsa F5 con la configuración *Depurar en la Pi el programa abierto*.
 La preparación (clave SSH y demás) está en el [README del repositorio](../README.md).
 
 **En la Raspberry Pi** (desde la carpeta del repositorio):
@@ -49,4 +50,4 @@ Para parar una lección antes de que termine, pulsa **Ctrl+C**.
 * Los números que el niño puede cambiar están arriba, en variables con nombre (`speed`, `turnTime`...).
 * Cada movimiento termina con `Speed = 0.0` en los dos motores.
 * Si añades una lección, sigue la numeración (`Lesson05.Buttons`...), añádela a `ExplorerHatSandbox.slnx` y a
-  la lista `lesson` de `.vscode/tasks.json`.
+  la lista `program` de `.vscode/tasks.json`.

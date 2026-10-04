@@ -47,7 +47,7 @@ cada ranura.
 3. Después de cada parte, sigue contando medio segundo: **el robot no se para en el acto**. La rueda sigue girando
    un poco por la inercia, y el programa lo muestra.
 
-Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC con *Ejecutar una lección en la Pi*.
+Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC con *Ejecutar en la Pi*.
 
 ## Nuestras medidas
 

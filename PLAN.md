@@ -322,6 +322,23 @@ Propuesta, dos formas de trabajar:
         Cambiada el 30/09/2026; el acceso por clave SSH desde el PC sigue funcionando.
   - [x] Versionar `launch.json`/`tasks.json` directamente (quitarlos de `.gitignore`) y borrar los scripts y plantillas antiguos.
         Los scripts antiguos tenían la contraseña de `pi` en claro y siguen en el historial de git (repositorio público).
+  - [x] **Lecciones en las tareas y en la depuración (04/10/2026).** Las lecciones solo estaban en la tarea *Ejecutar una
+        lección en la Pi*, y para depurar solo estaba BasicSample. Ahora:
+    - *Desplegar en la Pi* y *Ejecutar en la Pi* tienen una sola lista con las lecciones y los programas, por su carpeta
+      (`lessons/Lesson12.Screen`, `src/ExplorerHat.BasicSample`). En la Pi, el nombre de la carpeta lo da `$(basename ...)`:
+      lo calcula el shell de la Pi (en macOS y Linux, antes el del PC, con el mismo resultado). Quitadas *Ejecutar una
+      lección en la Pi* y *Desplegar BasicSample*.
+    - **Depurar en la Pi el programa abierto** (sustituye a *Depurar BasicSample en la Pi*): despliega y depura el proyecto
+      del archivo abierto en el editor (`${relativeFileDirname}` y `${fileDirnameBasename}`). Así la tarea previa y el
+      depurador usan el mismo programa sin preguntarlo dos veces (las variables `${input:...}` de `launch.json` y de
+      `tasks.json` se preguntan por separado).
+    - La consola de depuración no tiene teclado: los programas que leen teclas (ObstacleAvoidance, SonarDashboard y las
+      lecciones 04, 11 Odometry y 11 Square) se depuran con *Ejecutar en la Pi* y *Adjuntar a un programa en la Pi*.
+    - Probado desde el PC (comandos de las tareas en `cmd.exe`, con la lección 12): los dos despliegues borran la carpeta
+      anterior y copian la nueva; *Ejecutar en la Pi*, código 0. El usuario probó F5 con la lección 12 en VS Code: se
+      detiene en el punto de interrupción y responde a F10 y F5.
+    - Para probar una tarea fuera de VS Code: el comando, en un archivo `.cmd` ejecutado desde PowerShell. Desde Git Bash,
+      `cmd.exe` encuentra el `ssh` de Git (sin la clave) y las comillas llegan mal.
 - Descartado como opción principal: VS Code Remote-SSH ejecutándose en la Pi (1 GB de RAM se queda corto
   con la extensión de C#).
 - [ ] Guía de compilación ligera para 1 GB de RAM y ~3,5 GB libres en la microSD.
@@ -345,7 +362,8 @@ Propuesta, dos formas de trabajar:
 ## Fase 5: Itinerario didáctico (nuevos ejemplos graduados)
 Cada lección es un proyecto pequeño en `lessons/LessonNN.Nombre`, con un único `Program.cs` legible por niños
 (*top-level statements*, código y comentarios en inglés) y un README en español con retos. Índice en
-`lessons/README.md`. Tarea de VS Code *Ejecutar una lección en la Pi*; `tools/parar-robot.sh`, `vigilar-pines.sh` y
+`lessons/README.md`. Tareas de VS Code *Desplegar en la Pi* y *Ejecutar en la Pi* (eligen la lección) y depuración con F5
+(Fase 3); `tools/parar-robot.sh`, `vigilar-pines.sh` y
 la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - [x] 01 Luces (`Lesson01.Lights`): instrucciones en orden, `Thread.Sleep`, bucle `for`. Probada en la Pi
       (02/10/2026): termina con código 0 y los 8 pines a nivel bajo.
