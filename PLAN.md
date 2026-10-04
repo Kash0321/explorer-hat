@@ -14,6 +14,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     velocidad hacia delante. Causa: en la parte apagada del PWM, marcha atrás el DRV8833 frena (los dos pines en
     alto). La frecuencia no lo arregla. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos pines, como
     Pimoroni): los dos sentidos al 93–102 %. Detalles en la Fase 6 ("Marcha atrás más lenta").
+  - **Sin cable micro-USB:** la Pi funciona igual solo con los contactos de la UPS (Fase 2). Al compilar en la Pi,
+    la CPU llega a 60 °C y baja su frecuencia (`0x80000`).
   - **Recalibrado en el suelo con `HatMotor`** (los giros sobre sí mismo son más fuertes): lección 04, `turnTime`
     de 250 a **200 ms**; `Lesson11.Square`, `brakePulses` de 3 a **4**. La lección 09 y ObstacleAvoidance no cambian
     (giran a pasos y miran después de cada uno): esquivan igual o mejor, con giros de 1 paso casi siempre. El usuario
@@ -61,7 +63,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   1. Mirar las comprobaciones y los comentarios del #2616 (primer binding nuevo: pueden pedir cambios) y si
      pgrawehr responde en el #2610.
   2. Decidir si se informa en dotnet/iot de la marcha atrás de `DCMotor2PinNoEnable` (Fase 6) y si `ExplorerHat`
-     debe mover sus motores con PWM en los dos pines.
+     debe mover sus motores con PWM en los dos pines. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena
+     con los dos pines en alto: paradas más cortas), medir la corriente de cada motor con el INA219 (Pimoroni dice
+     200 mA por canal), condensadores de 100 nF en los motores y un disipador o ventilador para la Pi.
   3. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
      `explorerhat-dispose`; cada pin se abre la primera vez que se usa; pruebas con `FakeGpioDriver`. Prueba en la Pi
      sin motores: IN4 con el LM393 derecho (girar la rueda con la mano) y OUT4 con el LED de la lección 05 (si sigue
@@ -167,6 +171,31 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     La Redmi en el suelo con el giro a pasos (30/09/2026, modo S, batería ya usada) llegó al 91 % (20 caídas).
   - Conclusión: la UPS HAT (B) es la alimentación del robot. Las baterías externas USB quedan para trabajar con
     el robot quieto.
+- [x] **¿Hace falta el cable micro-USB con la UPS? (04/10/2026)** Desde el 01/10/2026, la Pi tenía además un cable
+      del puerto USB "5V OUT" de la UPS a su micro-USB (el 03/10/2026, el usuario cambió ese cable por uno más corto y
+      grueso). Según Waveshare, la UPS alimenta la Pi por sus contactos de muelle (*pogo pins*, los pines de 5 V del
+      GPIO) y "5V OUT" es para otros aparatos: todas las pruebas con la UPS se habían hecho con los dos caminos.
+      Prueba con el método de esta fase (solo baterías, `tools/vigilar-tension.sh`), con cable y después sin él (la Pi
+      apagada para quitarlo: arrancó solo con los contactos):
+
+  | Tramo | Con cable: baterías (mín.) / corriente máx. | Sin cable: baterías (mín.) / corriente máx. |
+  |---|---|---|
+  | Reposo (1,5 min) | 7,88 V / 0,55 A | 7,82 V / 0,56 A |
+  | Compilando la solución en la Pi (`--no-incremental`, ~4,5–5 min) | 7,80 V / 0,75 A | 7,72 V / 0,74 A |
+  | ObstacleAvoidance N, ruedas en el aire (1 min) | 7,72 V / 1,14 A | 7,64 V / 1,11 A |
+  | ObstacleAvoidance S, ruedas en el aire (1 min) | 7,70 V / 0,95 A | 7,65 V / 1,12 A |
+
+  **Tensión baja el 0 % del tiempo en todos los tramos de los dos casos.** Las baterías bajan ~0,06 V de una prueba
+  a otra por la descarga. Decisión: **sin cable**. Los dos caminos salen del mismo regulador, así que tenerlos a
+  la vez no es peligroso; el micro-USB de la Pi tiene un fusible rearmable y los 5 V del GPIO no (es lo normal en
+  las placas que alimentan la Pi por el GPIO). La prueba no mide el margen: la Pi solo avisa por debajo de ~4,63 V.
+  Con multímetro, se podría medir entre 5 V y GND del GPIO con los motores en marcha.
+  - **Temperatura:** al compilar, en los dos casos, `get_throttled` = `0x80000` (bit 19): la CPU llegó al límite
+    suave de 60 °C y bajó su frecuencia (52,6 °C al terminar; 46,7 °C al arrancar en frío). Compilar en la Pi tarda
+    más por eso. Un disipador o un ventilador lo evitaría; importa también para la Fase 7. Además, con 1 GB de RAM la
+    compilación llegó a usar la memoria de intercambio y la Pi tardó más de 20 s en aceptar una conexión SSH. Después
+    de compilar, `dotnet build-server shutdown` libera ~300 MB (los procesos de MSBuild y del compilador se quedan
+    esperando).
 - [x] Nuevo ejemplo `ExplorerHat.UpsDashboard`: panel de consola con todo lo que da la UPS (su única conexión de
       datos es el INA219 en I2C 0x42): tensión de las baterías, carga estimada (6,0 V = 0 %, 8,4 V = 100 %, como el
       ejemplo de Waveshare), corriente con signo, potencia, estado (cargando o descargando), mínimos de la sesión y

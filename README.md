@@ -31,7 +31,7 @@
 ### Pasos
 
 1. Monta los motores en los soportes del chasis, con los discos de 20 ranuras en sus ejes.
-2. Pon la UPS HAT (B) **debajo** de la Raspberry Pi, con el montaje que trae. Sus contactos tocan por debajo los pines de alimentación y de I2C de la Pi. No ocupan ningún GPIO del Explorer HAT.
+2. Pon la UPS HAT (B) **debajo** de la Raspberry Pi, con el montaje que trae. Sus contactos de muelle (*pogo pins*) tocan por debajo los pines de alimentación (5 V) y de I2C de la Pi. No ocupan ningún GPIO del Explorer HAT. **La Pi no necesita ningún cable micro-USB:** los contactos le dan toda la alimentación. El puerto USB "5V OUT" de la UPS es para alimentar otros aparatos.
 3. Pon el Explorer HAT Pro **encima** de la Raspberry Pi, en los 40 pines.
 4. Con su montaje, la UPS y la Pi forman un solo bloque. Ese bloque encaja en el hueco del chasis, entre los soportes de los motores, justo encima de dos ranuras. Atorníllalo por esas ranuras. Así no se mueve en los giros ni al frenar.
 5. Conecta el motor de la rueda **derecha** a la borna **MOTOR 1** del HAT y el de la rueda **izquierda** a **MOTOR 2**. En este robot, cada motor tiene un cable azul y otro morado:
@@ -194,7 +194,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 ### Aviso de tensión baja
 
 * Un LED rojo **PWR** fijo en la Raspberry Pi indica que la tensión es correcta.
-* Si el robot hace cosas raras, mira el estado de alimentación con `vcgencmd get_throttled` (`0x0` = bien).
+* Si el robot hace cosas raras, mira el estado de alimentación con `vcgencmd get_throttled` (`0x0` = bien). Los bits 0 y 16 son la tensión baja (ahora y desde el arranque). `0x80000` (bit 19) no es de tensión: la CPU llegó al límite suave de temperatura (60 °C) y bajó su frecuencia. Pasa al compilar en la Pi con los 4 núcleos al 100 %.
 
 ---
 
