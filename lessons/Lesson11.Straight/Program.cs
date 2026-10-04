@@ -113,7 +113,7 @@ using (var gpio = new GpioController())
     }
     else if (clock.ElapsedMilliseconds >= maxTime)
     {
-        Console.WriteLine("Time is up! Are both speed sensors connected (PWM and IN4)?");
+        Console.WriteLine("Time is up! Do both wheels turn? Are both speed sensors connected (PWM and IN4)?");
     }
 
     // The robot does not stop at once: count the pulses for a moment after stopping the motors

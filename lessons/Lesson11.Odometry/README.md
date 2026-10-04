@@ -52,7 +52,8 @@ Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC
 ## Nuestras medidas
 
 Con las ruedas en el aire (velocidad 0,6): 85 pulsos en 2 s, unos 43 cm por segundo. En la parte 2 se paró a los
-49 pulsos (50 cm) y la rueda siguió 4 pulsos más (4 cm).
+49 pulsos (50 cm) y la rueda siguió 4 pulsos más (4 cm). Con los motores nuevos (`HatMotor`, 04/10/2026): 92 pulsos en
+2 s (47 cm por segundo); en la parte 2, parada a los 49 pulsos y 5 más.
 
 En el suelo (7 pruebas, velocidad 0,6, UPS HAT (B), suelo liso):
 
@@ -82,6 +83,28 @@ veces entre 0 y 1 en unas millonésimas de segundo. Pasa porque la luz no cambia
 módulo no tiene **histéresis**, un pequeño margen que le obligaría a decidirse. El programa lee el sensor cada
 milisegundo, mucho más despacio que esos saltos, así que no los ve. Una ranura dura al menos 7 milisegundos, así que
 tampoco pierde ninguna.
+
+## Si no cuenta ningún pulso
+
+Si el programa dice `0 pulses` y `Time is up!`, el sensor no ve pasar ninguna ranura. Hay dos causas posibles: el
+sensor no envía la señal o **la rueda derecha no gira**. Pasó el 04/10/2026: el cable azul del motor derecho se había
+soltado de la borna MOTOR 1. La Pi enviaba la señal al motor, pero la corriente no llegaba, y la rueda derecha estaba
+quieta mientras la izquierda giraba. A simple vista no se notaba: parecía que giraban las dos.
+
+Comprueba, en este orden:
+
+1. **Mira la rueda derecha** mientras el programa la mueve. Si no gira, revisa el motor (abajo).
+2. **El sensor, sin motores:** con el LED de alimentación del sensor encendido, gira la rueda a mano. Su LED de señal
+   debe parpadear con cada ranura. En la Pi, `pinctrl lev 25` debe cambiar entre 0 y 1.
+3. **El cable D0** va a INPUT 4, no a OUTPUT 4.
+
+Si la rueda no gira:
+
+1. **La borna MOTOR 1:** tira con suavidad de los dos cables. Si uno sale o se mueve, aprieta su tornillo.
+2. **Las lengüetas del motor:** el cable va soldado a dos lengüetas de metal muy finas. Mira si una soldadura está
+   suelta o una lengüeta está rota.
+3. **El disco:** no debe rozar el sensor ni el chasis.
+4. Con las ruedas en el aire, `bash tools/probar-cableado.sh` prueba cada motor por separado.
 
 ## Retos
 
