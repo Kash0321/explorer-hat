@@ -19,14 +19,15 @@ enciende una luz. **Mueve los motores.**
 
 ## Qué hardware usa
 
-* **Motores TT** (amarillos, con reductora 1:48): motor 1 = GPIO 19 (velocidad) y 20 (dirección); motor 2 =
-  GPIO 21 y 26.
+* **Motores TT** (amarillos, con reductora 1:48): motor 1 = GPIO 19 (hacia delante) y 20 (hacia
+  atrás); motor 2 = GPIO 21 y 26.
 * **Luces:** verde para avanzar, roja para retroceder, amarilla para girar a la derecha y azul para girar a la
   izquierda.
 
 El chip del HAT que mueve los motores (un **puente en H**, el DRV8833) puede invertir la corriente que llega a
 cada motor: así el mismo motor gira hacia delante o hacia atrás. La velocidad se controla con **PWM**: el programa
-enciende y apaga el motor muchas veces por segundo, y cuanto más tiempo está encendido, más rápido gira.
+enciende y apaga el motor muchas veces por segundo, y cuanto más tiempo está encendido, más rápido gira. Hacia
+delante, el PWM va al primer pin de cada motor (19 o 21), y hacia atrás, al segundo (20 o 26).
 
 ## Qué hace
 

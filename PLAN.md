@@ -6,7 +6,17 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (03/10/2026)
+## Estado actual (04/10/2026)
+- **Sesión del 04/10/2026 (rama `motores-pwm-dos-pines`):**
+  - El usuario desmontó y volvió a montar todo el cableado. Revisado con `tools/probar-cableado.sh` (nuevo): todo
+    bien salvo los motores, que estaban cambiados de borna y con el derecho al revés. Cables, en el README (montaje).
+  - **Marcha atrás más lenta:** con el `DCMotor` del binding, a 0,4 las ruedas iban hacia atrás al ~36 % de la
+    velocidad hacia delante. Causa: en la parte apagada del PWM, marcha atrás el DRV8833 frena (los dos pines en
+    alto). La frecuencia no lo arregla. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos pines, como
+    Pimoroni): los dos sentidos al 93–102 %. Detalles en la Fase 6 ("Marcha atrás más lenta").
+  - **Pendiente:** recalibrar en el suelo lo que se ajustó con el motor anterior, porque ahora los giros sobre sí
+    mismo son más fuertes: `turnTime` de la lección 04 (250 ms), `brakePulses` de `Lesson11.Square` (3) y los pasos de
+    giro de la lección 09 y de ObstacleAvoidance.
 - **Fase 5, lecciones hechas y probadas** (`lessons/`, detalles en la Fase 5): 01 Luces, 02 Semáforo, 03 Motores,
   04 Cuadrado (PR #15), 05 Botones (PR #19), 06 Distancia (PR #17), 09 Robot autónomo (PR #18), 11 Contar vueltas en
   tres partes: odometría, ir recto con realimentación y el cuadrado con pulsos (PR #21, #22 y #23), y 12 La pantalla
@@ -21,7 +31,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   Alimentación con la Waveshare UPS HAT (B), sin caídas de tensión. Ejemplos en `src/`: BasicSample,
   ObstacleAvoidance, SonarDashboard y UpsDashboard.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, en dotnet/iot (al cierre del 03/10/2026):**
+- **Fase 6, en dotnet/iot (al cierre del 03/10/2026; el 04/10/2026, sin comentarios nuevos):**
 
   | Qué | Estado | Pendiente |
   |---|---|---|
@@ -49,7 +59,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Al retomar (siguiente sesión):**
   1. Mirar las comprobaciones y los comentarios del #2616 (primer binding nuevo: pueden pedir cambios) y si
      pgrawehr responde en el #2610.
-  2. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
+  2. Recalibrar en el suelo los giros con `HatMotor` (ver la sesión del 04/10/2026, arriba). Decidir si se informa
+     en dotnet/iot de la marcha atrás de `DCMotor2PinNoEnable` (Fase 6) y si `ExplorerHat` debe mover sus motores con
+     PWM en los dos pines.
+  3. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
      `explorerhat-dispose`; cada pin se abre la primera vez que se usa; pruebas con `FakeGpioDriver`. Prueba en la Pi
      sin motores: IN4 con el LM393 derecho (girar la rueda con la mano) y OUT4 con el LED de la lección 05 (si sigue
      en la protoboard). El PR se abre cuando fusionen el #2613.
@@ -71,6 +84,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       Serilog.Sinks.Console 6.1.1.
 - [x] Cambios de API: no hubo que tocar nada (`Hcsr04.Distance` sigue existiendo y lanza excepción si no
       hay eco; `DCMotor` controla bien el DRV8833 marcha atrás). Solo avisos de nulabilidad, corregidos.
+      **Corrección (04/10/2026):** el sentido es correcto, pero marcha atrás va más lento (Fase 6).
 - [x] Compila en la Pi: 0 errores, 0 avisos (primera compilación ~3 min, siguientes ~20 s).
 - [x] Prueba de LEDs en hardware como usuario `pi` (sin `root`): funciona.
 - [x] **Fallo al liberar el HAT** (ver Fase 6): `ExplorerHat.Dispose()` hace que el proceso muera con
@@ -582,7 +596,59 @@ solo cubre motores y las 4 luces. Falta:
 
     Configuración tras el setter arreglado: `0x39EF` (BADC 12 bits, SADC 32 muestras). Al terminar, `Reset()` deja
     la UPS como estaba: `0x399F` (la configuración de fábrica) y calibración `0x0000`.
-- [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
+- [x] Control del DRV8833 marcha atrás: el sentido es correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM
+      invertido), pero la velocidad no (siguiente punto).
+- [x] **Marcha atrás más lenta con `DCMotor2PinNoEnable` (04/10/2026).** Al comprobar el cableado, el usuario vio las
+      ruedas más lentas hacia atrás que hacia delante.
+  - **Medida** (programa aparte, no versionado: `~/apps/ReverseSpeed`; las dos ruedas a la vez, en el aire, 1 s para
+    coger velocidad y 3 s contando pulsos de los LM393), pulsos por segundo, media de las dos ruedas:
+
+    | Velocidad | Delante | Atrás con `DCMotor` | Atrás con `HatMotor` |
+    |---|---|---|---|
+    | 0,4 | 41–44 | 16 (~36 %) | 42 (102 %) |
+    | 0,6 | 51–52 | 30 (~57 %) | 48 (93 %) |
+    | 0,8 | 57 | 47 (~81 %) | 57 (100 %) |
+    | 1,0 | 61 | 61 (100 %) | 61 (100 %) |
+
+  - **Causa:** el DRV8833 tiene dos entradas por motor: alto/bajo = tensión hacia delante, bajo/alto = hacia atrás,
+    bajo/bajo = el motor gira libre, alto/alto = **frena** (une los dos cables del motor: freno dinámico).
+    `DCMotor2PinNoEnable` pone el PWM en el pin 19 (o 21): hacia delante, el 20 en bajo y en la parte apagada del
+    ciclo el motor gira libre; hacia atrás, el 20 en alto y el PWM invertido (`1.0 + val`), así que en la parte
+    apagada los dos pines están en alto y el motor **frena**. Comprobado grabando los pines con `pinctrl` mientras
+    giraba: a 0,4, delante 43 % con tensión y 57 % libre; atrás 43 % con tensión y 57 % frenando. A 1,0 no hay parte
+    apagada y las velocidades coinciden.
+  - **La frecuencia no lo arregla** (programa aparte `~/apps/PwmFrequency`, con `SoftwarePwmChannel` propio):
+
+    | Frecuencia | 0,4 delante / atrás | 0,6 delante / atrás |
+    |---|---|---|
+    | 50 Hz (la de `DCMotor`) | 43 / 17 | 52 / 31 |
+    | 100 Hz | 43 / 14 | 52 / 34 |
+    | 200 Hz | 41 / 18 | 52 / 34 |
+    | 500 Hz | 8 y 32 (irregular) / 15 | 53 / 38 |
+    | 1000 Hz | 45 / 29 | 44 / 29 |
+    | 2000 Hz | 44 / 29 | 45 / 29 |
+
+    Hasta 200 Hz, la bobina del motor (mucho menos de 1 ms) llega en cada parte apagada a la corriente de frenado
+    completa: frena lo mismo a cualquier frecuencia. Desde 500 Hz, `SoftwarePwmChannel` (que cede el procesador
+    mientras espera) ya no sigue la velocidad pedida: a 1000 y 2000 Hz, 0,4 y 0,6 dan lo mismo. `pinctrl` muestrea
+    cada ~7 ms: sus cifras no sirven por encima de 200 Hz. Haría falta PWM por hardware de varios kHz, y de los pines
+    de los motores solo el 19 lo tiene (el GPIO 18 de la fila lateral también, pero no va al DRV8833).
+  - **La librería de Python de Pimoroni** pone el PWM (100 Hz) en los dos pines: hacia delante en el 20 ("forward")
+    con el 19 en bajo, y hacia atrás en el 19 ("backward") con el 20 en bajo. El motor gira libre en los dos sentidos.
+    Su "delante" es el "atrás" de dotnet/iot: con ella, este robot iría al revés.
+  - **Arreglo en el robot:** `HatMotor` y `HatMotors` en `ExplorerHat.Common` (README de Common): un
+    `SoftwarePwmChannel` a 100 Hz en cada pin, el mismo sentido que `DCMotor`. `SafeExplorerHat` crea el
+    `ExplorerHat` del binding solo por sus luces, libera sus motores y mueve los mismos pines con `HatMotors`; las
+    lecciones y los ejemplos no cambian. Probado en el aire: pines en la parte apagada siempre libres (alto/alto el
+    0 % del tiempo), las seis fases de sentido bien (`~/apps/MotorCheck`, el usuario mirando las ruedas), parada de
+    emergencia con SIGINT, SIGTERM y SIGHUP a −0,6 (los 9 pines en `lo`, el mensaje de parada y ningún proceso) y la
+    lección 01 (código 0). CPU del proceso: ~7 % de un núcleo con los motores parados y ~20–25 % en marcha (antes,
+    ~15 %).
+  - **Pendiente de decidir:** informar en dotnet/iot (incidencia de `DCMotor2PinNoEnable`; un arreglo necesita PWM en
+    los dos pines) y si el PR de entradas y salidas de `ExplorerHat` (o uno aparte) mueve los motores como `HatMotor`.
+  - Especificación de Pimoroni: *"Two H-bridge motor drivers (up to 200mA per channel; soft PWM control)"*. El
+    DRV8833 admite 1,5 A por canal y se protege solo; un motor TT gasta ~100–200 mA en el aire y más al arrancar.
+    Si hace falta, se puede medir con el INA219 de la UPS (motores parados frente a en marcha).
 - [x] **Incidencia en `System.Device.Gpio` (Pi 3, `RaspberryPi3Driver`):** quitar un aviso de eventos
       con `UnregisterCallbackForPinValueChangedEvent` lanza `GpiodException: Device or resource busy` (detalles en la
       lección 11 de la Fase 5). Buscada el 03/10/2026: no hay ninguna igual (la más parecida, #1637, es de la Pi 4 y

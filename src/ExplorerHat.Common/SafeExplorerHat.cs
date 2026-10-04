@@ -28,9 +28,9 @@ namespace ExplorerHat.Common
         private Iot.Device.ExplorerHat.ExplorerHat? _hat;
 
         /// <summary>
-        /// Explorer HAT motors
+        /// Explorer HAT motors, with the PWM on both pins of each motor (see <see cref="HatMotor"/>)
         /// </summary>
-        public Motors Motors { get; }
+        public HatMotors Motors { get; }
 
         /// <summary>
         /// Explorer HAT lights
@@ -44,8 +44,13 @@ namespace ExplorerHat.Common
         {
             _controller = new SharedGpioController();
             _hat = new Iot.Device.ExplorerHat.ExplorerHat(_controller, shouldDispose: false);
-            Motors = _hat.Motors;
             Lights = _hat.Lights;
+
+            // The motors of the binding put the PWM on one pin only and brake when they go backwards:
+            // end their PWM threads and drive the same pins with HatMotor
+            _hat.Motors.Stop();
+            _hat.Motors.Dispose();
+            Motors = new HatMotors(_controller);
 
             foreach (var signal in new[] { PosixSignal.SIGINT, PosixSignal.SIGQUIT, PosixSignal.SIGTERM, PosixSignal.SIGHUP })
             {
@@ -105,6 +110,7 @@ namespace ExplorerHat.Common
                 Motors.Two.Speed = 0.0;
                 Lights.Off();
 
+                Motors.Dispose();
                 _hat.Dispose();
                 _hat = null;
 
