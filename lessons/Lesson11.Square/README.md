@@ -41,7 +41,7 @@ tecla, para que puedas medir el ángulo con un transportador. Después repite 4 
 
 Después de cada movimiento, escribe los pulsos de cada rueda y **cuánto ha resbalado** cada una durante la pausa.
 
-Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC con *Ejecutar una lección en la Pi*.
+Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC con *Ejecutar en la Pi*.
 
 ## Calibrar `brakePulses`
 

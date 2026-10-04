@@ -28,7 +28,7 @@ Después repite 4 veces: avanza durante `sideTime` (1 s) y gira a la derecha dur
 de cada movimiento para los motores, apaga las luces y espera `pauseTime` (0,3 s) para que el robot no resbale.
 En modo calibración, además, se para después de cada giro y espera a que pulses una tecla.
 
-Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC con *Ejecutar una lección en la Pi*.
+Como lee el teclado, hay que ejecutarla en una terminal: en la Pi, o desde el PC con *Ejecutar en la Pi*.
 
 ## Calibrar el giro
 

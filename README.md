@@ -293,9 +293,9 @@ sudo sysctl --system
 
 ### Ejecutar y depurar
 
-* **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige el programa. Para las lecciones, *Ejecutar una lección en la Pi*. Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir.
-* **Depurar BasicSample:** pestaña *Run and Debug*, configuración **Depurar BasicSample en la Pi** y F5.
-* **Depurar programas que leen el teclado** (como ObstacleAvoidance): primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
+* **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige la lección (`lessons/...`) o el programa (`src/...`). Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir. *Desplegar en la Pi* solo lo copia, sin ejecutarlo.
+* **Depurar:** abre en el editor el `Program.cs` de la lección o del programa. En la pestaña *Run and Debug*, elige la configuración **Depurar en la Pi el programa abierto** y pulsa F5. Despliega el proyecto de ese archivo y lo ejecuta en la Pi con el depurador. Si el archivo abierto no es de una lección ni de un programa (por ejemplo, un README), la compilación falla.
+* **Depurar programas que leen el teclado** (ObstacleAvoidance, SonarDashboard y las lecciones 04, 11 Contar vueltas y 11 El cuadrado perfecto): la consola de depuración no tiene teclado. Primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
 * **Parar el robot:** la tarea **Parar el robot** para los programas del robot y pone a nivel bajo los pines de motores y luces, y la salida OUT4.
 
 > ⚠️ **Puntos de interrupción y motores:** la velocidad de los motores se controla desde el propio programa (PWM por software). Cuando el depurador se detiene en un punto de interrupción congela todo el programa, y cada motor se queda como estuviera en ese instante: **parado o a toda velocidad**. Depura siempre con las ruedas en el aire.

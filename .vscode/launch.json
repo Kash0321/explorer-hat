@@ -4,16 +4,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Deploys BasicSample, runs it on the Pi with the debugger and stops the robot at the end
-            "name": "Depurar BasicSample en la Pi",
+            // Deploys the project of the file open in the editor (open the Program.cs of a lesson and press F5),
+            // runs it on the Pi with the debugger and stops the robot at the end. The debug console has no
+            // keyboard: for programs that read keys, use "Adjuntar a un programa en la Pi".
+            "name": "Depurar en la Pi el programa abierto",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Desplegar BasicSample",
+            "preLaunchTask": "Desplegar el programa abierto",
             "postDebugTask": "Parar el robot",
             "program": "~/.dotnet/dotnet",
             // Relative to cwd: vsdbg expands "~" in program and cwd, but not in args
-            "args": ["ExplorerHat.BasicSample.dll"],
-            "cwd": "~/apps/ExplorerHat.BasicSample",
+            "args": ["${fileDirnameBasename}.dll"],
+            "cwd": "~/apps/${fileDirnameBasename}",
             "justMyCode": false,
             // The debug symbols use "/_/" for the repository folder (PathMap in Directory.Build.props)
             "sourceFileMap": {
@@ -33,8 +35,8 @@
             }
         },
         {
-            // For programs that read the keyboard (like ObstacleAvoidance): first run them with the
-            // task "Ejecutar en la Pi", then attach the debugger and choose the "dotnet" process.
+            // For programs that read the keyboard (like ObstacleAvoidance or Lesson04.Square): first run them
+            // with the task "Ejecutar en la Pi", then attach the debugger and choose the "dotnet" process.
             // Stopping the debugger only detaches it: the program keeps running until Ctrl+C.
             "name": "Adjuntar a un programa en la Pi",
             "type": "coreclr",

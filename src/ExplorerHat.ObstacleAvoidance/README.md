@@ -51,7 +51,7 @@ ni con el depurador.
 dotnet run --project src/ExplorerHat.ObstacleAvoidance/ExplorerHat.ObstacleAvoidance.csproj
 ```
 
-**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `ExplorerHat.ObstacleAvoidance`.
+**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `src/ExplorerHat.ObstacleAvoidance`.
 Para depurarlo, ver *Adjuntar a un programa en la Pi* en el [README del repositorio](../../README.md).
 
 Al arrancar, el programa pide una tecla:

@@ -28,7 +28,7 @@ luces. **Mueve los motores.**
 dotnet run --project src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj
 ```
 
-**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `ExplorerHat.BasicSample`.
+**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `src/ExplorerHat.BasicSample`.
 La preparación (clave SSH y demás) está en el [README del repositorio](../../README.md).
 
 ## Qué hace

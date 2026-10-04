@@ -21,7 +21,7 @@ no cambia la configuración del chip.
 dotnet run --project src/ExplorerHat.UpsDashboard/ExplorerHat.UpsDashboard.csproj
 ```
 
-**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `ExplorerHat.UpsDashboard`
+**Desde el PC con VS Code:** `Terminal > Run Task... > Ejecutar en la Pi` y elige `src/ExplorerHat.UpsDashboard`
 (preparación en el [README del repositorio](../../README.md)).
 
 Pulsa **Ctrl+C** para salir; la conexión I2C se libera antes de terminar. No mueve nada, así que no hace

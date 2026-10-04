@@ -1,6 +1,9 @@
 {
     // Tasks to work from the PC: the program is compiled on the PC, copied to ~/apps on the
     // Raspberry Pi and run there through SSH. The name of the Pi is in .vscode/settings.json.
+    // A program is chosen by its folder (lessons/LessonNN.Name or src/ExplorerHat.Name); on the Pi
+    // it goes to ~/apps/<name of the folder>. "$(basename ...)" gives that name: the shell of the Pi
+    // runs it (on macOS and Linux, the shell of the PC runs it first, with the same result).
     "version": "2.0.0",
     "windows": {
         // cmd.exe so that "&&" stops the chain when a step fails
@@ -14,16 +17,16 @@
     "tasks": [
         {
             "label": "Desplegar en la Pi",
-            "detail": "Compila el programa en el PC y lo copia a ~/apps en la Raspberry Pi",
+            "detail": "Compila una lección o un programa en el PC y lo copia a ~/apps en la Raspberry Pi",
             "type": "shell",
-            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program} && sync\"",
+            "command": "dotnet publish ${input:program} -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/$(basename ${input:program}) && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/$(basename ${input:program}) && sync\"",
             "problemMatcher": "$msCompile"
         },
         {
             "label": "Ejecutar en la Pi",
-            "detail": "Despliega el programa y lo ejecuta en la Raspberry Pi (Ctrl+C para pararlo)",
+            "detail": "Despliega una lección o un programa y lo ejecuta en la Raspberry Pi (Ctrl+C para pararlo)",
             "type": "shell",
-            "command": "dotnet publish src/${input:program}/${input:program}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:program} && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:program} && sync && dotnet ~/apps/${input:program}/${input:program}.dll\"",
+            "command": "dotnet publish ${input:program} -c Debug -r linux-arm64 --self-contained false -o publish/${input:program} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/$(basename ${input:program}) && mkdir -p ~/apps\" && scp -r -q publish/${input:program} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/$(basename ${input:program}) && sync && dotnet ~/apps/$(basename ${input:program})/$(basename ${input:program}).dll\"",
             "problemMatcher": "$msCompile",
             "presentation": {
                 "focus": true,
@@ -32,22 +35,12 @@
             }
         },
         {
-            "label": "Ejecutar una lección en la Pi",
-            "detail": "Despliega una lección de lessons/ y la ejecuta en la Raspberry Pi (Ctrl+C para pararla)",
+            // Used by "Depurar en la Pi el programa abierto" (launch.json): the program is the project
+            // of the file open in the editor, so the task and the debugger don't ask for it twice
+            "label": "Desplegar el programa abierto",
+            "detail": "Despliega el proyecto del archivo abierto en el editor (lo usa la depuración)",
             "type": "shell",
-            "command": "dotnet publish lessons/${input:lesson}/${input:lesson}.csproj -c Debug -r linux-arm64 --self-contained false -o publish/${input:lesson} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${input:lesson} && mkdir -p ~/apps\" && scp -r -q publish/${input:lesson} ${config:explorerHat.host}:apps/ && ssh -t ${config:explorerHat.host} \"chmod -R go-w ~/apps/${input:lesson} && sync && dotnet ~/apps/${input:lesson}/${input:lesson}.dll\"",
-            "problemMatcher": "$msCompile",
-            "presentation": {
-                "focus": true,
-                "panel": "dedicated",
-                "clear": true
-            }
-        },
-        {
-            "label": "Desplegar BasicSample",
-            "detail": "Usada por la configuración de depuración de BasicSample",
-            "type": "shell",
-            "command": "dotnet publish src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj -c Debug -r linux-arm64 --self-contained false -o publish/ExplorerHat.BasicSample && ssh ${config:explorerHat.host} \"rm -rf ~/apps/ExplorerHat.BasicSample && mkdir -p ~/apps\" && scp -r -q publish/ExplorerHat.BasicSample ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/ExplorerHat.BasicSample && sync\"",
+            "command": "dotnet publish ${relativeFileDirname} -c Debug -r linux-arm64 --self-contained false -o publish/${fileDirnameBasename} && ssh ${config:explorerHat.host} \"rm -rf ~/apps/${fileDirnameBasename} && mkdir -p ~/apps\" && scp -r -q publish/${fileDirnameBasename} ${config:explorerHat.host}:apps/ && ssh ${config:explorerHat.host} \"chmod -R go-w ~/apps/${fileDirnameBasename} && sync\"",
             "problemMatcher": "$msCompile"
         },
         {
@@ -65,33 +58,25 @@
         {
             "id": "program",
             "type": "pickString",
-            "description": "¿Qué programa?",
+            "description": "¿Qué lección o programa?",
             "options": [
-                "ExplorerHat.BasicSample",
-                "ExplorerHat.ObstacleAvoidance",
-                "ExplorerHat.SonarDashboard",
-                "ExplorerHat.UpsDashboard"
+                "lessons/Lesson01.Lights",
+                "lessons/Lesson02.TrafficLight",
+                "lessons/Lesson03.Motors",
+                "lessons/Lesson04.Square",
+                "lessons/Lesson05.Buttons",
+                "lessons/Lesson06.Distance",
+                "lessons/Lesson09.Autonomous",
+                "lessons/Lesson11.Odometry",
+                "lessons/Lesson11.Straight",
+                "lessons/Lesson11.Square",
+                "lessons/Lesson12.Screen",
+                "src/ExplorerHat.BasicSample",
+                "src/ExplorerHat.ObstacleAvoidance",
+                "src/ExplorerHat.SonarDashboard",
+                "src/ExplorerHat.UpsDashboard"
             ],
-            "default": "ExplorerHat.BasicSample"
-        },
-        {
-            "id": "lesson",
-            "type": "pickString",
-            "description": "¿Qué lección?",
-            "options": [
-                "Lesson01.Lights",
-                "Lesson02.TrafficLight",
-                "Lesson03.Motors",
-                "Lesson04.Square",
-                "Lesson05.Buttons",
-                "Lesson06.Distance",
-                "Lesson09.Autonomous",
-                "Lesson11.Odometry",
-                "Lesson11.Straight",
-                "Lesson11.Square",
-                "Lesson12.Screen"
-            ],
-            "default": "Lesson01.Lights"
+            "default": "lessons/Lesson01.Lights"
         }
     ]
 }
