@@ -14,9 +14,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     velocidad hacia delante. Causa: en la parte apagada del PWM, marcha atrás el DRV8833 frena (los dos pines en
     alto). La frecuencia no lo arregla. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos pines, como
     Pimoroni): los dos sentidos al 93–102 %. Detalles en la Fase 6 ("Marcha atrás más lenta").
-  - **Pendiente:** recalibrar en el suelo lo que se ajustó con el motor anterior, porque ahora los giros sobre sí
-    mismo son más fuertes: `turnTime` de la lección 04 (250 ms), `brakePulses` de `Lesson11.Square` (3) y los pasos de
-    giro de la lección 09 y de ObstacleAvoidance.
+  - **Recalibrado en el suelo con `HatMotor`** (los giros sobre sí mismo son más fuertes): lección 04, `turnTime`
+    de 250 a **200 ms**; `Lesson11.Square`, `brakePulses` de 3 a **4**. La lección 09 y ObstacleAvoidance no cambian
+    (giran a pasos y miran después de cada uno): esquivan igual o mejor, con giros de 1 paso casi siempre. El usuario
+    decidió dejar el límite de obstáculo en 30 cm. Detalles en la Fase 5 (lecciones 04, 09 y 11) y en la Fase 2.
 - **Fase 5, lecciones hechas y probadas** (`lessons/`, detalles en la Fase 5): 01 Luces, 02 Semáforo, 03 Motores,
   04 Cuadrado (PR #15), 05 Botones (PR #19), 06 Distancia (PR #17), 09 Robot autónomo (PR #18), 11 Contar vueltas en
   tres partes: odometría, ir recto con realimentación y el cuadrado con pulsos (PR #21, #22 y #23), y 12 La pantalla
@@ -59,9 +60,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Al retomar (siguiente sesión):**
   1. Mirar las comprobaciones y los comentarios del #2616 (primer binding nuevo: pueden pedir cambios) y si
      pgrawehr responde en el #2610.
-  2. Recalibrar en el suelo los giros con `HatMotor` (ver la sesión del 04/10/2026, arriba). Decidir si se informa
-     en dotnet/iot de la marcha atrás de `DCMotor2PinNoEnable` (Fase 6) y si `ExplorerHat` debe mover sus motores con
-     PWM en los dos pines.
+  2. Decidir si se informa en dotnet/iot de la marcha atrás de `DCMotor2PinNoEnable` (Fase 6) y si `ExplorerHat`
+     debe mover sus motores con PWM en los dos pines.
   3. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
      `explorerhat-dispose`; cada pin se abre la primera vez que se usa; pruebas con `FakeGpioDriver`. Prueba en la Pi
      sin motores: IN4 con el LM393 derecho (girar la rueda con la mano) y OUT4 con el LED de la lección 05 (si sigue
@@ -213,6 +213,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
     filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
     temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
+  - Con `HatMotor` (04/10/2026, modo S, 1 min en el suelo): 16 maniobras, las 15 completas con giros de **1 paso**
+    (antes, 30 de 40) y ninguna repetida por seguir el obstáculo (antes, 7). Detecta a 20–30 cm (`OBSTACLE_DISTANCE`) y
+    tras retroceder queda a 30–40 cm. Al usuario le pareció algo cerca; decidió dejar 30 cm.
   - Sujeción: hecha el 01/10/2026 (la UPS y la Pi, en un bloque atornillado al chasis). En campo libre, a veces no avanza en línea recta (los dos
     motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
@@ -322,6 +325,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Calibrada en el suelo con un transportador (velocidad 0,8, UPS HAT (B)): 240 ms → ~85°, **250 ms → casi 90°**,
       320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
       90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
+      **Recalibrada con `HatMotor` (04/10/2026):** con 250 ms, las cuatro esquinas de ~120° (la rueda que va hacia
+      atrás ya no frena); con **200 ms, ~90°** (calculado con el arranque del motor de ~40 ms y acertado a la primera).
 - [x] 05 Botones (`Lesson05.Buttons`, 03/10/2026): pulsador de 12 mm entre 5V e IN4 (GPIO 25) y LED rojo con 330 Ω
       entre 5V y OUT4 (GPIO 16), en una protoboard (esquema SVG en el README). El programa lee y escribe con
       `GpioController` (el binding no tiene entradas ni salidas: Fase 6). Tres partes: la luz roja y el LED siguen al
@@ -381,6 +386,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     esquina queda entre dos conos. Explicado en el README como límite del sensor; no se corrige en la lección.
     Sin caídas de tensión (`0x0` en 857 muestras; baterías a 7,77 V como mínimo, 1,15 A como máximo) y pines a
     nivel bajo al terminar.
+  - Con `HatMotor` (04/10/2026, misma zona, 60 s): 18 obstáculos, detectados casi siempre a 18–29 cm; giros de 1 paso
+    (12 veces), 2 (5) y 3 (1); ninguna maniobra agotó los 10 pasos. El usuario lo vio bien. Sin cambios en la lección.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
@@ -455,6 +462,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     - En el suelo (`brakePulses` 3, batería al ~70 %): **las cuatro esquinas, casi 90°** según el usuario; cada rueda
       7 pulsos (una vez 8) y 1–3 resbalando; un lado se desvió muy poco. Margen de ±1 pulso (~9°): el sensor solo
       cuenta el inicio de cada ranura.
+    - **Recalibrada con `HatMotor` (04/10/2026):** con `brakePulses` 3, ~120° (la izquierda resbaló 2–4 pulsos y la
+      derecha, que va hacia atrás, 5–6; 11–13 pulsos en total); con 5, ~70° (8–10 en total); con **4, ~90°** (cada
+      rueda para a los 6–7, la izquierda resbala 2–3 y la derecha 3–6: ~10 de media, ±10° entre esquinas). Lados: 28–30
+      pulsos y 6–8 más al frenar, como antes; algo desviados. Sin caídas de tensión en estas pruebas (`0x0`; baterías
+      a 7,78 V como mínimo, 1,13 A como máximo).
     - La UPS se quedó sin batería durante las pruebas (la Pi se reinició). El programa desplegado justo antes quedó
       con `runtimeconfig.json` vacío (el corte llegó antes de escribir la caché en la microSD): las tareas de
       despliegue de VS Code ejecutan ahora `sync` después de copiar. `git fsck` en la Pi, sin daños. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
