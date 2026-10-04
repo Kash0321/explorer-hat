@@ -7,7 +7,15 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (al cierre del 04/10/2026)
-- **Sesión del 04/10/2026** (PR #33 a #36 de este repositorio; detalles en las fases):
+- **Sesión del 04/10/2026, tarde** (PR #38 y #39; detalles en las fases):
+  - **Lecciones en VS Code:** *Desplegar en la Pi* y *Ejecutar en la Pi* tienen las lecciones y los programas en una
+    sola lista, y **Depurar en la Pi el programa abierto** depura con F5 el proyecto del archivo abierto. Fase 3.
+  - **Rueda derecha parada:** `Lesson11.Odometry` contaba 0 pulsos. El sensor estaba bien: el cable azul del motor
+    derecho se había soltado de la borna MOTOR 1. Diagnóstico, mensajes de las lecciones 11 y README. Fase 5.
+  - **Lección 08 (sensores analógicos), decidida como siguiente tarea:** con `ProjectReference` al binding de la rama
+    `explorerhat-analog` del fork (`C:\work\iot`). Falta saber qué sensor analógico se usa (no hay potenciómetro ni
+    fotorresistencia en la lista de componentes).
+- **Sesión del 04/10/2026, mañana** (PR #33 a #36 de este repositorio; detalles en las fases):
   - El usuario desmontó y volvió a montar todo el cableado. Revisado con `tools/probar-cableado.sh` (nuevo): todo
     bien salvo los motores, cambiados de borna y con el derecho al revés. Colores de los cables, en el README.
   - **Marcha atrás más lenta** con el `DCMotor` del binding (a 0,4, al ~36 % de la velocidad hacia delante): marcha
@@ -62,8 +70,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      --onto upstream/main explorerhat-inputs-outputs explorerhat-analog`) y abrir su PR. Si piden cambios en un PR de
      abajo, rehacer encima las ramas de arriba.
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
-     **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa:
-     la lección 10 (siguelíneas, si están los dos TCRT5000), la Fase 7 (medir el LLM en el portátil) u otra tarea.
+     **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
+     **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). Después, la lección 10
+     (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V.
@@ -523,6 +532,20 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       rueda para a los 6–7, la izquierda resbala 2–3 y la derecha 3–6: ~10 de media, ±10° entre esquinas). Lados: 28–30
       pulsos y 6–8 más al frenar, como antes; algo desviados. Sin caídas de tensión en estas pruebas (`0x0`; baterías
       a 7,78 V como mínimo, 1,13 A como máximo).
+    - **Avería del 04/10/2026 (tarde): `Lesson11.Odometry` contaba 0 pulsos** en las dos partes (también con F5), sin
+      ningún error. Diagnóstico:
+      - Grabación de los pines cada ~11 ms durante la lección (script en `/tmp`, como `tools/vigilar-pines.sh` pero con
+        las entradas; en `pinctrl get`, el nivel de una entrada es el campo anterior a `//`): PWM en los pines 19 y 21,
+        443 cambios en el GPIO 18 (sensor izquierdo) y **0 cambios en el GPIO 25** (siempre `lo`).
+      - Sin programa, girando a mano la rueda derecha: 48 y 78 cambios en el GPIO 25. Con el motor derecho a toda
+        velocidad (`pinctrl set 19 op dh`): 0 cambios. **La rueda derecha no giraba**: el usuario creía que giraban
+        las dos.
+      - Causa: **el cable azul del motor derecho, suelto en la borna MOTOR 1.** Apretado, la lección cuenta bien en el
+        aire: 92 pulsos en 2 s (47 cm/s, con `HatMotor`) y parada a los 49 pulsos con 5 más de inercia.
+      - Cambios: el mensaje `Time is up!` de `Lesson11.Odometry` y `Lesson11.Straight` pregunta también si giran las
+        ruedas, y el README de la lección tiene la sección "Si no cuenta ningún pulso".
+      - Método para otra vez: si un sensor no cuenta, girar la rueda a mano (descarta el sensor) y mirar si la rueda gira
+        con el motor (los pines solo dicen lo que manda la Pi).
     - La UPS se quedó sin batería durante las pruebas (la Pi se reinició). El programa desplegado justo antes quedó
       con `runtimeconfig.json` vacío (el corte llegó antes de escribir la caché en la microSD): las tareas de
       despliegue de VS Code ejecutan ahora `sync` después de copiar. `git fsck` en la Pi, sin daños. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de

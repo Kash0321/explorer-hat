@@ -62,7 +62,7 @@ using (var gpio = new GpioController())
     Stop();
     if (clock.ElapsedMilliseconds >= maxTime)
     {
-        Console.WriteLine("Time is up! Is the speed sensor connected to IN4?");
+        Console.WriteLine("Time is up! Does the right wheel turn? Is the speed sensor connected to IN4?");
     }
 
     Console.WriteLine("Stopped after " + pulses + " pulses = " + Cm(pulses) + " cm");
