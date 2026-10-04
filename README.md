@@ -31,10 +31,17 @@
 ### Pasos
 
 1. Monta los motores en los soportes del chasis, con los discos de 20 ranuras en sus ejes.
-2. Pon la UPS HAT (B) **debajo** de la Raspberry Pi, con el montaje que trae. Sus contactos tocan por debajo los pines de alimentación y de I2C de la Pi. No ocupan ningún GPIO del Explorer HAT.
+2. Pon la UPS HAT (B) **debajo** de la Raspberry Pi, con el montaje que trae. Sus contactos de muelle (*pogo pins*) tocan por debajo los pines de alimentación (5 V) y de I2C de la Pi. No ocupan ningún GPIO del Explorer HAT. **La Pi no necesita ningún cable micro-USB:** los contactos le dan toda la alimentación. El puerto USB "5V OUT" de la UPS es para alimentar otros aparatos.
 3. Pon el Explorer HAT Pro **encima** de la Raspberry Pi, en los 40 pines.
 4. Con su montaje, la UPS y la Pi forman un solo bloque. Ese bloque encaja en el hueco del chasis, entre los soportes de los motores, justo encima de dos ranuras. Atorníllalo por esas ranuras. Así no se mueve en los giros ni al frenar.
-5. Conecta el motor de la rueda **derecha** a la borna **MOTOR 1** del HAT y el de la rueda **izquierda** a **MOTOR 2**. Si una rueda gira al revés de lo esperado, intercambia los dos cables de ese motor.
+5. Conecta el motor de la rueda **derecha** a la borna **MOTOR 1** del HAT y el de la rueda **izquierda** a **MOTOR 2**. En este robot, cada motor tiene un cable azul y otro morado:
+
+   | Borna | Motor | + | − |
+   |---|---|---|---|
+   | MOTOR 1 | rueda derecha | morado | azul |
+   | MOTOR 2 | rueda izquierda | azul | morado |
+
+   Un motor de corriente continua no se estropea si se conecta al revés: solo gira hacia el otro lado. Los dos motores van montados en espejo, así que el mismo color en el + no hace que las dos ruedas avancen. Comprueba el resultado con `bash tools/probar-cableado.sh` (con las ruedas en el aire): si una rueda gira al revés, intercambia los dos cables de ese motor; si gira la otra rueda, los motores están cambiados de borna.
 6. Monta los tres sensores en la parte delantera del robot, cada uno con su soporte, mirando hacia delante: izquierda, centro y derecha.
 7. Conecta los sensores como indica la tabla de cableado de abajo.
 8. Pon el interruptor deslizante de la UPS en **OFF**. Después coloca las dos baterías 18650, respetando la polaridad (+ y −) que marca el soporte. Si colocas las baterías con el interruptor en ON, la placa se puede dañar por un cortocircuito.
@@ -51,8 +58,8 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 
 | Elemento | Conector del HAT | GPIO | Notas |
 |---|---|---|---|
-| Motor 1 (rueda derecha, `One`) | Borna MOTOR 1 | 19 (velocidad) / 20 (dirección) | La velocidad es PWM por software |
-| Motor 2 (rueda izquierda, `Two`) | Borna MOTOR 2 | 21 (velocidad) / 26 (dirección) | La velocidad es PWM por software |
+| Motor 1 (rueda derecha, `One`) | Borna MOTOR 1 | 19 (hacia delante) / 20 (hacia atrás) | PWM por software en el pin del sentido de giro (`HatMotor`) |
+| Motor 2 (rueda izquierda, `Two`) | Borna MOTOR 2 | 21 (hacia delante) / 26 (hacia atrás) | PWM por software en el pin del sentido de giro (`HatMotor`) |
 | Luz azul (`Lights.One`) | LED 1 de la placa | 4 | |
 | Luz amarilla (`Lights.Two`) | LED 2 de la placa | 17 | |
 | Luz roja (`Lights.Three`) | LED 3 de la placa | 27 | |
@@ -187,7 +194,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 ### Aviso de tensión baja
 
 * Un LED rojo **PWR** fijo en la Raspberry Pi indica que la tensión es correcta.
-* Si el robot hace cosas raras, mira el estado de alimentación con `vcgencmd get_throttled` (`0x0` = bien).
+* Si el robot hace cosas raras, mira el estado de alimentación con `vcgencmd get_throttled` (`0x0` = bien). Los bits 0 y 16 son la tensión baja (ahora y desde el arranque). `0x80000` (bit 19) no es de tensión: la CPU llegó al límite suave de temperatura (60 °C) y bajó su frecuencia. Pasa al compilar en la Pi con los 4 núcleos al 100 %.
 
 ---
 
@@ -204,7 +211,7 @@ ejecutarlas en [`lessons/README.md`](lessons/README.md).
 El entorno está organizado en soluciones independientes según el nivel de aprendizaje:
 
 * 🟢 **`ExplorerHat.BasicSample/`**: El laboratorio de inicio. Ideal para enseñar bucles, hilos con `Thread.Sleep`, encendido de luces LED secuenciales y movimientos básicos de los dos motores (Adelante, Atrás, Giros).
-* ⚙️ **`ExplorerHat.Common/`**: Código compartido por los ejemplos y las lecciones. `SafeExplorerHat` se usa igual que `ExplorerHat`, pero al terminar para los motores, apaga las luces y libera los pines sin errores. `Screen` maneja la pantalla LCD.
+* ⚙️ **`ExplorerHat.Common/`**: Código compartido por los ejemplos y las lecciones. `SafeExplorerHat` se usa igual que `ExplorerHat`, pero al terminar para los motores, apaga las luces y libera los pines sin errores. Sus motores (`HatMotor`) giran igual de rápido hacia delante que hacia atrás. `Screen` maneja la pantalla LCD.
 * 📡 **`ExplorerHat.SonarDashboard/`**: Panel en la consola con la distancia que mide cada sensor de ultrasonidos, sin mover los motores. Sirve para comprobar el montaje de los sensores. La tecla **F** activa o desactiva el mismo filtro de lecturas falsas que usa el robot autónomo. Con `--registro <archivo> [segundos]` no muestra el panel: guarda cada lectura en un archivo CSV para estudiar las lecturas falsas.
 * 🔋 **`ExplorerHat.UpsDashboard/`**: Panel en la consola con los datos de la Waveshare UPS HAT (B): tensión y carga de las baterías, corriente, potencia y si se cargan o se descargan, junto con el estado de alimentación y la temperatura de la Raspberry Pi. No mueve los motores.
 * 🔵 **`ExplorerHat.ObstacleAvoidance/`**: El robot autónomo. Integra lecturas de sensores de distancia por ultrasonidos (HC-SR04) para calcular proximidad y tomar decisiones de esquiva en tiempo real.
@@ -213,7 +220,7 @@ El entorno está organizado en soluciones independientes según el nivel de apre
 
 ## 🧰 Herramientas (`tools/`)
 
-Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Cada script explica su uso al principio.
+Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Cada script explica su uso al principio.
 
 ---
 

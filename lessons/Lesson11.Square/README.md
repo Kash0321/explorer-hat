@@ -50,19 +50,24 @@ girando unos pulsos. En nuestra primera prueba en el suelo (`brakePulses` = 1), 
 **resbaló 3 o 4 más**: unos 12,5 pulsos, es decir, unos 112 grados. Con el transportador medimos unos **115 grados**.
 Las cuentas encajaban; sobraba lo que resbala.
 
-Por eso cada rueda se para `brakePulses` pulsos antes: 10 − 3 = 7 pulsos, y los 3 que resbala la llevan a 10.
-Con `brakePulses` = 3, en la segunda prueba **las cuatro esquinas midieron casi 90 grados**: cada rueda se paró a
-los 7 pulsos (una vez, 8) y resbaló de 1 a 3 más.
+Por eso cada rueda se para `brakePulses` pulsos antes: 10 − 4 = 6 pulsos, y los que resbala la llevan a unos 10.
+Con `brakePulses` = 4, **las cuatro esquinas midieron unos 90 grados**: cada rueda se paró a los 6 pulsos (alguna
+vez, 7); la izquierda resbaló 2 o 3 más y la derecha, de 3 a 6. Con 3, las esquinas salían de unos 120 grados, y
+con 5, de unos 70.
 
-Fíjate en que la primera esquina sumó solo 8 pulsos y también midió unos 90 grados. El sensor solo cuenta cuando
-empieza una ranura: al empezar y al terminar, el disco puede estar a mitad de un pulso. Por eso hay un margen de
-más o menos un pulso, unos 9 grados.
+La rueda derecha resbala más porque en el giro va hacia atrás. (Hasta el 04/10/2026 esa rueda giraba más despacio
+hacia atrás y bastaba con `brakePulses` = 3: lo cambió la forma de mover los motores, ver `HatMotor` en el README
+de Common.)
+
+El sensor solo cuenta cuando empieza una ranura: al empezar y al terminar, el disco puede estar a mitad de un pulso.
+Por eso hay un margen de más o menos un pulso, unos 9 grados. Y lo que resbala cambia un poco de una esquina a
+otra: por eso unas esquinas salen algo más abiertas que otras.
 
 1. Ejecuta la lección en modo calibración (`y`).
 2. Mide cada esquina con el transportador.
 3. Si gira más de 90 grados, sube `brakePulses`. Si gira menos, bájalo.
 
-En los lados pasa lo mismo: 29 pulsos y 5 a 7 más resbalando, unos 36 cm en lugar de 30. El cuadrado sale más
+En los lados pasa lo mismo: 29 pulsos y 6 a 8 más resbalando, unos 36 cm en lugar de 30. El cuadrado sale más
 grande, pero sigue siendo un cuadrado.
 
 ## Retos

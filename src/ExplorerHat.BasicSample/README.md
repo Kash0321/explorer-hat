@@ -6,7 +6,7 @@ luces. **Mueve los motores.**
 
 ## Qué hardware usa
 
-* **Motores** (motores amarillos TT): motor 1 = GPIO 19 (velocidad) y 20 (dirección); motor 2 = GPIO 21 y 26.
+* **Motores** (motores amarillos TT): motor 1 = GPIO 19 (hacia delante) y 20 (hacia atrás); motor 2 = GPIO 21 y 26.
   El motor `One` es la **rueda derecha** y `Two` la **izquierda**.
 * **Luces:** GPIO 4 (azul), 17 (amarilla), 27 (roja) y 5 (verde).
 * No usa sensores.

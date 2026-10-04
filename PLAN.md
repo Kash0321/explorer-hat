@@ -6,7 +6,20 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (03/10/2026)
+## Estado actual (04/10/2026)
+- **Sesión del 04/10/2026 (rama `motores-pwm-dos-pines`):**
+  - El usuario desmontó y volvió a montar todo el cableado. Revisado con `tools/probar-cableado.sh` (nuevo): todo
+    bien salvo los motores, que estaban cambiados de borna y con el derecho al revés. Cables, en el README (montaje).
+  - **Marcha atrás más lenta:** con el `DCMotor` del binding, a 0,4 las ruedas iban hacia atrás al ~36 % de la
+    velocidad hacia delante. Causa: en la parte apagada del PWM, marcha atrás el DRV8833 frena (los dos pines en
+    alto). La frecuencia no lo arregla. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos pines, como
+    Pimoroni): los dos sentidos al 93–102 %. Detalles en la Fase 6 ("Marcha atrás más lenta").
+  - **Sin cable micro-USB:** la Pi funciona igual solo con los contactos de la UPS (Fase 2). Al compilar en la Pi,
+    la CPU llega a 60 °C y baja su frecuencia (`0x80000`).
+  - **Recalibrado en el suelo con `HatMotor`** (los giros sobre sí mismo son más fuertes): lección 04, `turnTime`
+    de 250 a **200 ms**; `Lesson11.Square`, `brakePulses` de 3 a **4**. La lección 09 y ObstacleAvoidance no cambian
+    (giran a pasos y miran después de cada uno): esquivan igual o mejor, con giros de 1 paso casi siempre. El usuario
+    decidió dejar el límite de obstáculo en 30 cm. Detalles en la Fase 5 (lecciones 04, 09 y 11) y en la Fase 2.
 - **Fase 5, lecciones hechas y probadas** (`lessons/`, detalles en la Fase 5): 01 Luces, 02 Semáforo, 03 Motores,
   04 Cuadrado (PR #15), 05 Botones (PR #19), 06 Distancia (PR #17), 09 Robot autónomo (PR #18), 11 Contar vueltas en
   tres partes: odometría, ir recto con realimentación y el cuadrado con pulsos (PR #21, #22 y #23), y 12 La pantalla
@@ -21,7 +34,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   Alimentación con la Waveshare UPS HAT (B), sin caídas de tensión. Ejemplos en `src/`: BasicSample,
   ObstacleAvoidance, SonarDashboard y UpsDashboard.
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, en dotnet/iot (al cierre del 03/10/2026):**
+- **Fase 6, en dotnet/iot (al cierre del 03/10/2026; el 04/10/2026, sin comentarios nuevos):**
 
   | Qué | Estado | Pendiente |
   |---|---|---|
@@ -49,7 +62,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Al retomar (siguiente sesión):**
   1. Mirar las comprobaciones y los comentarios del #2616 (primer binding nuevo: pueden pedir cambios) y si
      pgrawehr responde en el #2610.
-  2. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
+  2. Decidir si se informa en dotnet/iot de la marcha atrás de `DCMotor2PinNoEnable` (Fase 6) y si `ExplorerHat`
+     debe mover sus motores con PWM en los dos pines. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena
+     con los dos pines en alto: paradas más cortas), medir la corriente de cada motor con el INA219 (Pimoroni dice
+     200 mA por canal), condensadores de 100 nF en los motores y un disipador o ventilador para la Pi.
+  3. Entradas y salidas en `ExplorerHat` (PR 2 del orden acordado): rama nueva en `C:\work\iot` desde
      `explorerhat-dispose`; cada pin se abre la primera vez que se usa; pruebas con `FakeGpioDriver`. Prueba en la Pi
      sin motores: IN4 con el LM393 derecho (girar la rueda con la mano) y OUT4 con el LED de la lección 05 (si sigue
      en la protoboard). El PR se abre cuando fusionen el #2613.
@@ -71,6 +88,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
       Serilog.Sinks.Console 6.1.1.
 - [x] Cambios de API: no hubo que tocar nada (`Hcsr04.Distance` sigue existiendo y lanza excepción si no
       hay eco; `DCMotor` controla bien el DRV8833 marcha atrás). Solo avisos de nulabilidad, corregidos.
+      **Corrección (04/10/2026):** el sentido es correcto, pero marcha atrás va más lento (Fase 6).
 - [x] Compila en la Pi: 0 errores, 0 avisos (primera compilación ~3 min, siguientes ~20 s).
 - [x] Prueba de LEDs en hardware como usuario `pi` (sin `root`): funciona.
 - [x] **Fallo al liberar el HAT** (ver Fase 6): `ExplorerHat.Dispose()` hace que el proceso muera con
@@ -153,6 +171,31 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     La Redmi en el suelo con el giro a pasos (30/09/2026, modo S, batería ya usada) llegó al 91 % (20 caídas).
   - Conclusión: la UPS HAT (B) es la alimentación del robot. Las baterías externas USB quedan para trabajar con
     el robot quieto.
+- [x] **¿Hace falta el cable micro-USB con la UPS? (04/10/2026)** Desde el 01/10/2026, la Pi tenía además un cable
+      del puerto USB "5V OUT" de la UPS a su micro-USB (el 03/10/2026, el usuario cambió ese cable por uno más corto y
+      grueso). Según Waveshare, la UPS alimenta la Pi por sus contactos de muelle (*pogo pins*, los pines de 5 V del
+      GPIO) y "5V OUT" es para otros aparatos: todas las pruebas con la UPS se habían hecho con los dos caminos.
+      Prueba con el método de esta fase (solo baterías, `tools/vigilar-tension.sh`), con cable y después sin él (la Pi
+      apagada para quitarlo: arrancó solo con los contactos):
+
+  | Tramo | Con cable: baterías (mín.) / corriente máx. | Sin cable: baterías (mín.) / corriente máx. |
+  |---|---|---|
+  | Reposo (1,5 min) | 7,88 V / 0,55 A | 7,82 V / 0,56 A |
+  | Compilando la solución en la Pi (`--no-incremental`, ~4,5–5 min) | 7,80 V / 0,75 A | 7,72 V / 0,74 A |
+  | ObstacleAvoidance N, ruedas en el aire (1 min) | 7,72 V / 1,14 A | 7,64 V / 1,11 A |
+  | ObstacleAvoidance S, ruedas en el aire (1 min) | 7,70 V / 0,95 A | 7,65 V / 1,12 A |
+
+  **Tensión baja el 0 % del tiempo en todos los tramos de los dos casos.** Las baterías bajan ~0,06 V de una prueba
+  a otra por la descarga. Decisión: **sin cable**. Los dos caminos salen del mismo regulador, así que tenerlos a
+  la vez no es peligroso; el micro-USB de la Pi tiene un fusible rearmable y los 5 V del GPIO no (es lo normal en
+  las placas que alimentan la Pi por el GPIO). La prueba no mide el margen: la Pi solo avisa por debajo de ~4,63 V.
+  Con multímetro, se podría medir entre 5 V y GND del GPIO con los motores en marcha.
+  - **Temperatura:** al compilar, en los dos casos, `get_throttled` = `0x80000` (bit 19): la CPU llegó al límite
+    suave de 60 °C y bajó su frecuencia (52,6 °C al terminar; 46,7 °C al arrancar en frío). Compilar en la Pi tarda
+    más por eso. Un disipador o un ventilador lo evitaría; importa también para la Fase 7. Además, con 1 GB de RAM la
+    compilación llegó a usar la memoria de intercambio y la Pi tardó más de 20 s en aceptar una conexión SSH. Después
+    de compilar, `dotnet build-server shutdown` libera ~300 MB (los procesos de MSBuild y del compilador se quedan
+    esperando).
 - [x] Nuevo ejemplo `ExplorerHat.UpsDashboard`: panel de consola con todo lo que da la UPS (su única conexión de
       datos es el INA219 en I2C 0x42): tensión de las baterías, carga estimada (6,0 V = 0 %, 8,4 V = 100 %, como el
       ejemplo de Waveshare), corriente con signo, potencia, estado (cargando o descargando), mínimos de la sesión y
@@ -199,6 +242,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - SonarDashboard: la tecla F activa y desactiva el mismo filtro (y `--registro` guarda también la distancia
     filtrada). Con el filtro, el usuario nota que las medidas ya no dan saltos grandes de repente. No suaviza el
     temblor normal (±8 cm en el centro) ni dos saltos seguidos; para el panel se podría añadir una media.
+  - Con `HatMotor` (04/10/2026, modo S, 1 min en el suelo): 16 maniobras, las 15 completas con giros de **1 paso**
+    (antes, 30 de 40) y ninguna repetida por seguir el obstáculo (antes, 7). Detecta a 20–30 cm (`OBSTACLE_DISTANCE`) y
+    tras retroceder queda a 30–40 cm. Al usuario le pareció algo cerca; decidió dejar 30 cm.
   - Sujeción: hecha el 01/10/2026 (la UPS y la Pi, en un bloque atornillado al chasis). En campo libre, a veces no avanza en línea recta (los dos
     motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
 
@@ -308,6 +354,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Calibrada en el suelo con un transportador (velocidad 0,8, UPS HAT (B)): 240 ms → ~85°, **250 ms → casi 90°**,
       320 ms → ~120°; las cuatro esquinas, casi iguales. Las estimaciones a ojo fallaron mucho (se confunden 45° y
       90°): en el taller, medir con transportador. El giro no es proporcional al tiempo (arranque del motor).
+      **Recalibrada con `HatMotor` (04/10/2026):** con 250 ms, las cuatro esquinas de ~120° (la rueda que va hacia
+      atrás ya no frena); con **200 ms, ~90°** (calculado con el arranque del motor de ~40 ms y acertado a la primera).
 - [x] 05 Botones (`Lesson05.Buttons`, 03/10/2026): pulsador de 12 mm entre 5V e IN4 (GPIO 25) y LED rojo con 330 Ω
       entre 5V y OUT4 (GPIO 16), en una protoboard (esquema SVG en el README). El programa lee y escribe con
       `GpioController` (el binding no tiene entradas ni salidas: Fase 6). Tres partes: la luz roja y el LED siguen al
@@ -367,6 +415,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     esquina queda entre dos conos. Explicado en el README como límite del sensor; no se corrige en la lección.
     Sin caídas de tensión (`0x0` en 857 muestras; baterías a 7,77 V como mínimo, 1,15 A como máximo) y pines a
     nivel bajo al terminar.
+  - Con `HatMotor` (04/10/2026, misma zona, 60 s): 18 obstáculos, detectados casi siempre a 18–29 cm; giros de 1 paso
+    (12 veces), 2 (5) y 3 (1); ninguna maniobra agotó los 10 pasos. El usuario lo vio bien. Sin cambios en la lección.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
@@ -441,6 +491,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     - En el suelo (`brakePulses` 3, batería al ~70 %): **las cuatro esquinas, casi 90°** según el usuario; cada rueda
       7 pulsos (una vez 8) y 1–3 resbalando; un lado se desvió muy poco. Margen de ±1 pulso (~9°): el sensor solo
       cuenta el inicio de cada ranura.
+    - **Recalibrada con `HatMotor` (04/10/2026):** con `brakePulses` 3, ~120° (la izquierda resbaló 2–4 pulsos y la
+      derecha, que va hacia atrás, 5–6; 11–13 pulsos en total); con 5, ~70° (8–10 en total); con **4, ~90°** (cada
+      rueda para a los 6–7, la izquierda resbala 2–3 y la derecha 3–6: ~10 de media, ±10° entre esquinas). Lados: 28–30
+      pulsos y 6–8 más al frenar, como antes; algo desviados. Sin caídas de tensión en estas pruebas (`0x0`; baterías
+      a 7,78 V como mínimo, 1,13 A como máximo).
     - La UPS se quedó sin batería durante las pruebas (la Pi se reinició). El programa desplegado justo antes quedó
       con `runtimeconfig.json` vacío (el corte llegó antes de escribir la caché en la microSD): las tareas de
       despliegue de VS Code ejecutan ahora `sync` después de copiar. `git fsck` en la Pi, sin daños. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
@@ -582,7 +637,59 @@ solo cubre motores y las 4 luces. Falta:
 
     Configuración tras el setter arreglado: `0x39EF` (BADC 12 bits, SADC 32 muestras). Al terminar, `Reset()` deja
     la UPS como estaba: `0x399F` (la configuración de fábrica) y calibración `0x0000`.
-- [x] Control del DRV8833 marcha atrás: correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM invertido).
+- [x] Control del DRV8833 marcha atrás: el sentido es correcto (`DCMotor2PinNoEnable`, pin de dirección + PWM
+      invertido), pero la velocidad no (siguiente punto).
+- [x] **Marcha atrás más lenta con `DCMotor2PinNoEnable` (04/10/2026).** Al comprobar el cableado, el usuario vio las
+      ruedas más lentas hacia atrás que hacia delante.
+  - **Medida** (programa aparte, no versionado: `~/apps/ReverseSpeed`; las dos ruedas a la vez, en el aire, 1 s para
+    coger velocidad y 3 s contando pulsos de los LM393), pulsos por segundo, media de las dos ruedas:
+
+    | Velocidad | Delante | Atrás con `DCMotor` | Atrás con `HatMotor` |
+    |---|---|---|---|
+    | 0,4 | 41–44 | 16 (~36 %) | 42 (102 %) |
+    | 0,6 | 51–52 | 30 (~57 %) | 48 (93 %) |
+    | 0,8 | 57 | 47 (~81 %) | 57 (100 %) |
+    | 1,0 | 61 | 61 (100 %) | 61 (100 %) |
+
+  - **Causa:** el DRV8833 tiene dos entradas por motor: alto/bajo = tensión hacia delante, bajo/alto = hacia atrás,
+    bajo/bajo = el motor gira libre, alto/alto = **frena** (une los dos cables del motor: freno dinámico).
+    `DCMotor2PinNoEnable` pone el PWM en el pin 19 (o 21): hacia delante, el 20 en bajo y en la parte apagada del
+    ciclo el motor gira libre; hacia atrás, el 20 en alto y el PWM invertido (`1.0 + val`), así que en la parte
+    apagada los dos pines están en alto y el motor **frena**. Comprobado grabando los pines con `pinctrl` mientras
+    giraba: a 0,4, delante 43 % con tensión y 57 % libre; atrás 43 % con tensión y 57 % frenando. A 1,0 no hay parte
+    apagada y las velocidades coinciden.
+  - **La frecuencia no lo arregla** (programa aparte `~/apps/PwmFrequency`, con `SoftwarePwmChannel` propio):
+
+    | Frecuencia | 0,4 delante / atrás | 0,6 delante / atrás |
+    |---|---|---|
+    | 50 Hz (la de `DCMotor`) | 43 / 17 | 52 / 31 |
+    | 100 Hz | 43 / 14 | 52 / 34 |
+    | 200 Hz | 41 / 18 | 52 / 34 |
+    | 500 Hz | 8 y 32 (irregular) / 15 | 53 / 38 |
+    | 1000 Hz | 45 / 29 | 44 / 29 |
+    | 2000 Hz | 44 / 29 | 45 / 29 |
+
+    Hasta 200 Hz, la bobina del motor (mucho menos de 1 ms) llega en cada parte apagada a la corriente de frenado
+    completa: frena lo mismo a cualquier frecuencia. Desde 500 Hz, `SoftwarePwmChannel` (que cede el procesador
+    mientras espera) ya no sigue la velocidad pedida: a 1000 y 2000 Hz, 0,4 y 0,6 dan lo mismo. `pinctrl` muestrea
+    cada ~7 ms: sus cifras no sirven por encima de 200 Hz. Haría falta PWM por hardware de varios kHz, y de los pines
+    de los motores solo el 19 lo tiene (el GPIO 18 de la fila lateral también, pero no va al DRV8833).
+  - **La librería de Python de Pimoroni** pone el PWM (100 Hz) en los dos pines: hacia delante en el 20 ("forward")
+    con el 19 en bajo, y hacia atrás en el 19 ("backward") con el 20 en bajo. El motor gira libre en los dos sentidos.
+    Su "delante" es el "atrás" de dotnet/iot: con ella, este robot iría al revés.
+  - **Arreglo en el robot:** `HatMotor` y `HatMotors` en `ExplorerHat.Common` (README de Common): un
+    `SoftwarePwmChannel` a 100 Hz en cada pin, el mismo sentido que `DCMotor`. `SafeExplorerHat` crea el
+    `ExplorerHat` del binding solo por sus luces, libera sus motores y mueve los mismos pines con `HatMotors`; las
+    lecciones y los ejemplos no cambian. Probado en el aire: pines en la parte apagada siempre libres (alto/alto el
+    0 % del tiempo), las seis fases de sentido bien (`~/apps/MotorCheck`, el usuario mirando las ruedas), parada de
+    emergencia con SIGINT, SIGTERM y SIGHUP a −0,6 (los 9 pines en `lo`, el mensaje de parada y ningún proceso) y la
+    lección 01 (código 0). CPU del proceso: ~7 % de un núcleo con los motores parados y ~20–25 % en marcha (antes,
+    ~15 %).
+  - **Pendiente de decidir:** informar en dotnet/iot (incidencia de `DCMotor2PinNoEnable`; un arreglo necesita PWM en
+    los dos pines) y si el PR de entradas y salidas de `ExplorerHat` (o uno aparte) mueve los motores como `HatMotor`.
+  - Especificación de Pimoroni: *"Two H-bridge motor drivers (up to 200mA per channel; soft PWM control)"*. El
+    DRV8833 admite 1,5 A por canal y se protege solo; un motor TT gasta ~100–200 mA en el aire y más al arrancar.
+    Si hace falta, se puede medir con el INA219 de la UPS (motores parados frente a en marcha).
 - [x] **Incidencia en `System.Device.Gpio` (Pi 3, `RaspberryPi3Driver`):** quitar un aviso de eventos
       con `UnregisterCallbackForPinValueChangedEvent` lanza `GpiodException: Device or resource busy` (detalles en la
       lección 11 de la Fase 5). Buscada el 03/10/2026: no hay ninguna igual (la más parecida, #1637, es de la Pi 4 y

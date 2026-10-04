@@ -24,7 +24,7 @@ Los dos motores y las luces verde (avanzar) y amarilla (girar), como en la lecci
 
 Al empezar, pregunta si quieres el **modo calibración**: pulsa `y` para sí o cualquier otra tecla para no.
 
-Después repite 4 veces: avanza durante `sideTime` (1 s) y gira a la derecha durante `turnTime` (250 ms). Después
+Después repite 4 veces: avanza durante `sideTime` (1 s) y gira a la derecha durante `turnTime` (200 ms). Después
 de cada movimiento para los motores, apaga las luces y espera `pauseTime` (0,3 s) para que el robot no resbale.
 En modo calibración, además, se para después de cada giro y espera a que pulses una tecla.
 
@@ -42,8 +42,9 @@ buscar el tiempo correcto:
 5. Repite hasta que las esquinas midan 90 grados. Después ejecútala sin modo calibración y mira si el robot vuelve
    cerca del punto de salida.
 
-Nuestras medidas (velocidad 0,8, UPS HAT (B), suelo liso): 240 ms giran unos 85 grados, 250 ms casi 90 y 320 ms
-unos 120. Las cuatro esquinas salen casi iguales. El giro no crece de forma regular con el tiempo: el motor tarda
+Nuestras medidas (velocidad 0,8, UPS HAT (B), suelo liso): 200 ms giran unos 90 grados y 250 ms unos 120. Las
+cuatro esquinas salen casi iguales. (Hasta el 04/10/2026, la rueda que va hacia atrás giraba más despacio y hacían
+falta 250 ms para 90 grados: lo cambió la forma de mover los motores, ver `HatMotor` en el README de Common.) El giro no crece de forma regular con el tiempo: el motor tarda
 un poco en arrancar, así que con tiempos muy cortos casi no gira.
 
 El tiempo correcto cambia con el suelo (baldosa, madera, alfombra), con la carga de las baterías y con la
