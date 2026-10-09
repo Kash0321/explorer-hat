@@ -18,11 +18,12 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #39, cuyas descripciones resumen cada fase y cada lección.
+     sobre todo los #4 a #42, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
-     actual" de PLAN.md (el 04/10/2026: PR #2612, #2613 y #2616, incidencias #2614, #2615 y #2617,
-     y el PR #2610 de pgrawehr, donde comentamos), con sus comprobaciones y comentarios nuevos
-     (gh pr checks <n> -R dotnet/iot y gh api repos/dotnet/iot/issues/<n>/comments). Si hay
+     actual" de PLAN.md (el 09/10/2026: PR #2613 y #2616, incidencias #2614, #2615 y #2617,
+     y el PR #2610 de pgrawehr, donde comentamos), con sus comprobaciones, comentarios y revisiones
+     nuevos (gh pr checks <n> -R dotnet/iot, gh api repos/dotnet/iot/issues/<n>/comments y, en los
+     PR, gh api repos/dotnet/iot/pulls/<n>/reviews y .../pulls/<n>/comments). Si hay
      comentarios, dímelo antes de responder.
 
 2. Comprueba que llegas a la Raspberry Pi sin que te pida nada:
