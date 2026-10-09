@@ -6,14 +6,15 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (09/10/2026)
-- **Sesión del 09/10/2026** (detalles en la Fase 6):
+## Estado actual (al cierre del 09/10/2026)
+- **Sesión del 09/10/2026** (PR #41 y #42 de este repositorio; detalles en la Fase 6):
   - **#2612 (`Ina219`) fusionado** el 08/10/2026 (`d84c9407` en `upstream/main`). Rama `ina219-signed-readings` borrada.
   - **#2613, #2616 y #2610, aprobados** por raffaeler (el #2612 también por pgrawehr). Las pruebas de `Button` ya no
     fallan (#2608 fusionado): pasan todas las comprobaciones.
   - **Revisión del #2613 respondida** con un commit nuevo (`15efc1ae`): excepción si no hay controlador y
     `shouldDispose` es false (lo pidió pgrawehr) y el pin de dirección en bajo antes de liberar el canal PWM (hallazgo
-    de Copilot). Ramas apiladas rehechas encima.
+    de Copilot). Ramas apiladas rehechas encima. Con el commit nuevo pasan las 10 comprobaciones, pero se anuló la
+    aprobación de raffaeler: el PR está en "Review required" hasta que la repitan (no hay que pedir nada).
   - **#2610:** en el *triage* decidieron fusionarlo así y arreglar aparte el fallo de los dos avisos en un pin. Según
     pgrawehr, el #2610 arregla la #2614.
 - **Sesión del 04/10/2026, tarde** (PR #38 y #39; detalles en las fases):
@@ -54,7 +55,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | Qué | Estado | Pendiente |
   |---|---|---|
   | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | **Fusionado** el 08/10/2026 | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
-  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Aprobado por raffaeler; revisión de pgrawehr y de Copilot respondida el 09/10/2026 (`15efc1ae`) | Que respondan y lo fusionen. De él dependen las dos ramas de abajo |
+  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Revisión de pgrawehr y de Copilot respondida el 09/10/2026 (`15efc1ae`); 10/10 comprobaciones; "Review required" (el commit nuevo anuló la aprobación de raffaeler) | Que lo aprueben otra vez y lo fusionen. De él dependen las dos ramas de abajo |
   | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Aprobado por raffaeler, sin comentarios | Que lo fusionen |
   | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta (`untriaged`) | pgrawehr: la arregla el #2610 |
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`), sin respuesta | Solo incidencia |
