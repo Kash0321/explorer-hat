@@ -6,7 +6,16 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (al cierre del 04/10/2026)
+## Estado actual (09/10/2026)
+- **Sesión del 09/10/2026** (detalles en la Fase 6):
+  - **#2612 (`Ina219`) fusionado** el 08/10/2026 (`d84c9407` en `upstream/main`). Rama `ina219-signed-readings` borrada.
+  - **#2613, #2616 y #2610, aprobados** por raffaeler (el #2612 también por pgrawehr). Las pruebas de `Button` ya no
+    fallan (#2608 fusionado): pasan todas las comprobaciones.
+  - **Revisión del #2613 respondida** con un commit nuevo (`15efc1ae`): excepción si no hay controlador y
+    `shouldDispose` es false (lo pidió pgrawehr) y el pin de dirección en bajo antes de liberar el canal PWM (hallazgo
+    de Copilot). Ramas apiladas rehechas encima.
+  - **#2610:** en el *triage* decidieron fusionarlo así y arreglar aparte el fallo de los dos avisos en un pin. Según
+    pgrawehr, el #2610 arregla la #2614.
 - **Sesión del 04/10/2026, tarde** (PR #38 y #39; detalles en las fases):
   - **Lecciones en VS Code:** *Desplegar en la Pi* y *Ejecutar en la Pi* tienen las lecciones y los programas en una
     sola lista, y **Depurar en la Pi el programa abierto** depura con F5 el proyecto del archivo abierto. Fase 3.
@@ -40,35 +49,40 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   no está montado. El pulsador de la lección 05 necesita IN4: idea, moverlo al GPIO 8 (CS) con el pull-down de la Pi.
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, en dotnet/iot (al cierre del 04/10/2026):**
+- **Fase 6, en dotnet/iot (09/10/2026):**
 
   | Qué | Estado | Pendiente |
   |---|---|---|
-  | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | Abierto, etiqueta `area-device-bindings`, sin revisión | Revisión de los mantenedores |
-  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Abierto, etiqueta `area-device-bindings`, sin revisión | Revisión. De él dependen las dos ramas de abajo |
-  | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Abierto, etiqueta `area-device-bindings`, sin revisión | Revisión (primer binding nuevo: pueden pedir cambios) |
-  | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta (`untriaged`) | La arregla el PR #2610 de pgrawehr (probado; le comentamos un fallo con dos avisos en un pin) |
-  | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`) | Solo incidencia |
-  | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`) | Respuesta a sus tres preguntas (forma de la API, variante que frena, si `ExplorerHat` la usa) |
-  | Rama `explorerhat-inputs-outputs` del fork (`ff7d5868`): entradas y salidas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2613 |
-  | Rama `explorerhat-analog` del fork (`21633ffa`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el de entradas y salidas |
-  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Abierto (no es nuestro) | Ver si responde a [nuestro comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665) |
+  | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | **Fusionado** el 08/10/2026 | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
+  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Aprobado por raffaeler; revisión de pgrawehr y de Copilot respondida el 09/10/2026 (`15efc1ae`) | Que respondan y lo fusionen. De él dependen las dos ramas de abajo |
+  | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Aprobado por raffaeler, sin comentarios | Que lo fusionen |
+  | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta (`untriaged`) | pgrawehr: la arregla el #2610 |
+  | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`), sin respuesta | Solo incidencia |
+  | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`), sin respuesta | Respuesta a sus tres preguntas (forma de la API, variante que frena, si `ExplorerHat` la usa) |
+  | Rama `explorerhat-inputs-outputs` del fork (`4ee7df07`): entradas y salidas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2613 |
+  | Rama `explorerhat-analog` del fork (`cc557fe9`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el de entradas y salidas |
+  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Aprobado por raffaeler (no es nuestro) | Lo fusionan así; el fallo de los dos avisos en un pin, aparte (pgrawehr quiere contar las referencias) |
 
-  Los PR #2612, #2613 y #2616 fallan solo en Linux Debug, por `Button.Tests` (inestable, no es nuestro); lo arregla
-  el PR [#2608](https://github.com/dotnet/iot/pull/2608) de pgrawehr (abierto). `upstream/main` no ha cambiado desde
-  el 01/10/2026 (`95384e77`). Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos
-  (sin *force push*). Para mirar el estado: `gh pr checks <PR> -R dotnet/iot` y los comentarios con
-  `gh api repos/dotnet/iot/issues/<n>/comments`.
+  El #2608 (pruebas de `Button`) está fusionado: los PR ya pasan todas las comprobaciones. `upstream/main` (09/10/2026)
+  tiene 5 commits nuevos desde `95384e77`; ninguno toca `DCMotor`, `ExplorerHat`, `Cap1xxx` ni `Ads1115`. Si los
+  mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*). Para mirar el
+  estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
+  un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
 - **Al retomar (siguiente sesión):**
-  1. Mirar comentarios y revisiones en los PR #2612, #2613 y #2616, en las incidencias #2614, #2615 y #2617 y en el
-     PR #2610. Si hay comentarios, contárselos al usuario antes de responder.
+  1. Mirar comentarios y revisiones en los PR #2613 y #2616, en las incidencias #2614, #2615 y #2617 y en el
+     PR #2610. Si hay comentarios, contárselos al usuario antes de responder. En el #2613, mirar si pgrawehr contesta a
+     la pregunta de nuestra respuesta: si también deben lanzar la excepción las variantes de `DCMotor.Create` que
+     reciben un `PwmChannel`.
   2. Cuando fusionen el #2613: llevar la rama `explorerhat-inputs-outputs` encima de `upstream/main`
      (`git rebase --onto upstream/main explorerhat-dispose explorerhat-inputs-outputs`, porque su base es la rama del
      #2613), volver a pasar las pruebas y abrir el PR de entradas y salidas. *Force push* solo antes de abrir el PR.
   3. Las ramas van apiladas: `explorerhat-dispose` (#2613) → `explorerhat-inputs-outputs` → `explorerhat-analog`.
      Cuando fusionen el PR de entradas y salidas, llevar la del analógico encima de `upstream/main` igual (`git rebase
      --onto upstream/main explorerhat-inputs-outputs explorerhat-analog`) y abrir su PR. Si piden cambios en un PR de
-     abajo, rehacer encima las ramas de arriba.
+     abajo, rehacer encima las ramas de arriba, como el 09/10/2026: guardar el commit anterior de la rama de en medio
+     (`OLD=$(git rev-parse explorerhat-inputs-outputs)`), `git rebase explorerhat-dispose explorerhat-inputs-outputs`,
+     `git rebase --onto explorerhat-inputs-outputs $OLD explorerhat-analog`, pasar las pruebas de `DCMotor` y de
+     `ExplorerHat` en cada rama y subirlas con `git push --force-with-lease` (solo las ramas sin PR).
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
      **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). Después, la lección 10
@@ -666,8 +680,8 @@ solo cubre motores y las 4 luces. Falta:
       también usa `shouldDispose` por defecto. El último cambio del binding (PR #2586, 02/07/2026) solo movió las
       asignaciones `= null` fuera del `if (_shouldDispose)`.
       **PR abierto el 03/10/2026: [dotnet/iot#2613](https://github.com/dotnet/iot/pull/2613)**, rama
-      `explorerhat-dispose` del fork. Pendiente de la revisión de los mantenedores. Al revisar el código salieron
-      dos fallos de `DCMotor`, en el mismo PR (el de `ExplorerHat` no basta sin ellos):
+      `explorerhat-dispose` del fork. Aprobado por raffaeler el 08/10/2026; pendiente de que lo fusionen. Al revisar el
+      código salieron dos fallos de `DCMotor`, en el mismo PR (el de `ExplorerHat` no basta sin ellos):
   - `DCMotor.Create` (las variantes con números de pin) crea el `SoftwarePwmChannel` con `shouldDispose = true`:
     al liberar el motor se libera el controlador aunque se pida `shouldDispose: false`, y otro motor que lo comparte
     tumba el proceso desde su hilo de PWM.
@@ -695,9 +709,29 @@ solo cubre motores y las 4 luces. Falta:
     | 4.2.0 | `hat` | el proceso se cae (código 134, `Can not get a pin mode of a pin that is not open`) | `lo`, **`hi`** | **sigue a toda velocidad** |
     | 4.2.0 | `motor` | código 0, sin error | `lo`, **`hi`** | **sigue a toda velocidad** |
 
+  - **Revisión del 08/10/2026, respondida el 09/10/2026** con el commit `15efc1ae` (sin *force push*) y una respuesta en
+    cada hilo:
+    - pgrawehr pidió lanzar una excepción si no hay controlador y `shouldDispose` es false, porque esa combinación no
+      es válida (antes, el código la corregía sin avisar). Hecho en las tres variantes de `DCMotor.Create` con números
+      de pin: `ArgumentException` para `shouldDispose`. Le preguntamos si también las variantes que reciben un
+      `PwmChannel` (hoy las clases de motor fuerzan `shouldDispose` a true sin controlador): cambia el comportamiento
+      para quien ya las usa. Y un detalle de estilo: `Controller != null`.
+    - Copilot (gravedad alta): con `Create(PwmChannel, directionPin, controller)`, el canal lo crea el usuario y puede
+      liberar el controlador compartido (`SoftwarePwmChannel` tiene `shouldDispose = true` por defecto). Entonces
+      `IsPinOpen` lanzaba `ObjectDisposedException` y el pin de dirección quedaba en alto: la rueda, a toda velocidad.
+      pgrawehr respondió que el PR ya crea los canales con `shouldDispose: false`, pero eso solo vale para las
+      variantes con números de pin. Arreglo: `Dispose` pone en bajo el pin de dirección **antes** de liberar el canal,
+      en el mismo orden que el setter de `Speed`.
+    - Sobre ese orden: marcha atrás, el PWM alterna "frenar" (los dos pines en alto) y "atrás" (PWM en bajo). Al bajar
+      antes el pin de dirección, el resto del ciclo en curso empuja hacia delante (menos de 20 ms a 50 Hz), igual que
+      al cambiar `Speed` de negativo a 0. `SoftwarePwmChannel.Stop()` no cambia el pin; `Dispose()` lo pone en bajo
+      al terminar su hilo.
+    - 3 pruebas nuevas (pasan las 10 de `DCMotor` y las de `ExplorerHat`); con el código anterior fallan las 3. Sin
+      prueba en la Pi: en el robot (el mismo controlador para todo) el resultado no cambia.
+    - La integración continua arrancó sola al subir el commit (antes la lanzaba un mantenedor con `/azp run`).
   - Cuando salga una versión con el arreglo, `SafeExplorerHat` podrá dejar de usar `SharedGpioController`; la parada
     ante señales y el forzado a nivel bajo de los pines siguen haciendo falta.
-- [~] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
+- [x] **Fallo en el binding `Ina219` (4.2.0 y rama principal en octubre de 2026):** `ReadShuntVoltage()` y
       `ReadCurrent()` leen el registro como número sin signo (`ReadRegister` devuelve `ushort`), así que las tensiones
       y corrientes negativas (por ejemplo, baterías descargándose en la UPS HAT (B)) salen como valores enormes.
       Arreglo: convertir a `short` antes de escalar. **Es la incidencia abierta #1659 de dotnet/iot** ("INA219 - strange
@@ -705,7 +739,9 @@ solo cubre motores y las 4 luces. Falta:
       −1 unidad leída sin signo da 65535 × 12,2 µA = 799,5 mA. Los mantenedores no tenían el chip para investigarla;
       nosotros sí (UPS HAT (B), 0x42). Último cambio del binding: febrero de 2022.
       **PR abierto el 03/10/2026: [dotnet/iot#2612](https://github.com/dotnet/iot/pull/2612)** ("Fixes #1659"), rama
-      `ina219-signed-readings` del fork. Pendiente de la revisión de los mantenedores.
+      `ina219-signed-readings` del fork. **Fusionado el 08/10/2026** (`d84c9407`), aprobado por pgrawehr y raffaeler,
+      sin cambios pedidos; rama borrada. UpsDashboard sigue leyendo los registros directamente hasta que salga una
+      versión de `Iot.Device.Bindings` con el arreglo.
   - Al revisar el binding aparecieron dos fallos más, en el mismo PR:
     - `ReadBusVoltage()` convierte a `short` un registro que no tiene signo: con el rango de 32 V, desde 16,384 V
       la tensión sale negativa. La UPS no llega a esa tensión; lo comprueban las pruebas unitarias.
@@ -813,6 +849,9 @@ solo cubre motores y las 4 luces. Falta:
     `_interruptDriver.ClosePin`, que libera la línea y borra todos sus avisos (`LibGpiodV2Driver` sí comprueba si quedan
     otros). **Comentado en el PR el 03/10/2026**
     ([comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-5973268665)); GitHub lo enlaza desde la #2614.
+    pgrawehr respondió (04/10/2026) que añadirá un contador de referencias. **En el *triage* del 08/10/2026 decidieron
+    fusionar el #2610 así** (aprobado por raffaeler) y arreglar el fallo de los dos avisos aparte, porque es un caso
+    raro. En la #2614, pgrawehr dice que la arregla el #2610. Copilot, en su revisión del #2610, señala el mismo fallo.
 - [x] **Incidencia nueva, encontrada al reproducir la anterior:** en la Pi 3, `GpioController.QueryComponentInformation()`
       lanza `NotSupportedException` (con 4.2.0 y con `main`): `RaspberryPi3Driver` llama a `GetChipInfo()`, que
       `RaspberryPi3LinuxDriver` no implementa. **Informada el 03/10/2026:
