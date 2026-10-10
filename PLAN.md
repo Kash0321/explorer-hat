@@ -16,6 +16,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     potenciómetros (3 ALLECIN WH148 B10K) están pedidos y llegan el 11/10/2026. Motivos y descartes en la Fase 5
     (lección 08).
   - **Mientras llegan, no se empieza la lección 10:** antes, decidir con el usuario otra tarea.
+  - **Medida de las LDR, preparada y sin hacer:** el usuario no tiene multímetro, así que se miden con el ADS1015 del
+    HAT. Programa `~/apps/LdrCheck` en la Pi, probado sin nada conectado (lee el chip, código 0, pines en `lo`).
+    Montaje, comando y tabla de modelos en la Fase 5 (lección 08). El usuario lo dejó para otra sesión.
 - **Sesión del 09/10/2026** (PR #41 y #42 de este repositorio; detalles en la Fase 6):
   - **#2612 (`Ina219`) fusionado** el 08/10/2026 (`d84c9407` en `upstream/main`). Rama `ina219-signed-readings` borrada.
   - **#2613, #2616 y #2610, aprobados** por raffaeler (el #2612 también por pgrawehr). Las pruebas de `Button` ya no
@@ -95,10 +98,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      `ExplorerHat` en cada rama y subirlas con `git push --force-with-lease` (solo las ramas sin PR).
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
-     **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba), cuando lleguen el
-     potenciómetro y la fotorresistencia (10/10/2026). Mientras tanto, otra tarea por decidir con el usuario; **la
-     lección 10 no** (decisión del usuario, 10/10/2026). Después, la lección 10 (siguelíneas, si están los dos TCRT5000)
-     o la Fase 7 (medir el LLM en el portátil).
+     **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). **Siguiente paso
+     (10/10/2026):** medir 3 o 4 LDR con `~/apps/LdrCheck` (Fase 5, lección 08), anotar los valores y elegir la
+     resistencia fija. Los potenciómetros llegan el 11/10/2026: comprobar el cable (ver la lección 08). Después,
+     programar la lección. **La lección 10, no todavía** (decisión del usuario, 10/10/2026). Después de la 08, la 10
+     (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V.
@@ -469,6 +473,35 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       resistencia fija, pero así se pierde construir el divisor. **Ya las hay:** una bolsa de 20, de modelo sin
       confirmar (10/10/2026). La resistencia fija debe parecerse a la de la LDR con la luz de la sala, para que la
       tensión cambie mucho entre luz y sombra: medir la LDR con el ADS1015 y elegir la resistencia con ese dato.
+  - **Medir las LDR con el robot (preparado el 10/10/2026, sin hacer).** No hay multímetro. Las LDR no llevan marca;
+    las de 5 mm suelen ser de la serie GL55xx, iguales por fuera (una bolsa puede ser un surtido de varios modelos).
+    Se distinguen por la resistencia con 10 lux y a oscuras (tras 10 s), según sus hojas de datos (aproximado):
+
+    | Modelo | Con 10 lux | A oscuras |
+    |---|---|---|
+    | GL5506 | 2–5 kΩ | 0,2 MΩ |
+    | GL5516 | 5–10 kΩ | 0,5 MΩ |
+    | GL5528 | 10–20 kΩ | 1 MΩ |
+    | GL5537-1 | 20–30 kΩ | 2 MΩ |
+    | GL5537-2 | 30–50 kΩ | 3 MΩ |
+    | GL5539 | 50–100 kΩ | 5 MΩ |
+    | GL5549 | 100–200 kΩ | 10 MΩ |
+
+    - **Programa `~/apps/LdrCheck`** (no versionado; su código, en `~/apps/LdrCheck/src` de la Pi): `Ads1115` de
+      4.2.0, sin el HAT (no toca ningún pin). Para cada LDR pide su nombre, los lux de la sala (opcional, de una
+      aplicación del móvil) y tres medidas de 2 s que empiezan con Enter: luz de la sala, tapada con un dedo y a
+      oscuras (espera 10 s). Al final, una tabla. Calcula R = 10 kΩ × (Vfuente / V − 1). Cada lectura usa la escala
+      más pequeña del ADS1015 que admite la tensión (hasta ±0,256 V: 0,125 mV por paso), para medir bien varios MΩ.
+      Fuente: si Analog 2 → 10 kΩ → 5V está conectado, la mide; si no, supone 5,30 V. Avisa si el nodo está casi a 0 V
+      o casi a la tensión de la fuente (un cable suelto).
+    - **Montaje**, en una protoboard de 400 puntos (no la pequeña del HAT, que tiene el nodo de 3,3 V de los LM393), con
+      el robot apagado: 5V del HAT → línea +, GND → línea −, LDR entre la línea + y una fila (el nodo), 10 kΩ entre esa
+      fila y la línea − (bandas marrón, negro, naranja; o marrón, negro, negro, rojo con 5 bandas), y un cable del nodo
+      a Analog 1. Opcional: Analog 2 → 10 kΩ → 5V. Numerar las LDR (son iguales). Cambiar solo la LDR con el robot
+      encendido no es peligroso: limita la corriente ella misma (unos pocos mA como mucho).
+    - **Comando** para la terminal del usuario: `cd ~/apps/LdrCheck && dotnet LdrCheck.dll | tee ~/ldr.log` (en
+      `~`, no en `/tmp`: en la Pi, `/tmp` es `tmpfs` y se borra al reiniciar). Después, leer `~/ldr.log`, comparar con
+      la tabla y anotar aquí los resultados.
     - Los dos, a 5 V y con menos de 1 mA: el ADS1015 del HAT admite de 0 a 5 V (Fase 6).
   - **Descartados:** el TCRT5000 como primer sensor analógico (su tensión depende de la altura, del color del suelo y
     de la luz ambiente: se ve peor la causa y el efecto; sigue siendo el de la lección 10, y puede ir por las entradas

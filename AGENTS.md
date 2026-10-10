@@ -10,7 +10,7 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Idioma:** conversación, documentación y mensajes de commit en español. Comentarios del código en inglés, como el resto del código.
 
 ## 🖥️ Entorno de ejecución
-* **Raspberry Pi 3 B+** (`harlequin`), Debian 13 de 64 bits (`linux-arm64`), 1 GB de RAM y unos 2,4 GB libres en la microSD (10/10/2026): evita generar logs masivos o archivos basura.
+* **Raspberry Pi 3 B+** (`harlequin`), Debian 13 de 64 bits (`linux-arm64`), 1 GB de RAM y unos 2,4 GB libres en la microSD (10/10/2026): evita generar logs masivos o archivos basura. `/tmp` es `tmpfs` (en memoria): se borra al reiniciar, así que el registro de una prueba que haya que leer en otra sesión va a `~`.
 * **.NET 10.0.401** en `~/.dotnet`, con enlace en `/usr/local/bin/dotnet` para que funcione también por SSH sin sesión interactiva.
 * **Repositorio clonado en la Pi** en `~/work/explorer-hat`. Los programas desplegados desde el PC van a `~/apps/<Proyecto>` y el depurador está en `~/vsdbg`.
 * **I2C habilitado** (`/dev/i2c-1`): el HAT responde en 0x28 (táctil CAP1208) y 0x48 (analógico ADS1015). La UPS responde en 0x42 (INA219) y la pantalla LCD en 0x27 (PCF8574T). Por SSH no interactivo, `i2cdetect` e `i2cget` están en `/usr/sbin`, fuera del `PATH`.
