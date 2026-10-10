@@ -6,7 +6,14 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (al cierre del 09/10/2026)
+## Estado actual (10/10/2026)
+- **Sesión del 10/10/2026:**
+  - **dotnet/iot, sin cambios:** nada nuevo desde nuestras respuestas del 09/10/2026. El #2613 sigue en "Review
+    required" (pgrawehr no ha contestado a la pregunta de las variantes con `PwmChannel`); el #2616 y el #2610, aprobados
+    y sin fusionar. `upstream/main`, sin commits nuevos.
+  - **Lección 08: sensores decididos.** Un **potenciómetro** lineal de 10 kΩ (B10K) y una **fotorresistencia** (LDR,
+    GL5528) con una resistencia fija de 10 kΩ. El usuario los compra. Motivos y descartes en la Fase 5 (lección 08).
+  - **Mientras llegan, no se empieza la lección 10:** antes, decidir con el usuario otra tarea.
 - **Sesión del 09/10/2026** (PR #41 y #42 de este repositorio; detalles en la Fase 6):
   - **#2612 (`Ina219`) fusionado** el 08/10/2026 (`d84c9407` en `upstream/main`). Rama `ina219-signed-readings` borrada.
   - **#2613, #2616 y #2610, aprobados** por raffaeler (el #2612 también por pgrawehr). Las pruebas de `Button` ya no
@@ -23,8 +30,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - **Rueda derecha parada:** `Lesson11.Odometry` contaba 0 pulsos. El sensor estaba bien: el cable azul del motor
     derecho se había soltado de la borna MOTOR 1. Diagnóstico, mensajes de las lecciones 11 y README. Fase 5.
   - **Lección 08 (sensores analógicos), decidida como siguiente tarea:** con `ProjectReference` al binding de la rama
-    `explorerhat-analog` del fork (`C:\work\iot`). Falta saber qué sensor analógico se usa (no hay potenciómetro ni
-    fotorresistencia en la lista de componentes).
+    `explorerhat-analog` del fork (`C:\work\iot`). Faltaba saber qué sensor analógico se usa: decidido el 10/10/2026
+    (potenciómetro y fotorresistencia, por comprar).
 - **Sesión del 04/10/2026, mañana** (PR #33 a #36 de este repositorio; detalles en las fases):
   - El usuario desmontó y volvió a montar todo el cableado. Revisado con `tools/probar-cableado.sh` (nuevo): todo
     bien salvo los motores, cambiados de borna y con el derecho al revés. Colores de los cables, en el README.
@@ -86,8 +93,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      `ExplorerHat` en cada rama y subirlas con `git push --force-with-lease` (solo las ramas sin PR).
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
-     **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). Después, la lección 10
-     (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
+     **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba), cuando lleguen el
+     potenciómetro y la fotorresistencia (10/10/2026). Mientras tanto, otra tarea por decidir con el usuario; **la
+     lección 10 no** (decisión del usuario, 10/10/2026). Después, la lección 10 (siguelíneas, si están los dos TCRT5000)
+     o la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V.
@@ -444,6 +453,23 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
+  - **Sensores decididos (10/10/2026):** el usuario los compra.
+    - **Potenciómetro** lineal de 10 kΩ (B10K), mejor en módulo con mando y 3 pines (cables dupont, sin soldar). Los
+      extremos a 5V y GND y la pata central a Analog 1: al girar el mando, da de 0 a 5 V (divisor de tensión). Es la
+      mejor forma de ver qué es "analógico": el niño cambia la tensión con la mano. Retos: la velocidad de un motor
+      (ruedas en el aire), las 4 luces como barra de nivel, los voltios en la pantalla. **La pata central nunca va a
+      5V ni a GND:** al final del recorrido uniría 5V y GND casi sin resistencia.
+    - **Fotorresistencia** (LDR, GL5528) en serie con una resistencia fija de 10 kΩ (ya las hay): el niño construye el
+      divisor. Retos: luces que se encienden solas a oscuras y, con dos LDR, un robot que sigue una linterna o huye
+      de ella (vehículo de Braitenberg; prepara "sentir, pensar y actuar" de la Fase 7). Los módulos KY-018 ya traen la
+      resistencia fija, pero así se pierde construir el divisor.
+    - Los dos, a 5 V y con menos de 1 mA: el ADS1015 del HAT admite de 0 a 5 V (Fase 6).
+  - **Descartados:** el TCRT5000 como primer sensor analógico (su tensión depende de la altura, del color del suelo y
+    de la luz ambiente: se ve peor la causa y el efecto; sigue siendo el de la lección 10, y puede ir por las entradas
+    analógicas, sin entradas digitales libres); micrófono KY-038 (el sonido cambia miles de veces por segundo y el
+    ADS1015 lee ~500 por segundo con el binding); temperatura TMP36 o LM35 (cambia muy despacio); gas serie MQ
+    (calentador de ~150 mA y minutos para estabilizarse); distancia por infrarrojos Sharp GP2Y0A21 (curva no lineal y
+    picos de ruido; para más adelante); joystick analógico (la lección 07 ya controla el robot con los pads).
 - [x] 09 Robot autónomo (`Lesson09.Autonomous`): versión simplificada de ObstacleAvoidance, sin hilos ni clases.
       Mirar, pensar y actuar en un bucle de 60 s como máximo: `Look()` mide los tres sensores uno detrás de otro
       (60 ms entre lecturas, ~5 veces por segundo) con el filtro de la 06 en cada uno. Con algo a menos de 30 cm:
@@ -604,6 +630,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - Una placa ESP32 DevKit (módulo ESP-WROOM-32, 30 pines, wifi y Bluetooth, lógica de 3,3 V). Ideas: mando a distancia
   inalámbrico del robot, o contar los pulsos de los LM393 (tiene contadores de pulsos por hardware) y pasárselos a la
   Pi, porque a la Pi le faltan entradas. Se puede programar en C# con .NET nanoFramework.
+- **Por comprar (10/10/2026), para la lección 08:** potenciómetros lineales de 10 kΩ (B10K, mejor en módulo con mando)
+  y fotorresistencias GL5528.
 - IN4 (GPIO 25) con nada conectado lee 0 en 50 de 50 lecturas (pull de la Pi desactivado): la entrada del HAT
   parece tener pull-down o un búfer que la mantiene baja. Confirmar con el pulsador.
 
