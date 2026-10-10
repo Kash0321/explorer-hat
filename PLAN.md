@@ -12,7 +12,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     required" (pgrawehr no ha contestado a la pregunta de las variantes con `PwmChannel`); el #2616 y el #2610, aprobados
     y sin fusionar. `upstream/main`, sin commits nuevos.
   - **Lección 08: sensores decididos.** Un **potenciómetro** lineal de 10 kΩ (B10K) y una **fotorresistencia** (LDR,
-    GL5528) con una resistencia fija de 10 kΩ. El usuario los compra. Motivos y descartes en la Fase 5 (lección 08).
+    modelo sin confirmar) con una resistencia fija de 10 kΩ. **Las fotorresistencias ya las hay** (una bolsa de 20); los
+    potenciómetros (3 ALLECIN WH148 B10K) están pedidos y llegan el 11/10/2026. Motivos y descartes en la Fase 5
+    (lección 08).
   - **Mientras llegan, no se empieza la lección 10:** antes, decidir con el usuario otra tarea.
 - **Sesión del 09/10/2026** (PR #41 y #42 de este repositorio; detalles en la Fase 6):
   - **#2612 (`Ina219`) fusionado** el 08/10/2026 (`d84c9407` en `upstream/main`). Rama `ina219-signed-readings` borrada.
@@ -453,16 +455,20 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
-  - **Sensores decididos (10/10/2026):** el usuario los compra.
-    - **Potenciómetro** lineal de 10 kΩ (B10K), mejor en módulo con mando y 3 pines (cables dupont, sin soldar). Los
-      extremos a 5V y GND y la pata central a Analog 1: al girar el mando, da de 0 a 5 V (divisor de tensión). Es la
+  - **Sensores decididos (10/10/2026):**
+    - **Potenciómetro** lineal de 10 kΩ (B10K). Pedidos 3 **ALLECIN WH148 B10K** (película de carbono, con mando y
+      cable con conector XH2.54 de 3 pines), llegan el 11/10/2026. Al llegar: mirar qué hay en el otro extremo del
+      cable (hembra dupont o cables sueltos) y qué color va a la pata central (la del medio en el cuerpo del
+      potenciómetro): el color de los cables no lo dice. Los extremos a 5V y GND y la pata central a Analog 1: al girar el mando, da de 0 a 5 V (divisor de tensión). Es la
       mejor forma de ver qué es "analógico": el niño cambia la tensión con la mano. Retos: la velocidad de un motor
       (ruedas en el aire), las 4 luces como barra de nivel, los voltios en la pantalla. **La pata central nunca va a
       5V ni a GND:** al final del recorrido uniría 5V y GND casi sin resistencia.
-    - **Fotorresistencia** (LDR, GL5528) en serie con una resistencia fija de 10 kΩ (ya las hay): el niño construye el
+    - **Fotorresistencia** (LDR) en serie con una resistencia fija de 10 kΩ (ya las hay): el niño construye el
       divisor. Retos: luces que se encienden solas a oscuras y, con dos LDR, un robot que sigue una linterna o huye
       de ella (vehículo de Braitenberg; prepara "sentir, pensar y actuar" de la Fase 7). Los módulos KY-018 ya traen la
-      resistencia fija, pero así se pierde construir el divisor.
+      resistencia fija, pero así se pierde construir el divisor. **Ya las hay:** una bolsa de 20, de modelo sin
+      confirmar (10/10/2026). La resistencia fija debe parecerse a la de la LDR con la luz de la sala, para que la
+      tensión cambie mucho entre luz y sombra: medir la LDR con el ADS1015 y elegir la resistencia con ese dato.
     - Los dos, a 5 V y con menos de 1 mA: el ADS1015 del HAT admite de 0 a 5 V (Fase 6).
   - **Descartados:** el TCRT5000 como primer sensor analógico (su tensión depende de la altura, del color del suelo y
     de la luz ambiente: se ve peor la causa y el efecto; sigue siendo el de la lección 10, y puede ir por las entradas
@@ -630,8 +636,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - Una placa ESP32 DevKit (módulo ESP-WROOM-32, 30 pines, wifi y Bluetooth, lógica de 3,3 V). Ideas: mando a distancia
   inalámbrico del robot, o contar los pulsos de los LM393 (tiene contadores de pulsos por hardware) y pasárselos a la
   Pi, porque a la Pi le faltan entradas. Se puede programar en C# con .NET nanoFramework.
-- **Por comprar (10/10/2026), para la lección 08:** potenciómetros lineales de 10 kΩ (B10K, mejor en módulo con mando)
-  y fotorresistencias GL5528.
+- 20 fotorresistencias (LDR, modelo sin confirmar; encontradas el 10/10/2026): lección 08.
+- **Pedidos (10/10/2026), para la lección 08:** 3 potenciómetros ALLECIN WH148 B10K (10 kΩ lineales, con mando y
+  cable con conector XH2.54 de 3 pines). Llegan el 11/10/2026.
 - IN4 (GPIO 25) con nada conectado lee 0 en 50 de 50 lecturas (pull de la Pi desactivado): la entrada del HAT
   parece tener pull-down o un búfer que la mantiene baja. Confirmar con el pulsador.
 
