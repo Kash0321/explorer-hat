@@ -18,9 +18,9 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #43, cuyas descripciones resumen cada fase y cada lección.
+     sobre todo los #4 a #44, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
-     actual" de PLAN.md (el 10/10/2026: PR #2613 y #2616, incidencias #2614, #2615 y #2617,
+     actual" de PLAN.md (el 16/10/2026: PR #2616 y #2625, incidencias #2614, #2615 y #2617,
      y el PR #2610 de pgrawehr, donde comentamos), con sus comprobaciones, comentarios y revisiones
      nuevos (gh pr checks <n> -R dotnet/iot, gh api repos/dotnet/iot/issues/<n>/comments y, en los
      PR, gh api repos/dotnet/iot/pulls/<n>/reviews y .../pulls/<n>/comments). Si hay
@@ -32,7 +32,7 @@ Antes de hacer nada más:
    indica AGENTS.md. Comprueba también que el autor de los commits es el correcto:
    git var GIT_AUTHOR_IDENT
    En el PC, revisa también el clon del fork de dotnet/iot (C:\work\iot, ver AGENTS.md): sus
-   ramas (las de entradas y salidas y la del analógico van apiladas sobre la del #2613), que no
+   ramas (la del analógico va apilada sobre la del #2625, la de entradas y salidas), que no
    haya cambios sin confirmar y lo que ha cambiado en upstream/main.
 
 3. Ya en la Pi, sin mover nada, revisa su estado: rama y estado de git en ~/work/explorer-hat
