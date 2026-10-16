@@ -6,7 +6,25 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (10/10/2026)
+## Estado actual (16/10/2026)
+- **Sesión del 16/10/2026** (desde el PC, sin la Pi: el usuario estaba fuera de casa; detalles en la Fase 6):
+  - **#2613 fusionado** el 15/10/2026 por pgrawehr (`1856d767` en `upstream/main`, *squash*). Lo aprobó sin contestar
+    a la pregunta de las variantes con `PwmChannel`. Rama `explorerhat-dispose` borrada (local y en el fork) después de
+    comprobar que su contenido era igual al commit fusionado.
+  - **#2616 (`Cap1208`):** Copilot revisó el PR (15/10/2026) con dos hallazgos. pgrawehr arregló el primero con un
+    commit en nuestra rama (`73c9225e`: el constructor libera el `I2cDevice` si el chip no es un CAP1208) y nos
+    preguntó por el segundo: el simulador no daba la interrupción al soltar un pad, así que un pad soltado seguía
+    "tocado" para siempre. Respondido con el commit `985490a8` (una línea en `Release()` del simulador y dos
+    comprobaciones nuevas en las pruebas, que fallan sin los arreglos) y una respuesta en cada hilo.
+  - **PR de entradas y salidas abierto: [#2625](https://github.com/dotnet/iot/pull/2625)**, rama `explorerhat-io`.
+    Claude Code (modo automático) no dejó hacer `git rebase` de las ramas apiladas: los commits se copiaron con
+    `cherry-pick` sobre `upstream/main` en **ramas nuevas** (`explorerhat-io` y `explorerhat-analog-v2`), sin *force
+    push*. Las antiguas (`explorerhat-inputs-outputs` y `explorerhat-analog`), borradas. Pruebas: 10 de `DCMotor` y 8
+    y 14 de `ExplorerHat` en cada rama, sin avisos.
+  - **#2610:** pgrawehr añadió el recuento de referencias (`0f4e5718`, el fallo de los dos avisos en un pin de la
+    #2614). krwq pidió a Copilot otros dos arreglos. Sin fusionar.
+  - **Llegaron los potenciómetros** (3 ALLECIN WH148 B10K) y una **cámara para la Raspberry Pi** (modelo sin anotar;
+    Fase 7). La lección 08 sigue en la Pi, en la próxima sesión con el robot.
 - **Sesión del 10/10/2026:**
   - **dotnet/iot, sin cambios:** nada nuevo desde nuestras respuestas del 09/10/2026. El #2613 sigue en "Review
     required" (pgrawehr no ha contestado a la pregunta de las variantes con `PwmChannel`); el #2616 y el #2610, aprobados
@@ -62,45 +80,44 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   no está montado. El pulsador de la lección 05 necesita IN4: idea, moverlo al GPIO 8 (CS) con el pull-down de la Pi.
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
-- **Fase 6, en dotnet/iot (09/10/2026):**
+- **Fase 6, en dotnet/iot (16/10/2026):**
 
   | Qué | Estado | Pendiente |
   |---|---|---|
   | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | **Fusionado** el 08/10/2026 | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
-  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | Revisión de pgrawehr y de Copilot respondida el 09/10/2026 (`15efc1ae`); 10/10 comprobaciones; "Review required" (el commit nuevo anuló la aprobación de raffaeler) | Que lo aprueben otra vez y lo fusionen. De él dependen las dos ramas de abajo |
-  | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Aprobado por raffaeler, sin comentarios | Que lo fusionen |
+  | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | **Fusionado** el 15/10/2026 (`1856d767`) | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
+  | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | Revisión de Copilot (15/10/2026): un arreglo de pgrawehr en nuestra rama (`73c9225e`) y el nuestro (`985490a8`, 16/10/2026), con respuesta en los dos hilos. "Review required" | Que lo aprueben otra vez y lo fusionen |
+  | [PR #2625](https://github.com/dotnet/iot/pull/2625): entradas y salidas en `ExplorerHat` (rama `explorerhat-io`, `0078c337`) | Abierto el 16/10/2026 | Que lo revisen. De él depende la rama del analógico |
   | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta (`untriaged`) | pgrawehr: la arregla el #2610 |
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`), sin respuesta | Solo incidencia |
   | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`), sin respuesta | Respuesta a sus tres preguntas (forma de la API, variante que frena, si `ExplorerHat` la usa) |
-  | Rama `explorerhat-inputs-outputs` del fork (`4ee7df07`): entradas y salidas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2613 |
-  | Rama `explorerhat-analog` del fork (`cc557fe9`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el de entradas y salidas |
-  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Aprobado por raffaeler (no es nuestro) | Lo fusionan así; el fallo de los dos avisos en un pin, aparte (pgrawehr quiere contar las referencias) |
+  | Rama `explorerhat-analog-v2` del fork (`f39ca85c`, encima de `explorerhat-io`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2625 |
+  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Aprobado por raffaeler (no es nuestro). Con el recuento de referencias (`0f4e5718`); krwq pidió a Copilot dos arreglos más (15/10/2026) | Que lo fusionen. Probar en la Pi si arregla la #2614 |
 
-  El #2608 (pruebas de `Button`) está fusionado: los PR ya pasan todas las comprobaciones. `upstream/main` (09/10/2026)
-  tiene 5 commits nuevos desde `95384e77`; ninguno toca `DCMotor`, `ExplorerHat`, `Cap1xxx` ni `Ads1115`. Si los
-  mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*). Para mirar el
+  `upstream/main` (16/10/2026) tiene 4 commits nuevos desde el 09/10/2026; de ellos, solo el del #2613 toca nuestros
+  bindings. Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*).
+  **Los mantenedores pueden subir commits a nuestras ramas** (pgrawehr lo hizo en el #2616): antes de confirmar nada en
+  la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
 - **Al retomar (siguiente sesión):**
-  1. Mirar comentarios y revisiones en los PR #2613 y #2616, en las incidencias #2614, #2615 y #2617 y en el
-     PR #2610. Si hay comentarios, contárselos al usuario antes de responder. En el #2613, mirar si pgrawehr contesta a
-     la pregunta de nuestra respuesta: si también deben lanzar la excepción las variantes de `DCMotor.Create` que
-     reciben un `PwmChannel`.
-  2. Cuando fusionen el #2613: llevar la rama `explorerhat-inputs-outputs` encima de `upstream/main`
-     (`git rebase --onto upstream/main explorerhat-dispose explorerhat-inputs-outputs`, porque su base es la rama del
-     #2613), volver a pasar las pruebas y abrir el PR de entradas y salidas. *Force push* solo antes de abrir el PR.
-  3. Las ramas van apiladas: `explorerhat-dispose` (#2613) → `explorerhat-inputs-outputs` → `explorerhat-analog`.
-     Cuando fusionen el PR de entradas y salidas, llevar la del analógico encima de `upstream/main` igual (`git rebase
-     --onto upstream/main explorerhat-inputs-outputs explorerhat-analog`) y abrir su PR. Si piden cambios en un PR de
-     abajo, rehacer encima las ramas de arriba, como el 09/10/2026: guardar el commit anterior de la rama de en medio
-     (`OLD=$(git rev-parse explorerhat-inputs-outputs)`), `git rebase explorerhat-dispose explorerhat-inputs-outputs`,
-     `git rebase --onto explorerhat-inputs-outputs $OLD explorerhat-analog`, pasar las pruebas de `DCMotor` y de
-     `ExplorerHat` en cada rama y subirlas con `git push --force-with-lease` (solo las ramas sin PR).
+  1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
+     comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
+     el 16/10/2026).
+  2. Las ramas van apiladas: `explorerhat-io` (#2625) → `explorerhat-analog-v2`. Cuando fusionen el #2625 (con
+     *squash*, como el #2613), copiar el commit del analógico encima de `upstream/main` en una rama nueva, sin `rebase`
+     ni *force push*: `git switch -c explorerhat-analog upstream/main`, `git cherry-pick <commit de
+     explorerhat-analog-v2>` (el nombre `explorerhat-analog` está libre). Pasar las pruebas de `DCMotor` y de
+     `ExplorerHat`, comprobar que el contenido es igual (`git diff explorerhat-analog-v2 explorerhat-analog --
+     src/devices/ExplorerHat`), subirla, abrir su PR y borrar `explorerhat-io` y `explorerhat-analog-v2` (local y en
+     el fork). Si piden cambios en el #2625, van en commits nuevos en `explorerhat-io`; después, copiar otra vez el
+     commit del analógico encima en otra rama nueva, igual.
+  3. Probar en la Pi el #2610 con el recuento de referencias, si no lo fusionan antes: dos avisos en un pin (#2614).
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
      **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). **Siguiente paso
      (10/10/2026):** medir 3 o 4 LDR con `~/apps/LdrCheck` (Fase 5, lección 08), anotar los valores y elegir la
-     resistencia fija. Los potenciómetros llegan el 11/10/2026: comprobar el cable (ver la lección 08). Después,
+     resistencia fija. Los potenciómetros ya llegaron (16/10/2026): comprobar el cable (ver la lección 08). Después,
      programar la lección. **La lección 10, no todavía** (decisión del usuario, 10/10/2026). Después de la 08, la 10
      (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
@@ -461,7 +478,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
   - **Sensores decididos (10/10/2026):**
     - **Potenciómetro** lineal de 10 kΩ (B10K). Pedidos 3 **ALLECIN WH148 B10K** (película de carbono, con mando y
-      cable con conector XH2.54 de 3 pines), llegan el 11/10/2026. Al llegar: mirar qué hay en el otro extremo del
+      cable con conector XH2.54 de 3 pines), **ya llegaron** (confirmado el 16/10/2026). Mirar qué hay en el otro extremo del
       cable (hembra dupont o cables sueltos) y qué color va a la pata central (la del medio en el cuerpo del
       potenciómetro): el color de los cables no lo dice. Los extremos a 5V y GND y la pata central a Analog 1: al girar el mando, da de 0 a 5 V (divisor de tensión). Es la
       mejor forma de ver qué es "analógico": el niño cambia la tensión con la mano. Retos: la velocidad de un motor
@@ -680,7 +697,8 @@ Estado: el binding sigue en el repositorio (activo, último cambio en el binding
 solo cubre motores y las 4 luces. Falta:
 - [~] 4 entradas digitales (GPIO 23, 22, 24, 25, tolerantes a 5 V) y 4 salidas de colector abierto (GPIO 6, 12, 13,
       16). **Hechas el 04/10/2026** en la rama `explorerhat-inputs-outputs` del fork (sobre `explorerhat-dispose`, la
-      del #2613). Pendiente: abrir el PR cuando fusionen el #2613.
+      del #2613). **PR abierto el 16/10/2026: [dotnet/iot#2625](https://github.com/dotnet/iot/pull/2625)**, rama
+      `explorerhat-io` (el mismo commit, copiado con `cherry-pick` encima de `upstream/main` tras fusionar el #2613).
   - API: `hat.Inputs.One`…`Four` (`DigitalInput`: `Read()` → `PinValue`, `Pin`) y `hat.Outputs.One`…`Four`
     (`DigitalOutput`: `On()`, `Off()`, `IsOn`, `Pin`). `On()` = la salida une el cable a 0 V (ULN2003A), como Pimoroni.
     Cada pin se abre la primera vez que se usa (`Read`, `On` u `Off`), no al crear `ExplorerHat`; `Dispose` apaga las
@@ -695,8 +713,9 @@ solo cubre motores y las 4 luces. Falta:
     pin 16 `hi`, `Off()` → `lo`, y al liberar con la salida encendida, `lo` y los 8 pines cerrados. El LED de la
     lección 05 no estaba montado: el programa mostraba `pinctrl get 16` tras cada paso (que el pin 16 en alto
     enciende ese LED se comprobó el 03/10/2026).
-- [~] 4 entradas analógicas (ADS1015, I2C 0x48). **Hechas el 04/10/2026** en la rama `explorerhat-analog` del fork
-      (encima de `explorerhat-inputs-outputs`). Pendiente: abrir el PR cuando fusionen el de entradas y salidas.
+- [~] 4 entradas analógicas (ADS1015, I2C 0x48). **Hechas el 04/10/2026** en la rama `explorerhat-analog` del fork;
+      desde el 16/10/2026, rama `explorerhat-analog-v2` (encima de `explorerhat-io`, la del #2625). Pendiente: abrir el
+      PR cuando fusionen el #2625 (método en el "Estado actual").
   - API: `hat.Analog.One`…`Four` (`AnalogInput.ReadVoltage()` → `ElectricPotential`); Analog 1–4 = canales 3, 2, 1 y 0
     del ADS1015. Usa `Ads1115` con ±6,144 V, una medida cada vez y `DataRate.SPS128` (en el ADS1015, 1600 por segundo, su
     velocidad de fábrica; en modo de una medida, `Ads1115` consulta el chip hasta que acaba, sin esperar según la
@@ -749,7 +768,7 @@ solo cubre motores y las 4 luces. Falta:
       también usa `shouldDispose` por defecto. El último cambio del binding (PR #2586, 02/07/2026) solo movió las
       asignaciones `= null` fuera del `if (_shouldDispose)`.
       **PR abierto el 03/10/2026: [dotnet/iot#2613](https://github.com/dotnet/iot/pull/2613)**, rama
-      `explorerhat-dispose` del fork. Aprobado por raffaeler el 08/10/2026; pendiente de que lo fusionen. Al revisar el
+      `explorerhat-dispose` del fork. **Fusionado el 15/10/2026** (`1856d767`, aprobado por pgrawehr). Al revisar el
       código salieron dos fallos de `DCMotor`, en el mismo PR (el de `ExplorerHat` no basta sin ellos):
   - `DCMotor.Create` (las variantes con números de pin) crea el `SoftwarePwmChannel` con `shouldDispose = true`:
     al liberar el motor se libera el controlador aunque se pida `shouldDispose: false`, y otro motor que lo comparte
@@ -1032,8 +1051,9 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
    1. Binding `Cap1208` (`src/devices/Cap1xxx`). No toca `ExplorerHat`: se puede abrir sin esperar al #2613.
       **Abierto el 03/10/2026: [dotnet/iot#2616](https://github.com/dotnet/iot/pull/2616).**
    2. Entradas y salidas en `ExplorerHat`: se programan sobre la rama del #2613 (`explorerhat-dispose`) y el PR se
-      abre cuando lo fusionen. **Hecho y probado el 04/10/2026** (rama `explorerhat-inputs-outputs`).
-   3. Analógico en `ExplorerHat`. **Hecho y probado el 04/10/2026** (rama `explorerhat-analog`).
+      abre cuando lo fusionen. **Hecho y probado el 04/10/2026. Abierto el 16/10/2026:
+      [dotnet/iot#2625](https://github.com/dotnet/iot/pull/2625)** (rama `explorerhat-io`).
+   3. Analógico en `ExplorerHat`. **Hecho y probado el 04/10/2026** (rama `explorerhat-analog-v2`, encima del #2625).
    4. Pads en `ExplorerHat`.
    5. Según lo que respondan en la #2617 (04/10/2026): motor con PWM en las dos entradas en `DCMotor` y en
       `ExplorerHat.Motors`, después del #2613.
@@ -1098,6 +1118,8 @@ Pasos:
 - [ ] Voz: Whisper local en el portátil (por ejemplo, whisper.cpp) con *push-to-talk*. Probar con ruido de fondo.
 - [ ] Opcional: respuesta hablada (un altavoz con amplificador propio en el conector de 3,5 mm de la Pi, o el portátil).
 - [ ] Opcional: cámara en el conector CSI de la Pi y un modelo de visión en el portátil, para que el robot "vea".
+      **La cámara ya está** (confirmado el 16/10/2026; anotar el modelo). La Pi 3 B+ tiene un conector CSI de 15 pines:
+      comprobar que el cable de la cámara es de ese ancho.
 - [ ] Opcional, como experimento para el taller: `llama.cpp` con un modelo de 0,5B en la Pi, con los motores parados.
       Medir tokens/s, RAM y temperatura, para que los niños vean con datos por qué el cerebro va fuera. Ocupa unos
       400 MB (la microSD tiene ~2,6 GB libres).
