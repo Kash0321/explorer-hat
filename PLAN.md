@@ -130,6 +130,17 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Montaje actual:** todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
   a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
   no está montado. El pulsador de la lección 05 necesita IN4: idea, moverlo al GPIO 8 (CS) con el pull-down de la Pi.
+  **Desde el 17/10/2026, además:** el **potenciómetro** de la lección 08 (rojo → 5V, amarillo → GND, negro → Analog 1)
+  comparte con el LM393 derecho el nodo de 5V de la protoboard de la Pi. El nodo de 3,3 V del LM393 izquierdo y de la
+  pantalla sigue separado. **Comprobado con `tools/probar-cableado.sh` el 17/10/2026** (Pi en `main`, ruedas en el
+  aire): luces bien; LM393 derecho 89 cambios (y 0 en el izquierdo) y izquierdo 110 (y 0 en el derecho); motores en el
+  sentido esperado; sensores de distancia 20/20. **La pantalla falló** (`IOException: Error 5 (Input/output error)`
+  en la primera escritura al PCF8574; `i2cdetect` no veía el 0x27, y sí el 0x28, 0x42 y 0x48): el usuario había
+  desconectado los cuatro cables de la pantalla para trabajar y los volvió a conectar con **SDA y SCL intercambiados**.
+  Al corregirlos, `i2cdetect` vuelve a mostrar 0x27. **Lección:** con la pantalla apagada, `Error 5` en el
+  constructor de `Screen` quiere decir que nadie contesta en 0x27 (alimentación, SDA/SCL cruzados o cable suelto);
+  con la luz de fondo encendida, la alimentación está bien y se mira SDA/SCL. Si VCC fuera a 5V en vez de a 3,3 V, las
+  resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi: comprobarlo con la Pi apagada.
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
 - **Fase 6, en dotnet/iot (16/10/2026):**
