@@ -143,7 +143,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   20/20). **Lección:** con la pantalla apagada, `Error 5` en el
   constructor de `Screen` quiere decir que nadie contesta en 0x27 (alimentación, SDA/SCL cruzados o cable suelto);
   con la luz de fondo encendida, la alimentación está bien y se mira SDA/SCL. Si VCC fuera a 5V en vez de a 3,3 V, las
-  resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi: comprobarlo con la Pi apagada.
+  resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi. **Medido el 17/10/2026**
+  (pantalla desconectada, multímetro en `20k`): **4,73 kΩ entre SDA y VCC y 4,67 kΩ entre SCL y VCC**, así que la
+  placa sí lleva resistencias de subida de 4,7 kΩ y la regla "VCC solo a 3v3" es necesaria.
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
 - **Fase 6, en dotnet/iot (16/10/2026):**
