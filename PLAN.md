@@ -777,7 +777,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     1. La Pi en `main` y al día (`git pull --ff-only` en `~/work/explorer-hat`), sin programas del robot en marcha
        (`P=Lesson; pgrep -fc "${P}[0-9]"` en una llamada SSH **que no contenga nombres de lección**: si no, cuenta su
        propio comando), los 8 pines en `lo` (`pinctrl get 19,20,21,26,4,17,27,5`) y `get_throttled` = `0x0`.
-    2. `i2cdetect` (`/usr/sbin/i2cdetect -y 1`) con 0x27, 0x28, 0x42 y 0x48. Si el montaje cambió desde el
+    2. `i2cdetect` (`/usr/sbin/i2cdetect -y 1`) con 0x28, 0x42 y 0x48; **el 0x27 (pantalla) solo si está conectada**:
+       el usuario la desconecta a menudo y ninguna de estas lecciones la usa. Si el montaje cambió desde el
        17/10/2026, que el usuario ejecute antes `bash tools/probar-cableado.sh`.
     3. **Confirmación explícita del usuario de que el robot tiene las ruedas en el aire** (sobre un bote o un libro,
        sin tocar la mesa) **antes de cada ejecución** (`AskUserQuestion`), aunque ya haya dicho "adelante". El asesor ya
@@ -789,22 +790,38 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - **Cómo desplegar y ejecutar:** `dotnet publish lessons/LessonNN.X -c Debug -r linux-arm64 --self-contained false
     -o publish/lessons/LessonNN.X`, borrar `~/apps/LessonNN.X`, `scp.exe -r` y `chmod -R go-w` (o la tarea de VS Code
     *Desplegar en la Pi*). Las lecciones sin teclado (06, 09 y 11 Ir recto) se pueden lanzar desde el PC por SSH con
-    `timeout`. Las que leen el teclado (04, 11 Contar vueltas y 11 El cuadrado perfecto) las ejecuta el usuario en su
-    terminal de la Pi, o se le mandan las teclas: `(sleep 8; printf 'n'; sleep 30) | timeout 60 ssh.exe -tt harlequin
-    'cd ~/apps/X && timeout --foreground 40 dotnet X.dll; exit'` (sin `--foreground` el programa no recibe las
-    teclas; si la tecla llega antes de que arranque .NET, que tarda de 3 a 8 s, se pierde).
+    `timeout`; **cada `timeout` debe superar la duración de la lección más unos 10 s de arranque de .NET** (por
+    ejemplo, `timeout 90` para la 09, que dura 60 s): si no, envía un `SIGTERM` que nadie planeó. **Las que leen el
+    teclado (04, 11 Contar vueltas y 11 El cuadrado perfecto) las ejecuta el usuario en su terminal de la Pi** (es lo
+    normal: está delante, controla el arranque y tiene Ctrl+C), con `cd ~/apps/X && dotnet X.dll`. Alternativa, si no
+    puede: mandarle las teclas por SSH, con una espera de **12 s o más** antes de la tecla (.NET tarda de 3 a 8 s en
+    arrancar y la tecla antes de eso se pierde): `(sleep 12; printf 'n'; sleep 30) | timeout 70 ssh.exe -tt harlequin
+    'cd ~/apps/X && timeout --foreground 50 dotnet X.dll; exit'` (sin `--foreground` el programa no recibe las teclas).
   - **Orden y qué debe verse** (siempre con las ruedas en el aire):
 
     | Lección | Teclado | Duración | Qué debe verse |
     |---|---|---|---|
     | 04 Cuadrado (responder `n`) | Sí | ~8 s | Cuatro veces: las dos ruedas adelante 1 s y un giro a la derecha (derecha atrás, izquierda adelante, 200 ms) |
     | 06 Distancia, **tal como está** (`moveMotors = false`) | No | hasta 10 s | Solo mide y enciende luces (verde, amarilla, roja) con la mano delante del sensor central. Los motores no se mueven |
-    | 06 Distancia, **copia temporal con `moveMotors = true`** (en el scratchpad, sin tocar el repositorio; volver a desplegar la original después) | No | hasta 10 s | Lejos: verde y rápido. Menos de 60 cm: amarilla y lento. Menos de 30 cm: roja, para y termina |
+    | 06 Distancia, **con `moveMotors = true`** (ver la receta debajo de la tabla) | No | hasta 10 s | Lejos: verde y rápido. Menos de 60 cm: amarilla y lento. Menos de 30 cm: roja, para y termina |
     | 11 Contar vueltas | Sí (una tecla entre las partes) | ~2 s + hasta 5 s | Parte 1: adelante 2 s contando los pulsos de la rueda derecha. Parte 2: hasta 50 cm o 5 s |
     | 11 Ir recto | No | hasta 6 s | Adelante 100 cm o 6 s, luces verde, amarilla o azul; los dos sensores cuentan |
     | 11 El cuadrado perfecto (responder `n`) | Sí | hasta ~25 s | Cuatro lados y cuatro giros por pulsos |
-    | 09 Robot autónomo | No | 60 s o Ctrl+C | Mano en el sensor izquierdo: retrocede y gira a la derecha; en el derecho: gira a la izquierda; sin obstáculo: adelante. **Aquí se prueba la parada de emergencia, en dos ejecuciones:** una con `SIGTERM` desde el PC (esperando un texto del programa, no con un tiempo fijo) y otra con Ctrl+C del usuario en su terminal, a mitad, con tres sensores y los hilos de los motores en marcha |
+    | 09 Robot autónomo | No | 60 s o Ctrl+C | Mano en el sensor izquierdo: retrocede y gira a la derecha; en el derecho: gira a la izquierda; sin obstáculo: adelante. **Aquí se prueba la parada de emergencia, en dos ejecuciones**, con tres sensores y los hilos de los motores en marcha: una con `SIGTERM` desde el PC y otra con Ctrl+C del usuario en su terminal, a mitad (ver la receta debajo de la tabla) |
 
+  - **Receta de la lección 06 con motores:** el `.csproj` de la lección hereda `TargetFramework` de
+    `Directory.Build.props` y su `ProjectReference` es relativa, así que **una copia fuera del repositorio no compila**.
+    Cambiar `moveMotors = true` en `lessons/Lesson06.Distance/Program.cs` del árbol de trabajo, publicar en una
+    carpeta de salida propia y desplegar en `~/apps/Lesson06.Distance` (el proceso sigue llamándose
+    `Lesson06.Distance`: `parar-robot.sh` lo reconoce). **Después de la prueba:** `git restore
+    lessons/Lesson06.Distance/Program.cs`, comprobar que `git status` queda limpio y volver a desplegar la original.
+  - **Receta de la parada de la lección 09 con `SIGTERM`:** lanzarla en segundo plano en la Pi con la salida a un
+    archivo (en `~`) y guardar su PID; el usuario pone la mano delante del sensor **izquierdo**; esperar a que el
+    archivo contenga **`Obstacle!`** (se imprime al ver el obstáculo, justo antes de retroceder 300 ms) con un
+    `timeout 30`, esperar unos 0,15 s y enviar `kill -TERM` al PID: cae en la marcha atrás, que es el caso que
+    importa. Si no sale `Obstacle!`, el sensor no vio la mano: repetir. El `timeout` general, de 90 s. Después:
+    "Parada de emergencia (SIGTERM)", salida 143, pines en `lo`, ningún proceso. El método (esperar un texto del
+    programa y no un tiempo fijo) es el de la lección 03 del 17/10/2026, que esperó `Backwards`.
   - **Después de cada ejecución:** salida 0 (o 143 si se paró con `SIGTERM`), 8 pines en `lo`, ningún proceso,
     `get_throttled` = `0x0`, y que el usuario diga si las ruedas y las luces hicieron lo esperado.
   - **Si algo no cuadra** (una rueda al revés, una que no para, un pin que no baja): **no seguir con la lección
