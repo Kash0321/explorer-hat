@@ -70,10 +70,11 @@ Lo comprobamos en el robot (17/10/2026):
 | Ningún pad responde | Comprueba con `/usr/sbin/i2cdetect -y 1` que sale 0x28. |
 | La luz de un pad no coincide | Comprueba el número impreso junto al pad en el HAT. |
 | El robot avanza al revés | Comprueba los cables de los motores (ver el README del repositorio). |
+| Las ruedas zumban y no se mueven | La velocidad es muy baja: sube `speed`. En el suelo de pruebas, con 0.4 arrancaban y con 0.3 no. |
 
 ## Retos
 
-* **Más rápido, más lento.** Cambia `speed` (0.4, 0.8). ¿Qué velocidad es la más fácil de manejar?
+* **Más rápido, más lento.** Cambia `speed` (0.3, 0.6, 0.8). ¿Qué velocidad es la más fácil de manejar? ¿Cuál es la más baja con la que arrancan las ruedas? ¿Por qué cuesta más girar que avanzar?
 * **El turbo.** Haz que, mientras tocas el pad 5 (`hat.Touch.Five`), la velocidad sea 1.0. Recuerda que el chip solo
   cuenta un toque a la vez: ¿puedes usar el turbo y avanzar a la vez? ¿Por qué no? Piensa otra forma (por
   ejemplo, que el pad 5 cambie la variable `speed` cada vez que se toca).
