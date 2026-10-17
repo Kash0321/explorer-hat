@@ -111,6 +111,10 @@ divisor de tensión, igual que el potenciómetro, pero lo cambia la luz y no tu 
 Más luz: la LDR baja de resistencia y sube la tensión del nodo (el punto entre las dos). Con la fórmula del
 potenciómetro, `V = 5,3 V × 10 kΩ / (R de la LDR + 10 kΩ)`.
 
+> ⚠️ **Cuidado con la protoboard:** el cable 5V del divisor tiene que ir a un punto unido al pin 5V del HAT. Una
+> fila suelta no lleva alimentación (es lo que falló con el potenciómetro). Con el robot apagado, comprueba con el
+> zumbador del multímetro que esa fila y el pin 5V están unidos.
+
 Nuestras medidas (tres LDR casi iguales, con 10 kΩ):
 
 | Condición | Resistencia de la LDR | Tensión esperada |
