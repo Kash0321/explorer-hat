@@ -34,11 +34,14 @@ English texts, which agree. Obvious errors in the original are corrected and fla
   - `Ω` (resistencia): 200, 2000, 20k, 200k y 2000k.
   - `DCV` (tensión continua): 200m, 2000m, 20, 200 y 1000.
 - **Nota [N. del T.]:** el selector marca `2000k` como último alcance de resistencia, pero la tabla del
-  manual lo llama 20 MΩ. Las marcas `2000m`, `2000µ` y `2000` equivalen a 2 V, 2 mA y 2 kΩ.
+  manual lo llama 20 MΩ. Es un error del manual: con 1999 cuentas, una resolución de 1 kΩ da un fondo de
+  escala de unos 2 MΩ (200 Ω → 0,1 Ω, 2 kΩ → 1 Ω, 20 kΩ → 10 Ω y 200 kΩ → 100 Ω siguen la misma regla).
+  Un rango de 20 MΩ tendría una resolución de 10 kΩ. Las marcas `2000m`, `2000µ` y `2000` equivalen a 2 V,
+  2 mA y 2 kΩ.
 
 ### I. Introducción
 
-1. **Pantalla:** LED de 3 1/2 dígitos.
+1. **Pantalla:** LED de 3 1/2 dígitos *[N. del T.: la sección II la llama LCD; la pantalla real es LCD]*.
 2. **Interruptor:**
    - 2.1. **Función y rango:** el multímetro incorpora un interruptor giratorio situado en el centro de la
      carcasa frontal. Se utiliza para seleccionar la función (FUNCTION) y el rango (RANGE).
@@ -62,7 +65,7 @@ English texts, which agree. Obvious errors in the original are corrected and fla
 - **Precisión:** ±a % de la lectura ±N dígitos *[N. del T.: el original dice "±SIN números", error de
   traducción de "±N digits"]*.
 - **Garantía:** 1 año.
-- **Humedad ambiente:** 23 °C ± 2 °C.
+- **Humedad ambiente:** 23 °C ± 2 °C *[N. del T.: es la temperatura de referencia de la precisión, no una humedad]*.
 - **Humedad relativa:** < 75 %.
 
 #### 1. Tensión continua CC (más de 500 V solo como referencia)
@@ -108,7 +111,10 @@ Protección contra sobrecarga: fusible 0,2 A / 250 V. El rango de 10 A no tiene 
 | 2 kΩ   | ±0,8 % de lectura ±8 dígitos  | 1 Ω        |
 | 20 kΩ  | ±0,8 % de lectura ±8 dígitos  | 10 Ω       |
 | 200 kΩ | ±0,8 % de lectura ±8 dígitos  | 100 Ω      |
-| 20 MΩ  | ±2,0 % de lectura ±10 dígitos | 1 kΩ       |
+| 2 MΩ (`2000k`) | ±2,0 % de lectura ±10 dígitos | 1 kΩ |
+
+*[N. del T.: el manual escribe "20 MΩ" en la última fila. Es un error; ver la nota de las marcas de la carcasa.
+Por encima de 2 MΩ la pantalla muestra solo "1".]*
 
 - **Protección contra sobrecarga:** 250 V CC o CA rms, durante menos de 10 segundos.
 - **Tensión máxima en circuito abierto:** aproximadamente 3 V.
@@ -190,11 +196,13 @@ Vce aproximadamente 3 V, Ib aproximadamente 10 µA. La pantalla muestra aproxima
   - `Ω` (resistance): 200, 2000, 20k, 200k and 2000k.
   - `DCV` (DC voltage): 200m, 2000m, 20, 200 and 1000.
 - **Note:** the switch labels the last resistance range `2000k`, but the manual table calls it 20 MΩ.
-  The labels `2000m`, `2000µ` and `2000` mean 2 V, 2 mA and 2 kΩ.
+  That is an error in the manual: with 1999 counts, a resolution of 1 kΩ gives a full scale of about 2 MΩ
+  (200 Ω → 0.1 Ω, 2 kΩ → 1 Ω, 20 kΩ → 10 Ω and 200 kΩ → 100 Ω follow the same rule). A 20 MΩ range would
+  have a resolution of 10 kΩ. The labels `2000m`, `2000µ` and `2000` mean 2 V, 2 mA and 2 kΩ.
 
 ### I. Introduction
 
-1. **Display:** 3½ digit LED.
+1. **Display:** 3½ digit LED *[Note: section II calls it LCD; the real display is an LCD]*.
 2. **Switch:**
    - 2.1. **Function and range:** our CMM adopts a rotational switch which is situated at the middle of the
      front case. It is used for the selection of FUNCTION and RANGE.
@@ -217,7 +225,7 @@ Vce aproximadamente 3 V, Ib aproximadamente 10 µA. La pantalla muestra aproxima
 
 - **Accuracy:** ±a % of reading ±N digits *[Note: the original prints "±NO digits"]*.
 - **Guaranteed** for 1 year.
-- **Environmental humidity:** 23 °C ± 2 °C.
+- **Environmental humidity:** 23 °C ± 2 °C *[Note: this is the reference temperature for the accuracy, not a humidity]*.
 - **Relative humidity:** < 75 %.
 
 #### 1. DC voltage (over 500 V only reference)
@@ -263,7 +271,10 @@ Overload protection: 0.2 A / 250 V fused. The 10 A range is not fused.
 | 2 kΩ   | ±0.8 % of rdg ±8 digits   | 1 Ω        |
 | 20 kΩ  | ±0.8 % of rdg ±8 digits   | 10 Ω       |
 | 200 kΩ | ±0.8 % of rdg ±8 digits   | 100 Ω      |
-| 20 MΩ  | ±2.0 % of rdg ±10 digits  | 1 kΩ       |
+| 2 MΩ (`2000k`) | ±2.0 % of rdg ±10 digits | 1 kΩ |
+
+*[Note: the manual writes "20 MΩ" in the last row. This is an error; see the note on the case markings.
+Above 2 MΩ the display shows only "1".]*
 
 - **Overload protection:** 250 V DC or AC rms, for less than 10 seconds.
 - **Maximum open circuit voltage:** approximately 3 V.

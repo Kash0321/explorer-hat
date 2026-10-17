@@ -13,7 +13,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - **Multímetro llegado:** ExtraStar DT830B, barato y sencillo. Manual y marcas de la carcasa transcritos en
     castellano y en inglés en [`docs/multimetro-DT830B.md`](docs/multimetro-DT830B.md) (la foto del manual venía con
     cinco idiomas; solo se guardan esos dos). Con él se pueden medir las LDR y comprobar el potenciómetro de la
-    lección 08 sin el ADS1015 (ver la Fase 5).
+    lección 08 sin el ADS1015 (ver la Fase 5). **Límite:** el último rango de resistencia es de **2 MΩ**, no de
+    20 MΩ como dice la tabla del manual (con 1999 cuentas y 1 kΩ de resolución, el fondo de escala es de unos 2 MΩ;
+    coincide con la marca `2000k` del selector). Una LDR a oscuras puede pasar de 2 MΩ: la pantalla mostrará solo
+    "1" (fuera de rango).
   - **Experimento de modelos** (asesor Opus 5.5, subagente `buscador`): reglas en `AGENTS.md` y criterio para
     seguir o quitarlo en "Sin prisa".
   - **#2610 probado en la Pi con el último commit del PR** (`c6fcf210`, ya con el recuento de referencias `0f4e5718` y
@@ -24,14 +27,15 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     1. Con dos avisos de **tipos de evento distintos** (por ejemplo `Rising | Falling` y solo `Rising`), quitar el
        segundo **no lo quita**: sigue recibiendo flancos. Causa: `LibGpiodV2EventObserver.RemoveCallback` busca solo
        la primera suscripción del `offset` (`FirstOrDefault`), y cada tipo de evento es otra suscripción. El código es
-       el mismo que en `main` (el PR no lo toca); en la Pi 3 no se veía porque ni siquiera dejaba registrar un segundo
+       el mismo que en `main` (el PR solo cambia el tipo del índice de un bucle en ese archivo); en la Pi 3 no se veía porque ni siquiera dejaba registrar un segundo
        aviso.
     2. **Intermitente:** dos `WaitForEvent` seguidos y después registrar un aviso: a veces el hilo que lee los eventos
        muestra `Unhandled exception while handling libgpiodv2 edge events: GpiodException ... epoll_ctl: Error:
        'Success'` y se pierden flancos (2 de 4 en una de las 5 ejecuciones; en otra, el aviso no vio ninguno). Con un
        solo `WaitForEvent` no pasó. Parece una carrera entre la limpieza de la petición tras el `WaitForEvent` y el
        hilo observador: es la zona de los hallazgos que krwq pidió arreglar a Copilot (15/10/2026).
-    Programa en el scratchpad de la sesión (no versionado), con un modo `seq` (`dotnet GpioEvents.dll 8 seq
+
+    Programa de prueba (no versionado; fuente en `~/apps/GpioEvents2610/Program.cs` en la Pi), con un modo `seq` (`dotnet GpioEvents.dll 8 seq
     R1,R2,U2,E`: `R1`/`R2` registran el aviso 1 (flancos de subida y de bajada) o el 2 (solo subida), `U1`/`U2` los
     quitan, `E` hace 4 flancos y `W` es un `WaitForEvent`). Registro de la secuencia completa en la Pi:
     `~/gpioevents-2610-c6fcf210.log`. **Sin publicar nada en dotnet/iot todavía**: falta el visto bueno del usuario
