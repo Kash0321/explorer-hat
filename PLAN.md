@@ -36,7 +36,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     de la entrada del sensor. No importa: 4,93 V es un nivel alto claro.
   - **Lección 08 hecha** (`lessons/Lesson08.Analog`, PR de la rama `fase-5-leccion-08-analogico`): el usuario eligió un
     ayudante `AnalogInputs` en `ExplorerHat.Common` y no el fork (choque de tipos `CS0433`, comprobado). Probada en la
-    Pi con el potenciómetro, sin motores. Detalles y lo que falta probar en la Fase 5, lección 08.
+    Pi con el potenciómetro, sin motores. Detalles y lo que falta probar en la Fase 5, lección 08. **Prueba de motores
+    con el `Common` nuevo hecha (`Lesson03.Motors`, ejecución completa y parada con `SIGTERM`, 0,24 s hasta tener los
+    pines en `lo`)**; PR #48 fusionado y la Pi al día en `main` (`0d6fb5f`).
   - **#2610 probado en la Pi con el último commit del PR** (`c6fcf210`, ya con el recuento de referencias `0f4e5718` y
     los arreglos de Copilot). Mismo método que el 03/10/2026 (GPIO 8 sin nada conectado y flancos con `pinctrl set 8
     pu`/`pd`; no mueve los motores). **Arregla lo que faltaba:** con dos avisos en el pin, quitar uno deja funcionando
@@ -587,9 +589,20 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     lee 0,01 V; parada con `SIGTERM` (mensaje, 8 pines en `lo`, ningún proceso) y con Ctrl+C del usuario con luces
     encendidas (bien); las luces siguen el mando según los umbrales de la tabla del README (0,66, 1,99, 3,31 y
     4,64 V); `Lesson01.Lights` con el `Common` nuevo termina con salida 0 y los 8 pines en `lo`;
-    `get_throttled` = `0x0`. Solución compilada con 0 avisos. **Sin probar:** las lecciones con motores con el
-    `Common` nuevo (solo cambia `SafeExplorerHat` en `Analog` y al final del `Dispose`; antes de la primera prueba que
-    mueva los motores, consultar al asesor y confirmar las ruedas en el aire).
+    `get_throttled` = `0x0`. Solución compilada con 0 avisos.
+  - **Prueba de motores con el `Common` nuevo (17/10/2026, `Lesson03.Motors`, ruedas en el aire, velocidad 0,8):**
+    hecha con la consulta al asesor y la confirmación explícita del usuario. **(1) Ejecución completa:** adelante,
+    atrás, giro a la derecha y giro a la izquierda; el usuario vio las ruedas girar como se esperaba y las luces en
+    el orden verde, roja, amarilla y azul (la primera ejecución empezó sin aviso y no le dio tiempo a verla: se
+    repitió con una cuenta atrás de 8 s); salida 0, 8 pines en `lo` y los pines grabados con `tools/vigilar-pines.sh`
+    (en `~/pines-prueba03.log` de la Pi) coinciden con cada fase (adelante: 19 y 21; atrás: 20 y 26; derecha: 20 y
+    21; izquierda: 19 y 26). **(2) Parada de emergencia:** `SIGTERM` enviado 0,3 s después de que el programa
+    escribiera `Backwards` (esperando el texto en el registro, no con un tiempo fijo, porque .NET tarda de 3 a 8 s en
+    arrancar): salida 143, mensaje "Parada de emergencia (SIGTERM): motores parados", **los cuatro pines de los
+    motores en `lo` 0,24 s después de la señal** (registro en `~/pines-prueba03-term.log`), ningún proceso y
+    `get_throttled` = `0x0`; el usuario vio que las ruedas se pararon en el acto. **Quedan sin probar con el `Common`
+    nuevo** las lecciones con motores 04, 06, 09 y 11 (usan el mismo `SafeExplorerHat`; solo cambia la propiedad
+    `Analog` y el final del `Dispose`, y la lección 03 ya ejerce los dos caminos de la parada).
   - **Sensores decididos (10/10/2026):**
     - **Potenciómetro** lineal de 10 kΩ (B10K). Pedidos 3 **ALLECIN WH148 B10K** (película de carbono, con mando y
       cable con conector XH2.54 de 3 pines), **ya llegaron** (confirmado el 16/10/2026). Mirar qué hay en el otro extremo del
