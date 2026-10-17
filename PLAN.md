@@ -25,6 +25,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     robot ni la Pi.
   - **Potenciómetro probado en la Pi** (17/10/2026): de 0,01 V a 5,31 V con `~/apps/PotCheck`. Fallo del primer
     intento: el 5V iba a una fila de protoboard sin unir al pin 5V del HAT. Detalles en la lección 08.
+  - **Pull-up del Trig de los HC-SR04P medida** (17/10/2026, multímetro, mismos resultados en los tres sensores): con
+    el robot apagado y en `200k` (en `20k` marcaba "1"), **unos 62–65 kΩ entre Trig y VCC, igual en los dos sentidos**
+    (una resistencia, no un diodo: el valor encaja con una de 62 kΩ, 5 %); con el robot encendido y sin programa,
+    **4,93 V entre Trig y GND**. El multímetro no dice si es una pieza soldada o está dentro del chip (U3). Queda
+    sin explicar por qué marca 4,93 V y no 5,30 V (ver "Sin prisa").
   - **Lección 08 hecha** (`lessons/Lesson08.Analog`, PR de la rama `fase-5-leccion-08-analogico`): el usuario eligió un
     ayudante `AnalogInputs` en `ExplorerHat.Common` y no el fork (choque de tipos `CS0433`, comprobado). Probada en la
     Pi con el potenciómetro, sin motores. Detalles y lo que falta probar en la Fase 5, lección 08.
@@ -195,9 +200,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
      se quita a menudo (17/10/2026): un conector con llave (por ejemplo, de tipo JST) en vez de cuatro Dupont sueltos, y
      comprobar si su placa tiene un puente de la luz de fondo (sin él se apagaría; sin comprobar en esta placa).
-- **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); con un multímetro, medir si la pull-up del Trig de
-  los HC-SR04P es una resistencia de la placa o la interna del chip (método en el README); repetir con carga completa
-  la batería Xiaomi (Fase 2). **El multímetro ya llegó (17/10/2026)**: ese método ya se puede probar.
+- **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); repetir con carga completa la batería Xiaomi
+  (Fase 2). La pull-up del Trig de los HC-SR04P ya está medida (17/10/2026, ver el README y el "Estado actual").
+  Dudas pequeñas que quedan: por qué el Trig marca 4,93 V con el multímetro si el pin 5V del HAT da 5,30 V con el
+  ADS1015 (medir VCC–GND en el mismo sensor, con el robot encendido, diría si el aparato o el cableado), y si la
+  pull-up de unos 62 kΩ es una pieza suelta o está dentro del chip (se ve en la placa).
 - **Experimento de modelos (desde el 17/10/2026):** Sonnet 5.5 con asesor Opus 5.5 y el subagente `buscador`
   (reglas en `AGENTS.md`, archivos en `.claude/`). Tras tres sesiones, revisar con `/usage` el coste, cuántas
   veces el asesor cambió una decisión y si `buscador` ahorró contexto. Si no aporta, quitar
@@ -486,8 +493,10 @@ Propuesta, dos formas de trabajar:
       habilitar I2C, normas de seguridad en el taller. Datos confirmados con el usuario (01/10/2026): sensores
       HC-SR04P, cada uno en su soporte; VCC al 5V del HAT y GND al GND del HAT; TRIG directo a OUT1–OUT3, sin
       resistencia: como las salidas OUT son de colector abierto, la pull-up del TRIG debe estar en el módulo (en la
-      foto de la placa no se ve si es una resistencia o la interna del chip U3, RCW9006; se puede comprobar con un
-      multímetro: ~5 V entre Trig y Gnd con el robot encendido y sin programa), y el
+      foto de la placa no se ve si es una resistencia o la interna del chip U3, RCW9006; **medido el 17/10/2026 con el
+      multímetro: unos 62–65 kΩ entre Trig y VCC en los tres sensores, igual en los dos sentidos, y 4,93 V entre Trig
+      y GND con el robot encendido y sin programa**: hay una pull-up de unos 62 kΩ; si es pieza suelta o del chip no lo
+      dice el multímetro), y el
       pulso de disparo llega invertido (bajo en vez de alto) y aun así funciona. UPS: interruptor deslizante OFF/ON
       (en OFF al colocar las baterías) y pulsador *boot* para activar la protección (wiki de Waveshare).
 - [x] README propio de cada ejemplo: BasicSample (estaba vacío), Common (`SafeExplorerHat`), ObstacleAvoidance
@@ -864,7 +873,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - **Pedidos (10/10/2026), para la lección 08:** 3 potenciómetros ALLECIN WH148 B10K (10 kΩ lineales, con mando y
   cable con conector XH2.54 de 3 pines). Llegan el 11/10/2026.
 - IN4 (GPIO 25) con nada conectado lee 0 en 50 de 50 lecturas (pull de la Pi desactivado): la entrada del HAT
-  parece tener pull-down o un búfer que la mantiene baja. Confirmar con el pulsador.
+  parece tener pull-down o un búfer que la mantiene baja. **Confirmado con el pulsador en la lección 05:** las
+  entradas del HAT llevan pull-down por dentro. Su valor no se ha medido (con el multímetro, entre IN4 y GND con el
+  HAT apagado y sin nada conectado a IN4; opcional).
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
