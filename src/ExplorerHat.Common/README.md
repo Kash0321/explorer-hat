@@ -1,8 +1,8 @@
 # Código compartido (Common)
 
 Biblioteca con `SafeExplorerHat`, que usan los ejemplos y las lecciones que mueven los motores o encienden las
-luces, con `HatMotor`, que mueve cada motor, y con `Screen`, para la pantalla LCD. No es un programa: no se ejecuta
-sola.
+luces, con `HatMotor`, que mueve cada motor, con `Screen`, para la pantalla LCD, y con `AnalogInputs`, para las
+entradas analógicas. No es un programa: no se ejecuta sola.
 
 ## `HatMotor`: los dos sentidos a la misma velocidad
 
@@ -40,6 +40,23 @@ desde la fila lateral del Explorer HAT. Esconde la configuración del adaptador 
 la pantalla) para que las lecciones solo usen `Clear()` y `Write(línea, texto)`. `Write` escribe la línea entera:
 corta el texto a 20 caracteres o lo rellena con espacios. La pantalla guarda el último texto al terminar el programa.
 La usa la lección 12.
+
+## `AnalogInputs`: las entradas analógicas
+
+`SafeExplorerHat.Analog` da las cuatro entradas analógicas del HAT (`Analog.One` a `Analog.Four`). Cada una se lee con
+`ReadVoltage()`, que devuelve la tensión (`.Volts`, de 0 a 5 V, con una resolución de 3 mV). Las mide el conversor
+ADS1015 (I2C, dirección 0x48), que va alimentado a 5 V. La usa la lección 08.
+
+* **Misma forma que el binding futuro.** Es la API de las entradas analógicas propuestas para `Iot.Device.ExplorerHat`
+  en dotnet/iot (rama `explorerhat-analog-v2` del fork), pero por dentro usa `Ads1115` de `Iot.Device.Bindings` 4.2.0
+  (el ADS1015 tiene los mismos registros, con los 12 bits en la parte alta). Cuando una versión publicada del binding
+  tenga las entradas analógicas, se borran `AnalogInputs` y `AnalogInput` y las lecciones no cambian. No se usa el
+  proyecto del fork directamente: su tipo `ExplorerHat` choca con el del paquete 4.2.0 (`error CS0433`).
+* **El I2C se abre al leer por primera vez.** Los programas que no leen una entrada no dependen del conversor.
+* **Los números del HAT no coinciden con los del chip:** Analog 1 = canal 3 (AIN3), Analog 2 = AIN2, Analog 3 = AIN1 y
+  Analog 4 = AIN0.
+* **Una entrada sin nada conectado no marca 0 V,** sino unos 0,5 V (flota). Una atada a GND marca unos 0,02 V.
+* **El pin 5V del HAT da unos 5,3 V,** no 5,0: un potenciómetro al máximo marca unos 5,3 V.
 
 ## Para qué sirve `SafeExplorerHat`
 
@@ -86,6 +103,8 @@ En este orden:
    de pines.
 5. Fuerza a nivel bajo los ocho pines de salida (19, 20, 21, 26, 4, 17, 27 y 5). El programa puede seguir
    ejecutándose durante una parada de emergencia y haber escrito un pin justo antes de liberarlo.
+6. Libera las entradas analógicas (`Analog`), si se leyó alguna. Va al final y dentro de un `try`: un fallo del bus
+   I2C no puede retrasar la parada de emergencia, y `Analog` no espera más de 0,5 s a una lectura colgada.
 
 Es seguro llamarlo más de una vez.
 
