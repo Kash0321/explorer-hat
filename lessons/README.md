@@ -20,7 +20,7 @@ repositorio; cada lección tiene un README en español para el monitor.
 | [10 El cuadrado perfecto](Lesson10.Square/README.md) | Girar ángulos exactos con geometría y pulsos; calibrar lo que resbala | **Sí** |
 | [11 La pantalla](Lesson11.Screen/README.md) | Texto y variables en una pantalla, líneas desde 0, una barra con un bucle | No |
 
-El catálogo no tiene la lección 10 de siguelíneas: se guarda como idea en `PLAN.md` (Fase 5, "Ideas para ampliar").
+El siguelíneas no está en el catálogo: se guarda como idea en `PLAN.md` (Fase 5, "Ideas para ampliar las lecciones").
 
 ## Cómo ejecutar una lección
 

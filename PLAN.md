@@ -168,7 +168,13 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   TCRT5000) pasa a "Ideas para ampliar las lecciones" (Fase 5). **Renumeración del 17/10/2026:** `Lesson11.*` (Contar
   vueltas, Ir recto y El cuadrado perfecto) es ahora `Lesson10.*`, y `Lesson12.Screen` es `Lesson11.Screen`. Los PR, las
   ramas y los commits anteriores usan los números antiguos (por ejemplo, la rama `fase-5-leccion-12`); el texto de este
-  documento ya usa los nuevos. Las carpetas viejas de `~/apps` en la Pi se borran al desplegar.
+  documento ya usa los nuevos.
+  - **Limpieza pendiente en la Pi (después de fusionar el PR y de comprobar que no hay ningún programa del robot en
+    marcha):** `git pull --ff-only` deja las carpetas ignoradas `bin/` y `obj/` dentro de `lessons/Lesson11.Odometry`,
+    `Lesson11.Straight`, `Lesson11.Square` y `Lesson12.Screen`, y `~/apps` conserva sus carpetas desplegadas. Borrar
+    esas cuatro carpetas **por su nombre**, en `lessons/` y en `~/apps`. **No usar el comodín `Lesson11.*`:** después de
+    desplegar, también borraría la nueva `Lesson11.Screen`. Después, desplegar las cuatro lecciones con los nombres
+    nuevos y comprobar con `tools/parar-robot.sh` y `pinctrl` que los pines siguen en `lo`.
 - **Montaje actual** (a las 22:00 del 17/10/2026, **la pantalla LCD está desconectada**; el resto, como se describe):
   todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
   a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
@@ -189,7 +195,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi. **Medido el 17/10/2026**
   (pantalla desconectada, multímetro en `20k`): **4,73 kΩ entre SDA y VCC y 4,67 kΩ entre SCL y VCC**, así que la
   placa sí lleva resistencias de subida de 4,7 kΩ y la regla "VCC solo a 3v3" es necesaria.
-- **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
+- **Cerradas:** fases 0 a 4 y la Fase 5 (catálogo cerrado el 17/10/2026; queda probar la lección 07 en el suelo). De la Fase 3 solo queda la guía de compilación ligera en la Pi (poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; la Fase 5 está cerrada (17/10/2026), así que puede empezar.
 - **Fase 6, en dotnet/iot (16/10/2026):**
 
@@ -945,7 +951,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - **Si algo no cuadra** (una rueda al revés, una que no para, un pin que no baja): **no seguir con la lección
     siguiente.** Lanzar `parar-robot.sh`, anotar el síntoma y llamar al asesor (error que no se arregla a la primera).
   - **No hace falta probar en el suelo:** el `Common` nuevo no cambia el movimiento. Solo si el usuario quiere repetir
-    la 04 o la 11 Cuadrado perfecto allí.
+    la 04 o la 10 Cuadrado perfecto allí.
   - **Al terminar:** anotar los resultados en esta sección (qué lección, qué se vio, tiempos de los pines y de la
     parada), en una rama nueva desde `main` (`fase-5-repaso-motores-common`), con su PR. Pedir al usuario `/usage` (al
     empezar y al terminar la sesión) para el experimento de modelos.

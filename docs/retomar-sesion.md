@@ -64,7 +64,7 @@ Pega el prompt de arriba y **añade esto al final**:
 
 ```text
 Hoy hacemos la tarea principal de "Al retomar" de PLAN.md: el repaso de las lecciones con motores
-(04, 06, 09 y 11) con el Common nuevo. Haz los pasos 1 a 3 (incluido mirar dotnet/iot, que son 5
+(04, 06, 09 y 10) con el Common nuevo. Haz los pasos 1 a 3 (incluido mirar dotnet/iot, que son 5
 minutos) y propón el orden según el protocolo de la Fase 5 ("Repaso con el Common nuevo"). Espera mi
 "adelante". Antes de CADA ejecución que mueva los motores, pregúntame si el robot tiene las ruedas en
 el aire (aunque ya haya dicho "adelante") y empieza con una cuenta atrás de 8 segundos para que pueda
