@@ -123,21 +123,30 @@ Con Ctrl+C, `kill` o el cierre de la sesión SSH, el proceso de .NET termina **s
 * **Primero para los motores y después escribe en la consola.** Si se pierde la sesión SSH, escribir en la
   consola falla. Antes de este cambio, el programa terminaba sin parar los motores y se quedaban al 100 %.
   Los errores de escritura se ignoran.
+* **Termina el proceso ella misma.** Después del mensaje llama a `Environment.Exit(128 + número de la señal)`, con el
+  mismo código de salida que la acción por defecto (130 con Ctrl+C, 143 con `kill`, 129 con SIGHUP). No deja que el
+  hilo principal siga: mientras el hilo de la señal cierra los pines, el hilo principal puede escribir en un motor ya
+  cerrado y lanzar `ObjectDisposedException` (pasó el 17/10/2026 en la lección 07, que escribe en los motores cada
+  50 ms). Sin este cuidado, el programa se abortaba con un mensaje de error y sin el mensaje de la parada.
+* **El aviso de excepciones y las señales siguen puestos hasta el final de `Dispose`.** Si el hilo principal falla
+  durante la parada, su aviso llama a `Dispose` y espera al mismo cerrojo (`lock`): el proceso no puede abortarse
+  antes de que los pines estén en `lo`.
 
 ## Qué hace al liberarse (`Dispose`)
 
 En este orden:
 
-1. Quita el registro de las señales.
-2. Pone `Motors.One.Speed` y `Motors.Two.Speed` a `0.0`.
-3. Apaga las luces.
-4. Libera los motores (los hilos de PWM terminan y dejan sus pines en bajo), `ExplorerHat` y después el controlador
+1. Pone `Motors.One.Speed` y `Motors.Two.Speed` a `0.0`.
+2. Apaga las luces.
+3. Libera los motores (los hilos de PWM terminan y dejan sus pines en bajo), `ExplorerHat` y después el controlador
    de pines.
-5. Fuerza a nivel bajo los ocho pines de salida (19, 20, 21, 26, 4, 17, 27 y 5). El programa puede seguir
+4. Fuerza a nivel bajo los ocho pines de salida (19, 20, 21, 26, 4, 17, 27 y 5). El programa puede seguir
    ejecutándose durante una parada de emergencia y haber escrito un pin justo antes de liberarlo.
-6. Libera las entradas analógicas (`Analog`) y los pads táctiles (`Touch`), si se leyó alguno. Va al final y cada
+5. Libera las entradas analógicas (`Analog`) y los pads táctiles (`Touch`), si se leyó alguno. Va al final y cada
    uno dentro de un `try`: un fallo del bus I2C no puede retrasar la parada de emergencia, y ninguno espera más de
    0,5 s a una lectura colgada.
+6. Al final, quita el registro de las señales y el aviso de excepciones no controladas. Si antes llega una segunda
+   señal (dos Ctrl+C) o falla el hilo principal, esperan al cerrojo en vez de abortar el proceso a mitad de la limpieza.
 
 Es seguro llamarlo más de una vez.
 

@@ -27,6 +27,9 @@ namespace ExplorerHat.Common
         private SharedGpioController? _controller;
         private Iot.Device.ExplorerHat.ExplorerHat? _hat;
 
+        // Exit code of the emergency stop (128 + signal number), or 0 when no signal has arrived
+        private volatile int _emergencyExitCode;
+
         /// <summary>
         /// Explorer HAT motors, with the PWM on both pins of each motor (see <see cref="HatMotor"/>)
         /// </summary>
@@ -79,13 +82,36 @@ namespace ExplorerHat.Common
         {
             // Stop the motors first: when the SSH session is lost (SIGHUP) the terminal no longer exists
             // and writing to the console fails. The process ends afterwards (default behavior).
+            _emergencyExitCode = 128 + context.Signal switch
+            {
+                PosixSignal.SIGHUP => 1,
+                PosixSignal.SIGINT => 2,
+                PosixSignal.SIGQUIT => 3,
+                _ => 15,
+            };
+
             Dispose();
             TryWriteLine($"Parada de emergencia ({context.Signal}): motores parados");
+
+            // The main thread is still running and cannot use the hat any more. End the process here, as the
+            // default behavior would do, with the same exit code
+            Environment.Exit(_emergencyExitCode);
         }
 
         private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            // Wait here until the cleanup of the emergency stop ends: this handler stays registered until then,
+            // so the process cannot be aborted before the pins are low (Dispose takes the same lock)
             Dispose();
+
+            if (_emergencyExitCode != 0)
+            {
+                // The main thread used the motors while the signal thread was stopping them. It is not an error:
+                // the signal thread ends the process after its message. This wait is only a safety net
+                Thread.Sleep(5000);
+                Environment.Exit(_emergencyExitCode);
+            }
+
             TryWriteLine("Error inesperado: motores parados");
         }
 
@@ -113,12 +139,6 @@ namespace ExplorerHat.Common
                 {
                     return;
                 }
-
-                foreach (var registration in _signalRegistrations)
-                {
-                    registration.Dispose();
-                }
-                AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
 
                 Motors.One.Speed = 0.0;
                 Motors.Two.Speed = 0.0;
@@ -160,6 +180,16 @@ namespace ExplorerHat.Common
                 {
                     // Same as above
                 }
+
+                // Last of all: if the main thread fails while this method runs (it writes to the closed motors),
+                // the handler waits for the lock above, so the process cannot end before the cleanup is done.
+                // The same for a second signal (two Ctrl+C): while the signals are registered, it waits for the lock
+                // instead of getting the default action, which would end the process in the middle of the cleanup
+                foreach (var registration in _signalRegistrations)
+                {
+                    registration.Dispose();
+                }
+                AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
             }
         }
     }
