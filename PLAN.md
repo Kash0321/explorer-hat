@@ -21,7 +21,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     seguir o quitarlo en "Sin prisa". Configuración comprobada en una sesión nueva.
   - **Medidas con el multímetro** (lección 08, tarde del 17/10/2026): las tres LDR son casi iguales (~12 kΩ con una
     luz fuerte, ~23 kΩ con la luz de la sala, ~110 kΩ con un dedo encima y > 2 MΩ a oscuras) y el potenciómetro
-    tiene el cursor en el hilo **negro**. Resultados, tablas y decisiones en la Fase 5 (lección 08). Sin tocar el
+    tiene el cursor en el hilo **negro**. Resultados, tablas y propuestas en la Fase 5 (lección 08). Sin tocar el
     robot ni la Pi.
   - **#2610 probado en la Pi con el último commit del PR** (`c6fcf210`, ya con el recuento de referencias `0f4e5718` y
     los arreglos de Copilot). Mismo método que el 03/10/2026 (GPIO 8 sin nada conectado y flancos con `pinctrl set 8
@@ -163,7 +163,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
      **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). **Siguiente paso
      (17/10/2026):** programar la lección 08 con las medidas ya hechas (Fase 5, lección 08): divisor de la LDR con
-     10 kΩ y potenciómetro (rojo → 5V, amarillo → GND, negro → Analog 1). Antes, comprobar los otros dos
+     10 kΩ (propuesta, falta que el usuario la confirme) y potenciómetro (rojo → 5V, amarillo → GND, negro → Analog 1). Antes, comprobar los otros dos
      potenciómetros. **La lección 10, no todavía** (decisión del usuario, 10/10/2026). Después de la 08, la 10
      (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
@@ -560,11 +560,13 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       | Dedo encima, rango `200k` | 108,1–112,5 | ~110 kΩ |
       | A oscuras (cuarto sin luz), rango `2000k` | "1" | > 2 MΩ |
 
-      A oscuras da fuera de rango, así que no son GL5506, GL5516 ni GL5528 (darían de 0,2 a 1 MΩ). Con 57 lux y
-      23 kΩ, y una ley de R ∝ lux^−0,6, saldrían unos 65 kΩ con 10 lux: **GL5539 (o GL5537-2)**, solo orientativo
-      (el sensor de luz del móvil es poco exacto). No hace falta el modelo exacto.
-    - **Decisión del divisor:** 5V → LDR → nodo → **10 kΩ** → GND, y el nodo a Analog 1: más luz, más voltios.
-      Tensiones esperadas (5 V × Rf / (R_LDR + Rf)):
+      A oscuras da fuera de rango (> 2 MΩ), pero eso **no descarta ningún modelo**: la columna "a oscuras" de la
+      tabla de arriba suele ser un mínimo de la hoja de datos (sin confirmar). El dato que sí distingue es el de la
+      luz: con 57 lux y 23 kΩ, y una ley de R ∝ lux^−0,6, saldrían unos 65 kΩ con 10 lux: **GL5539 (o GL5537-2)**.
+      Para que fuera una GL5528 (10–20 kΩ con 10 lux), la sala tendría que estar a unos 5 lux. Solo orientativo (el
+      sensor de luz del móvil es poco exacto). No hace falta el modelo exacto.
+    - **Propuesta del divisor (pendiente de confirmar por el usuario):** 5V → LDR → nodo → **10 kΩ** → GND, y el
+      nodo a Analog 1: más luz, más voltios. Tensiones esperadas (5 V × Rf / (R_LDR + Rf)):
 
       | Condición | R de la LDR | Con 10 kΩ | Con 22 kΩ (rojo, rojo, naranja; reto opcional) |
       |---|---|---|---|
@@ -589,7 +591,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       (casi lineal, como una B). **Montaje: rojo → 5V, amarillo → GND, negro → Analog 1:** da 0 V con el mando al
       mínimo y 5 V al máximo (~1,1, 2,4 y 3,9 V a 1/4, 1/2 y 3/4). **Trampa:** por el color, el negro parecería ir a
       GND; así el cursor iría a GND y, al girar el mando hacia el rojo, 5V quedaría unido a GND casi sin resistencia.
-      Etiquetar el conector ("NEGRO = SEÑAL").
+      Etiquetar el conector ("NEGRO = SEÑAL"). Antes de dar corriente, con el robot apagado y sin los cables al HAT:
+      montar el potenciómetro en la protoboard y medir entre las líneas + y −; debe dar ~9,33 kΩ con el mando en
+      cualquier posición (si en un extremo da ~0 Ω, el cableado está mal). **Para el código:** el pin 5V del HAT da
+      ~5,30 V, no 5,0: con el mando al máximo, Analog 1 leerá ~5,3 V. No suponer 5,0 V como tope al pasar la
+      lectura a velocidad o a luces (usar un tope o dividir entre la tensión medida).
   - **Medir las LDR con el robot (preparado el 10/10/2026; ya no hace falta: se midieron con el multímetro).** Plan
     antiguo, sin multímetro. Las LDR no llevan marca;
     las de 5 mm suelen ser de la serie GL55xx, iguales por fuera (una bolsa puede ser un surtido de varios modelos).
