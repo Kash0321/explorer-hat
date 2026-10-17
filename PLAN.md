@@ -137,7 +137,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   sentido esperado; sensores de distancia 20/20. **La pantalla falló** (`IOException: Error 5 (Input/output error)`
   en la primera escritura al PCF8574; `i2cdetect` no veía el 0x27, y sí el 0x28, 0x42 y 0x48): el usuario había
   desconectado los cuatro cables de la pantalla para trabajar y los volvió a conectar con **SDA y SCL intercambiados**.
-  Al corregirlos, `i2cdetect` vuelve a mostrar 0x27, y **el script completo salió bien en la segunda pasada** (LM393
+  Los cuatro cables son Dupont independientes (amarillo GND, verde VCC → 3v3, azul SDA, blanco SCL): colores, foto y
+  reglas para conectarla y desconectarla, en el README. Al corregirlos, `i2cdetect` vuelve a mostrar 0x27, y **el script completo salió bien en la segunda pasada** (LM393
   derecho 81 y 0, izquierdo 0 y 129; motores en el sentido esperado; texto en la pantalla; sensores de distancia
   20/20). **Lección:** con la pantalla apagada, `Error 5` en el
   constructor de `Screen` quiere decir que nadie contesta en 0x27 (alimentación, SDA/SCL cruzados o cable suelto);
@@ -189,7 +190,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
-     motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V.
+     motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
+     se quita a menudo (17/10/2026): un conector con llave (por ejemplo, de tipo JST) en vez de cuatro Dupont sueltos, y
+     comprobar si su placa tiene un puente de la luz de fondo (sin él se apagaría; sin comprobar en esta placa).
 - **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); con un multímetro, medir si la pull-up del Trig de
   los HC-SR04P es una resistencia de la placa o la interna del chip (método en el README); repetir con carga completa
   la batería Xiaomi (Fase 2). **El multímetro ya llegó (17/10/2026)**: ese método ya se puede probar.

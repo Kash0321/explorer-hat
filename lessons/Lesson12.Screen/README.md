@@ -25,6 +25,9 @@ necesidad de un ordenador: la distancia a un obstáculo, la batería, lo que est
   | SDA | SDA |
   | SCL | SCL |
 
+  Los colores de los cables de este robot, una foto y cómo conectarla y desconectarla sin equivocarse (SDA y SCL
+  cruzados es el error más fácil) están en el [README del repositorio](../../README.md).
+
 * El sensor de distancia del centro (TRIG en OUT1, ECHO en IN1).
 
 > ℹ️ Si la pantalla se enciende pero no se ven las letras, gira despacio el **potenciómetro azul** del adaptador
