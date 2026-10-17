@@ -34,6 +34,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     porque la línea tiene, además de la pull-up de ~62 kΩ, una carga de **~1 MΩ hacia GND** (cálculo con el divisor:
     62 kΩ × 4,93 / 0,36 ≈ 0,85 MΩ en total, ≈ 0,9 MΩ sin los 10 MΩ del multímetro), de la salida del HAT en reposo o
     de la entrada del sensor. No importa: 4,93 V es un nivel alto claro.
+  - **Cierre de la sesión del 17/10/2026:** PR #44 a #50 de este repositorio fusionados; `main` y la Pi en `44c554a`
+    (con `git pull --ff-only`). Quedó pendiente el repaso de las lecciones con motores (ver "Al retomar"). **Experimento
+    de modelos:** esta fue la sesión 1 de 3; el usuario no pasó `/usage` (pedirlo al empezar y al terminar la próxima).
+    En dotnet/iot, sin respuesta nueva a nuestro comentario del #2610 ni en el #2616, el #2625 y las incidencias.
   - **Lección 08 hecha** (`lessons/Lesson08.Analog`, PR de la rama `fase-5-leccion-08-analogico`): el usuario eligió un
     ayudante `AnalogInputs` en `ExplorerHat.Common` y no el fork (choque de tipos `CS0433`, comprobado). Probada en la
     Pi con el potenciómetro, sin motores. Detalles y lo que falta probar en la Fase 5, lección 08. **Prueba de motores
@@ -179,7 +183,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
-- **Al retomar (siguiente sesión):**
+- **Al retomar (siguiente sesión):** **Tarea principal decidida por el usuario (17/10/2026): la opción A, el repaso
+  de las lecciones con motores con el `Common` nuevo** (04, 06, 09 y 11; protocolo, orden y criterios en la Fase 5,
+  "Repaso con el `Common` nuevo"). Orden: primero el punto 1 de abajo (5 minutos, dotnet/iot) y después el repaso.
+  Después del repaso, la opción B (lección 07 de pads táctiles con un ayudante en `Common`, porque `Cap1208` no está
+  en el paquete 4.2.0). Otras opciones que se ofrecieron: un checklist del taller, la lección 10 y la Fase 7.
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
      el 16/10/2026).
@@ -760,6 +768,52 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     nivel bajo al terminar.
   - Con `HatMotor` (04/10/2026, misma zona, 60 s): 18 obstáculos, detectados casi siempre a 18–29 cm; giros de 1 paso
     (12 veces), 2 (5) y 3 (1); ninguna maniobra agotó los 10 pasos. El usuario lo vio bien. Sin cambios en la lección.
+- [ ] **Repaso con el `Common` nuevo (lecciones con motores 04, 06, 09 y 11).** Decidido por el usuario el 17/10/2026
+      (opción A). Motivo: `SafeExplorerHat` cambió (propiedad `Analog` y final del `Dispose`) y solo se probó la
+      lección 03 con los motores (ejecución completa y parada con `SIGTERM`; ver la lección 08). Las lecciones no
+      cambian: se comprueba que **siguen haciendo lo mismo y que la parada de emergencia funciona con sus hilos y
+      sensores**. Unos 40 minutos, con el usuario delante.
+  - **Antes de empezar (en este orden):**
+    1. La Pi en `main` y al día (`git pull --ff-only` en `~/work/explorer-hat`), sin programas del robot en marcha
+       (`P=Lesson; pgrep -fc "${P}[0-9]"` en una llamada SSH **que no contenga nombres de lección**: si no, cuenta su
+       propio comando), los 8 pines en `lo` (`pinctrl get 19,20,21,26,4,17,27,5`) y `get_throttled` = `0x0`.
+    2. `i2cdetect` (`/usr/sbin/i2cdetect -y 1`) con 0x27, 0x28, 0x42 y 0x48. Si el montaje cambió desde el
+       17/10/2026, que el usuario ejecute antes `bash tools/probar-cableado.sh`.
+    3. **Confirmación explícita del usuario de que el robot tiene las ruedas en el aire** (sobre un bote o un libro,
+       sin tocar la mesa) **antes de cada ejecución** (`AskUserQuestion`), aunque ya haya dicho "adelante". El asesor ya
+       se consultó para el `Common` nuevo (lección 03); no hace falta otra vez, salvo que el código cambie.
+    4. Cada ejecución **con una cuenta atrás de 8 s** para que el usuario pueda mirar (el 17/10/2026 la primera
+       ejecución empezó sin aviso y no la vio). Parada de emergencia preparada desde el PC:
+       `ssh.exe harlequin 'bash -s' < tools/parar-robot.sh`.
+    5. Pines grabados con `tools/vigilar-pines.sh` (`setsid -f ... > /dev/null 2>&1 < /dev/null`, el registro en `~`).
+  - **Cómo desplegar y ejecutar:** `dotnet publish lessons/LessonNN.X -c Debug -r linux-arm64 --self-contained false
+    -o publish/lessons/LessonNN.X`, borrar `~/apps/LessonNN.X`, `scp.exe -r` y `chmod -R go-w` (o la tarea de VS Code
+    *Desplegar en la Pi*). Las lecciones sin teclado (06, 09 y 11 Ir recto) se pueden lanzar desde el PC por SSH con
+    `timeout`. Las que leen el teclado (04, 11 Contar vueltas y 11 El cuadrado perfecto) las ejecuta el usuario en su
+    terminal de la Pi, o se le mandan las teclas: `(sleep 8; printf 'n'; sleep 30) | timeout 60 ssh.exe -tt harlequin
+    'cd ~/apps/X && timeout --foreground 40 dotnet X.dll; exit'` (sin `--foreground` el programa no recibe las
+    teclas; si la tecla llega antes de que arranque .NET, que tarda de 3 a 8 s, se pierde).
+  - **Orden y qué debe verse** (siempre con las ruedas en el aire):
+
+    | Lección | Teclado | Duración | Qué debe verse |
+    |---|---|---|---|
+    | 04 Cuadrado (responder `n`) | Sí | ~8 s | Cuatro veces: las dos ruedas adelante 1 s y un giro a la derecha (derecha atrás, izquierda adelante, 200 ms) |
+    | 06 Distancia, **tal como está** (`moveMotors = false`) | No | hasta 10 s | Solo mide y enciende luces (verde, amarilla, roja) con la mano delante del sensor central. Los motores no se mueven |
+    | 06 Distancia, **copia temporal con `moveMotors = true`** (en el scratchpad, sin tocar el repositorio; volver a desplegar la original después) | No | hasta 10 s | Lejos: verde y rápido. Menos de 60 cm: amarilla y lento. Menos de 30 cm: roja, para y termina |
+    | 11 Contar vueltas | Sí (una tecla entre las partes) | ~2 s + hasta 5 s | Parte 1: adelante 2 s contando los pulsos de la rueda derecha. Parte 2: hasta 50 cm o 5 s |
+    | 11 Ir recto | No | hasta 6 s | Adelante 100 cm o 6 s, luces verde, amarilla o azul; los dos sensores cuentan |
+    | 11 El cuadrado perfecto (responder `n`) | Sí | hasta ~25 s | Cuatro lados y cuatro giros por pulsos |
+    | 09 Robot autónomo | No | 60 s o Ctrl+C | Mano en el sensor izquierdo: retrocede y gira a la derecha; en el derecho: gira a la izquierda; sin obstáculo: adelante. **Aquí se prueba la parada de emergencia, en dos ejecuciones:** una con `SIGTERM` desde el PC (esperando un texto del programa, no con un tiempo fijo) y otra con Ctrl+C del usuario en su terminal, a mitad, con tres sensores y los hilos de los motores en marcha |
+
+  - **Después de cada ejecución:** salida 0 (o 143 si se paró con `SIGTERM`), 8 pines en `lo`, ningún proceso,
+    `get_throttled` = `0x0`, y que el usuario diga si las ruedas y las luces hicieron lo esperado.
+  - **Si algo no cuadra** (una rueda al revés, una que no para, un pin que no baja): **no seguir con la lección
+    siguiente.** Lanzar `parar-robot.sh`, anotar el síntoma y llamar al asesor (error que no se arregla a la primera).
+  - **No hace falta probar en el suelo:** el `Common` nuevo no cambia el movimiento. Solo si el usuario quiere repetir
+    la 04 o la 11 Cuadrado perfecto allí.
+  - **Al terminar:** anotar los resultados en esta sección (qué lección, qué se vio, tiempos de los pines y de la
+    parada), en una rama nueva desde `main` (`fase-5-repaso-motores-common`), con su PR. Pedir al usuario `/usage` (al
+    empezar y al terminar la sesión) para el experimento de modelos.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
