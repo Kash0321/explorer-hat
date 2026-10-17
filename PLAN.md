@@ -25,6 +25,18 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     robot ni la Pi.
   - **Potenciómetro probado en la Pi** (17/10/2026): de 0,01 V a 5,31 V con `~/apps/PotCheck`. Fallo del primer
     intento: el 5V iba a una fila de protoboard sin unir al pin 5V del HAT. Detalles en la lección 08.
+  - **Pull-up del Trig de los HC-SR04P medida** (17/10/2026, multímetro, mismos resultados en los tres sensores): con
+    el robot apagado y en `200k` (en `20k` marcaba "1"), **unos 62–65 kΩ entre Trig y VCC, igual en los dos sentidos**
+    (una resistencia, no un diodo: el valor encaja con una de 62 kΩ, 5 %); con el robot encendido y sin programa,
+    **4,93 V entre Trig y GND**. El multímetro no dice si es una pieza soldada o está dentro del chip (U3).
+    **VCC–GND del mismo sensor, con el robot encendido: 5,29 V en los tres** (coincide con los 5,30 V del ADS1015: el
+    multímetro y el ADS1015 se confirman entre sí). El Trig queda 0,36 V por debajo de VCC (4,93 V frente a 5,29 V)
+    porque la línea tiene, además de la pull-up de ~62 kΩ, una carga de **~1 MΩ hacia GND** (cálculo con el divisor:
+    62 kΩ × 4,93 / 0,36 ≈ 0,85 MΩ en total, ≈ 0,9 MΩ sin los 10 MΩ del multímetro), de la salida del HAT en reposo o
+    de la entrada del sensor. No importa: 4,93 V es un nivel alto claro.
+  - **Lección 08 hecha** (`lessons/Lesson08.Analog`, PR de la rama `fase-5-leccion-08-analogico`): el usuario eligió un
+    ayudante `AnalogInputs` en `ExplorerHat.Common` y no el fork (choque de tipos `CS0433`, comprobado). Probada en la
+    Pi con el potenciómetro, sin motores. Detalles y lo que falta probar en la Fase 5, lección 08.
   - **#2610 probado en la Pi con el último commit del PR** (`c6fcf210`, ya con el recuento de referencias `0f4e5718` y
     los arreglos de Copilot). Mismo método que el 03/10/2026 (GPIO 8 sin nada conectado y flancos con `pinctrl set 8
     pu`/`pd`; no mueve los motores). **Arregla lo que faltaba:** con dos avisos en el pin, quitar uno deja funcionando
@@ -100,7 +112,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     derecho se había soltado de la borna MOTOR 1. Diagnóstico, mensajes de las lecciones 11 y README. Fase 5.
   - **Lección 08 (sensores analógicos), decidida como siguiente tarea:** con `ProjectReference` al binding de la rama
     `explorerhat-analog` del fork (`C:\work\iot`). Faltaba saber qué sensor analógico se usa: decidido el 10/10/2026
-    (potenciómetro y fotorresistencia, por comprar).
+    (potenciómetro y fotorresistencia, por comprar). **Cambiado el 17/10/2026 (opción Z, elegida por el usuario):** sin
+    `ProjectReference` al fork, porque su tipo `ExplorerHat` choca con el del paquete 4.2.0 (`CS0433`); la lección usa un
+    ayudante `AnalogInputs` en `ExplorerHat.Common`, con la forma del binding futuro (ver la Fase 5, lección 08).
 - **Sesión del 04/10/2026, mañana** (PR #33 a #36 de este repositorio; detalles en las fases):
   - El usuario desmontó y volvió a montar todo el cableado. Revisado con `tools/probar-cableado.sh` (nuevo): todo
     bien salvo los motores, cambiados de borna y con el derecho al revés. Colores de los cables, en el README.
@@ -117,13 +131,30 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     (`explorerhat-inputs-outputs`) y entradas analógicas (`explorerhat-analog`). Esperan al #2613. Fase 6.
   - Todos los programas de `~/apps` están desplegados desde `main` con `HatMotor`.
 - **Fase 5, lecciones hechas y probadas** (`lessons/`): 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones,
-  06 Distancia, 09 Robot autónomo, 11 Contar vueltas (odometría, ir recto y el cuadrado con pulsos) y 12 La pantalla.
-  Todas con las ruedas en el aire y, las que se mueven, también en el suelo.
-- **Faltan de la Fase 5:** 07 Pads táctiles y 08 Sensores analógicos (necesitan una versión de `Iot.Device.Bindings`
-  con la Fase 6, o el binding compilado desde el fork) y 10 Siguelíneas (dos TCRT5000, por confirmar).
+  06 Distancia, 08 Sensores analógicos (17/10/2026, sin motores), 09 Robot autónomo, 11 Contar vueltas (odometría, ir
+  recto y el cuadrado con pulsos) y 12 La pantalla. Todas con las ruedas en el aire y, las que se mueven, también en
+  el suelo.
+- **Faltan de la Fase 5:** 07 Pads táctiles (necesita una versión de `Iot.Device.Bindings` con la Fase 6, o el binding
+  compilado desde el fork) y 10 Siguelíneas (dos TCRT5000, por confirmar). **La 08 está hecha (17/10/2026).**
 - **Montaje actual:** todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
   a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
   no está montado. El pulsador de la lección 05 necesita IN4: idea, moverlo al GPIO 8 (CS) con el pull-down de la Pi.
+  **Desde el 17/10/2026, además:** el **potenciómetro** de la lección 08 (rojo → 5V, amarillo → GND, negro → Analog 1)
+  comparte con el LM393 derecho el nodo de 5V de la protoboard de la Pi. El nodo de 3,3 V del LM393 izquierdo y de la
+  pantalla sigue separado. **Comprobado con `tools/probar-cableado.sh` el 17/10/2026** (Pi en `main`, ruedas en el
+  aire): luces bien; LM393 derecho 89 cambios (y 0 en el izquierdo) y izquierdo 110 (y 0 en el derecho); motores en el
+  sentido esperado; sensores de distancia 20/20. **La pantalla falló** (`IOException: Error 5 (Input/output error)`
+  en la primera escritura al PCF8574; `i2cdetect` no veía el 0x27, y sí el 0x28, 0x42 y 0x48): el usuario había
+  desconectado los cuatro cables de la pantalla para trabajar y los volvió a conectar con **SDA y SCL intercambiados**.
+  Los cuatro cables son Dupont independientes (amarillo GND, verde VCC → 3v3, azul SDA, blanco SCL): colores, foto y
+  reglas para conectarla y desconectarla, en el README. Al corregirlos, `i2cdetect` vuelve a mostrar 0x27, y **el script completo salió bien en la segunda pasada** (LM393
+  derecho 81 y 0, izquierdo 0 y 129; motores en el sentido esperado; texto en la pantalla; sensores de distancia
+  20/20). **Lección:** con la pantalla apagada, `Error 5` en el
+  constructor de `Screen` quiere decir que nadie contesta en 0x27 (alimentación, SDA/SCL cruzados o cable suelto);
+  con la luz de fondo encendida, la alimentación está bien y se mira SDA/SCL. Si VCC fuera a 5V en vez de a 3,3 V, las
+  resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi. **Medido el 17/10/2026**
+  (pantalla desconectada, multímetro en `20k`): **4,73 kΩ entre SDA y VCC y 4,67 kΩ entre SCL y VCC**, así que la
+  placa sí lleva resistencias de subida de 4,7 kΩ y la regla "VCC solo a 3v3" es necesaria.
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
 - **Fase 6, en dotnet/iot (16/10/2026):**
@@ -163,17 +194,20 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      el dato extra de arriba ayuda.
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
-     **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). **Siguiente paso
-     (17/10/2026):** programar la lección 08 con las medidas ya hechas (Fase 5, lección 08): divisor de la LDR con
-     10 kΩ (propuesta, falta que el usuario la confirme) y potenciómetro (rojo → 5V, amarillo → GND, negro → Analog 1). Antes, comprobar los otros dos
-     potenciómetros. **La lección 10, no todavía** (decisión del usuario, 10/10/2026). Después de la 08, la 10
-     (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
+     **Lección 08 hecha el 17/10/2026** (opción Z, sin fork: ver la Fase 5, lección 08). **Siguiente paso:** probar la
+     lección 08 con la LDR en Analog 2 (divisor de 10 kΩ, propuesta que el usuario aún no ha confirmado) y comprobar
+     los otros dos potenciómetros (mismo orden de hilos). **La lección 10, no todavía** (decisión del usuario,
+     10/10/2026). Después, la 10 (siguelíneas, si están los dos TCRT5000), la 07 (pads, cuando fusionen el `Cap1208`) o
+     la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
-     motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V.
-- **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); con un multímetro, medir si la pull-up del Trig de
-  los HC-SR04P es una resistencia de la placa o la interna del chip (método en el README); repetir con carga completa
-  la batería Xiaomi (Fase 2). **El multímetro ya llegó (17/10/2026)**: ese método ya se puede probar.
+     motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
+     se quita a menudo (17/10/2026): un conector con llave (por ejemplo, de tipo JST) en vez de cuatro Dupont sueltos, y
+     comprobar si su placa tiene un puente de la luz de fondo (sin él se apagaría; sin comprobar en esta placa).
+- **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); repetir con carga completa la batería Xiaomi
+  (Fase 2). La pull-up del Trig de los HC-SR04P ya está medida (17/10/2026, ver el README y el "Estado actual").
+  Duda pequeña que queda: si la pull-up de unos 62 kΩ es una pieza suelta o está dentro del chip (se ve en la
+  placa). El 4,93 V del Trig frente a los 5,29 V de VCC ya está explicado (ver el "Estado actual").
 - **Experimento de modelos (desde el 17/10/2026):** Sonnet 5.5 con asesor Opus 5.5 y el subagente `buscador`
   (reglas en `AGENTS.md`, archivos en `.claude/`). Tras tres sesiones, revisar con `/usage` el coste, cuántas
   veces el asesor cambió una decisión y si `buscador` ahorró contexto. Si no aporta, quitar
@@ -462,8 +496,10 @@ Propuesta, dos formas de trabajar:
       habilitar I2C, normas de seguridad en el taller. Datos confirmados con el usuario (01/10/2026): sensores
       HC-SR04P, cada uno en su soporte; VCC al 5V del HAT y GND al GND del HAT; TRIG directo a OUT1–OUT3, sin
       resistencia: como las salidas OUT son de colector abierto, la pull-up del TRIG debe estar en el módulo (en la
-      foto de la placa no se ve si es una resistencia o la interna del chip U3, RCW9006; se puede comprobar con un
-      multímetro: ~5 V entre Trig y Gnd con el robot encendido y sin programa), y el
+      foto de la placa no se ve si es una resistencia o la interna del chip U3, RCW9006; **medido el 17/10/2026 con el
+      multímetro: unos 62–65 kΩ entre Trig y VCC en los tres sensores, igual en los dos sentidos, y 4,93 V entre Trig
+      y GND con el robot encendido y sin programa**: hay una pull-up de unos 62 kΩ; si es pieza suelta o del chip no lo
+      dice el multímetro), y el
       pulso de disparo llega invertido (bajo en vez de alto) y aun así funciona. UPS: interruptor deslizante OFF/ON
       (en OFF al colocar las baterías) y pulsador *boot* para activar la protección (wiki de Waveshare).
 - [x] README propio de cada ejemplo: BasicSample (estaba vacío), Common (`SafeExplorerHat`), ObstacleAvoidance
@@ -533,7 +569,27 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     arrancar el programa en la Pi (motores parados). Sin caídas de tensión (`0x0`), baterías a 7,95 V como
     mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
-- [ ] 08 Sensores analógicos: luz o potenciómetro (requiere Fase 6).
+- [x] 08 Sensores analógicos (`Lesson08.Analog`): luz o potenciómetro. **Hecha y probada con el potenciómetro el
+      17/10/2026** (la LDR en Analog 2 se probó solo midiendo con el multímetro, no con el programa).
+  - **Qué es:** un único `Program.cs` con *top-level statements*: lee `hat.Analog.One.ReadVoltage().Volts`, lo pone en
+    una escala de 0 a 1 (`minVolts` 0 y `maxVolts` 5,3, con `Math.Clamp`) y enciende de 0 a 4 luces (azul, amarilla,
+    roja y verde) con cuatro `if` seguidos. Escribe los voltios y una barra en la terminal. Sin motores (el reto del
+    motor va solo como texto, con aviso de las ruedas en el aire). 30 s y 10 lecturas por segundo. README con montaje,
+    la trampa del cable negro, tabla de síntomas, la LDR y los retos.
+  - **Cómo lee las entradas (opción Z, elegida por el usuario el 17/10/2026):** ayudante `AnalogInputs` y `AnalogInput`
+    en `ExplorerHat.Common`, con la forma del binding de dotnet/iot (`hat.Analog.One.ReadVoltage()`), sobre `Ads1115`
+    de `Iot.Device.Bindings` 4.2.0. `SafeExplorerHat.Analog` abre el I2C al leer por primera vez y se libera al final del
+    `Dispose`, dentro de un `try` y sin esperar más de 0,5 s (que un bus colgado no retrase la parada de emergencia).
+    Cuando una versión publicada del binding tenga las entradas analógicas, se borran las dos clases y la lección no
+    cambia. La decisión del 04/10/2026 (`ProjectReference` al fork) se descartó porque el tipo `ExplorerHat` del fork
+    choca con el del paquete (`CS0433`) y habría obligado a pasar todo `Common` al fork y a repetir las 11 lecciones.
+  - **Pruebas en la Pi (17/10/2026):** potenciómetro de 0,01 a 5,31 V (`PotCheck`); la lección con el mando al mínimo
+    lee 0,01 V; parada con `SIGTERM` (mensaje, 8 pines en `lo`, ningún proceso) y con Ctrl+C del usuario con luces
+    encendidas (bien); las luces siguen el mando según los umbrales de la tabla del README (0,66, 1,99, 3,31 y
+    4,64 V); `Lesson01.Lights` con el `Common` nuevo termina con salida 0 y los 8 pines en `lo`;
+    `get_throttled` = `0x0`. Solución compilada con 0 avisos. **Sin probar:** las lecciones con motores con el
+    `Common` nuevo (solo cambia `SafeExplorerHat` en `Analog` y al final del `Dispose`; antes de la primera prueba que
+    mueva los motores, consultar al asesor y confirmar las ruedas en el aire).
   - **Sensores decididos (10/10/2026):**
     - **Potenciómetro** lineal de 10 kΩ (B10K). Pedidos 3 **ALLECIN WH148 B10K** (película de carbono, con mando y
       cable con conector XH2.54 de 3 pines), **ya llegaron** (confirmado el 16/10/2026). Mirar qué hay en el otro extremo del
@@ -568,7 +624,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Para que fuera una GL5528 (10–20 kΩ con 10 lux), la sala tendría que estar a unos 5 lux. Solo orientativo (el
       sensor de luz del móvil es poco exacto). No hace falta el modelo exacto.
     - **Propuesta del divisor (pendiente de confirmar por el usuario):** 5V → LDR → nodo → **10 kΩ** → GND, y el
-      nodo a Analog 1: más luz, más voltios. Tensiones esperadas (5 V × Rf / (R_LDR + Rf)):
+      nodo a Analog 1 (el README de la lección lo pone en **Analog 2**, para no recablear el potenciómetro): más luz,
+      más voltios. Tensiones esperadas (5 V × Rf / (R_LDR + Rf); con los 5,30 V reales del pin 5V, multiplicar por 1,06):
 
       | Condición | R de la LDR | Con 10 kΩ | Con 22 kΩ (rojo, rojo, naranja; reto opcional) |
       |---|---|---|---|
@@ -615,7 +672,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       completo. Comprobado con un proyecto que referencia `ExplorerHat.Common` y el `.csproj` del fork: `error CS0433:
       el tipo 'ExplorerHat' existe en 'ExplorerHat' y en 'Iot.Device.Bindings'`. Con el fork, `Common` tendría que dejar
       el paquete y depender del fork para todos sus enlaces (`ExplorerHat`, `DCMotor`, `Hcsr04`, pantalla, ...), y las
-      11 lecciones habría que probarlas otra vez. Opciones y decisión del usuario: ver "Al retomar".
+      11 lecciones habría que probarlas otra vez. **Decisión del usuario (17/10/2026): opción Z** (ayudante en `Common`, ver
+      arriba); descartadas la Y (solo la lección 08 con el fork, sin `SafeExplorerHat` ni parada de emergencia) y la X
+      (`Common` entero con el fork).
   - **Medir las LDR con el robot (preparado el 10/10/2026; ya no hace falta: se midieron con el multímetro).** Plan
     antiguo, sin multímetro. Las LDR no llevan marca;
     las de 5 mm suelen ser de la serie GL55xx, iguales por fuera (una bolsa puede ser un surtido de varios modelos).
@@ -817,7 +876,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
 - **Pedidos (10/10/2026), para la lección 08:** 3 potenciómetros ALLECIN WH148 B10K (10 kΩ lineales, con mando y
   cable con conector XH2.54 de 3 pines). Llegan el 11/10/2026.
 - IN4 (GPIO 25) con nada conectado lee 0 en 50 de 50 lecturas (pull de la Pi desactivado): la entrada del HAT
-  parece tener pull-down o un búfer que la mantiene baja. Confirmar con el pulsador.
+  parece tener pull-down o un búfer que la mantiene baja. **Confirmado con el pulsador en la lección 05:** las
+  entradas del HAT llevan pull-down por dentro. Su valor no se ha medido (con el multímetro, entre IN4 y GND con el
+  HAT apagado y sin nada conectado a IN4; opcional).
 
 ## Fase 6: Binding `Iot.Device.ExplorerHat` en dotnet/iot
 Estado: el binding sigue en el repositorio (activo, último cambio en el binding en julio de 2026), pero
@@ -1190,7 +1251,11 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
 7. **Para los niños:** la lección 05 pasa a `hat.Inputs.Four.Read()` y `hat.Outputs.Four.On()` (sin `GpioController`);
    la 07 usa `hat.Touch.One.IsTouched()` y la 08, `hat.Analog.One.ReadVoltage().Volts`. `SafeExplorerHat` expone las
    cuatro colecciones nuevas y en la parada de emergencia pone a nivel bajo también OUT1–OUT4. Hasta que haya versión en
-   NuGet, las lecciones 07 y 08 necesitan el binding compilado desde el fork.
+   NuGet, la lección 07 necesitaría el binding compilado desde el fork. **La 08 ya usa `hat.Analog.One` desde el
+   17/10/2026** con el ayudante `AnalogInputs` de `Common` (el fork no sirve para las lecciones: su tipo `ExplorerHat`
+   choca con el del paquete 4.2.0, `CS0433`); se borra cuando el binding publicado tenga las entradas analógicas. La 07
+   no puede usar ese método: `Cap1208` es un binding nuevo (#2616) y no está en el paquete 4.2.0; habrá que decidir
+   entonces cómo llega a la lección.
 
 ## Fase 7: Robot con IA (agente)
 Idea (02/10/2026): en los últimos talleres, el robot funciona como un agente. Entiende órdenes en lenguaje natural

@@ -86,6 +86,31 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 | `0x48` | ADS1015 | Entradas analógicas del Explorer HAT Pro (de 0 a 5 V: el chip va alimentado a 5 V) |
 | `0x27` | PCF8574T | Adaptador I2C de la pantalla LCD 2004 (funciona a 3,3 V; el contraste se ajusta con su potenciómetro azul) |
 
+**Cables de la pantalla LCD en este robot.** La pantalla no está fijada al chasis y se quita a menudo. Se conecta con **cuatro cables Dupont independientes**, que se enchufan de uno en uno en los cuatro pines de su placa (aunque encajen juntos y parezcan un bloque). El color de cada cable es el mismo en los dos extremos:
+
+| Color | Pin de la placa de la pantalla | Pin del HAT |
+|---|---|---|
+| Amarillo | GND | un pin GND del HAT |
+| Verde | VCC | **3v3** de la fila lateral (nunca a 5V) |
+| Azul | SDA | SDA de la fila lateral |
+| Blanco | SCL | SCL de la fila lateral |
+
+SDA, SCL y 3v3 van a la fila lateral marcada "3.3V ONLY", que no tiene GND: el cable amarillo va a cualquier pin GND del HAT.
+
+![Los cuatro cables Dupont en la placa de la pantalla: de arriba abajo, amarillo (GND), verde (VCC), azul (SDA) y blanco (SCL)](docs/img/pantalla-conexion.jpg)
+
+> ℹ️ **Estos colores valen para este robot.** Si se cambia el cableado o se construye otro robot, no tienen por qué coincidir: manda siempre la etiqueta de la placa (GND, VCC, SDA, SCL) y la tabla de pines de arriba.
+
+**Conectar y desconectar la pantalla:**
+
+* **Lo más seguro es hacerlo con la Pi apagada.**
+* **Mira cada cable por su color, no por su posición:** los cables se cruzan y se enredan. El 17/10/2026 se cruzaron SDA y SCL al volver a conectarla: el programa falló con `Error 5 (Input/output error)` y `i2cdetect` no veía la dirección `0x27`, aunque la luz de fondo estaba encendida.
+* Si la Pi está encendida, **conecta en este orden: GND, VCC, SDA y SCL.** Para **desconectar, al revés: SCL, SDA, VCC y GND.** La masa y la alimentación van antes que los datos. Con VCC desconectado y SDA y SCL conectados, la placa puede alimentarse a medias a través de esas dos líneas y molestar al bus.
+* **No quites solo el cable VCC para "apagar" la pantalla.** Quita los cuatro.
+* **VCC va al pin 3v3, nunca a 5V:** las placas de este tipo suelen llevar resistencias que suben SDA y SCL hasta su VCC, y esas líneas llegan directas a la Raspberry Pi, que solo admite 3,3 V. **Esta placa las lleva:** con la pantalla desconectada y el multímetro en `20k`, el 17/10/2026 se midieron **4,73 kΩ entre SDA y VCC y 4,67 kΩ entre SCL y VCC** (resistencias de 4,7 kΩ). Con VCC a 5V, esas resistencias llevarían 5 V a los pines I2C de la Pi. Para otra placa, la misma prueba: unos kΩ quieren decir que lleva resistencias; "1" (fuera de rango), que no.
+* **Aparta los extremos sueltos** de las piezas metálicas (el eje del potenciómetro, el chasis) cuando desconectes con la Pi encendida: el cable verde queda con 3,3 V y el amarillo con GND.
+* **Después de conectarla, comprueba:** `/usr/sbin/i2cdetect -y 1` debe mostrar `27` (además de `28`, `42` y `48`).
+
 > ℹ️ Cada sensor HC-SR04 tiene cuatro cables: **VCC** (alimentación), **TRIG**, **ECHO** y **GND** (masa). **VCC va al pin 5V del HAT** y **GND al pin GND del HAT**. TRIG va a una salida OUT del HAT y ECHO a una entrada IN. Todos los GND (Pi, HAT y sensores) tienen que estar unidos: es la *masa común*, la referencia de 0 V con la que se miden todas las señales.
 
 > ⚠️ Los pines de la tabla ya tienen dueño. No conectes otro aparato a un pin que ya usa el robot.
@@ -102,7 +127,7 @@ Las entradas **IN1 a IN4** del Explorer HAT Pro sí **admiten 5 V**: protegen al
 
 El pin **TRIG** es al revés: la Pi envía el pulso al sensor. Va **directo** a una salida **OUT** del HAT, sin ningún componente en medio.
 
-Las salidas OUT del HAT son de **colector abierto**: dentro tienen un transistor que funciona como un interruptor a masa. Activa, la salida une el cable a 0 V. Inactiva, deja el cable suelto: no lo pone a 5 V. Para que el cable suba a 5 V hace falta una **resistencia de pull-up** entre el cable y 5 V. En este robot no hay ninguna en el cableado y los sensores funcionan, así que es el propio módulo HC-SR04P el que sube su Trig. No se ve en la placa si lo hace con una resistencia o con la resistencia interna de su chip de control (U3, RCW9006). Se puede comprobar con un multímetro: con el robot encendido y sin ningún programa en marcha, entre Trig y Gnd debe haber unos 5 V.
+Las salidas OUT del HAT son de **colector abierto**: dentro tienen un transistor que funciona como un interruptor a masa. Activa, la salida une el cable a 0 V. Inactiva, deja el cable suelto: no lo pone a 5 V. Para que el cable suba a 5 V hace falta una **resistencia de pull-up** entre el cable y 5 V. En este robot no hay ninguna en el cableado y los sensores funcionan, así que es el propio módulo HC-SR04P el que sube su Trig. **Medido el 17/10/2026 en los tres sensores:** con el robot apagado y el multímetro en `200k`, entre Trig y VCC hay **unos 62 a 65 kΩ**, igual en los dos sentidos (es una resistencia, no un diodo); con el robot encendido y sin ningún programa en marcha, entre Trig y GND hay **unos 4,9 V** (4,93 V, con VCC en 5,29 V: una carga de ~1 MΩ hacia GND, de la salida del HAT en reposo o de la entrada del sensor, lo baja 0,36 V). Es una resistencia de pull-up de unos 62 kΩ. El multímetro no dice si es una pieza soldada en la placa o está dentro de su chip de control (U3, RCW9006): para eso hay que mirar la placa. Es una subida débil, pero basta con un cable corto.
 
 Una curiosidad: con este montaje **la señal se invierte**. Cuando el programa pone el pin en alto, la salida se activa y el TRIG baja a 0 V. El sensor recibe un pulso bajo en lugar de uno alto, y aun así mide bien.
 

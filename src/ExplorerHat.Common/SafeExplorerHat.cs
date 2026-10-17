@@ -38,11 +38,18 @@ namespace ExplorerHat.Common
         public Lights Lights { get; }
 
         /// <summary>
+        /// Explorer HAT analog inputs (<c>Analog.One.ReadVoltage()</c>): the I2C device is opened the first time
+        /// an input is read
+        /// </summary>
+        public AnalogInputs Analog { get; }
+
+        /// <summary>
         /// Initializes a <see cref="SafeExplorerHat"/> instance
         /// </summary>
         public SafeExplorerHat()
         {
             _controller = new SharedGpioController();
+            Analog = new AnalogInputs();
             _hat = new Iot.Device.ExplorerHat.ExplorerHat(_controller, shouldDispose: false);
             Lights = _hat.Lights;
 
@@ -125,6 +132,17 @@ namespace ExplorerHat.Common
                     {
                         gpio.OpenPin(pin, PinMode.Output, PinValue.Low);
                     }
+                }
+
+                // The converter goes last: the motors and the pins are already safe, and a failure of the I2C bus
+                // must never get in the way of the emergency stop
+                try
+                {
+                    Analog.Dispose();
+                }
+                catch (Exception)
+                {
+                    // Nothing else to do: the program is ending and the pins are already low
                 }
             }
         }
