@@ -204,8 +204,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores y la lección 07 están hechos
   (17/10/2026, noche).** Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
   probar la lección 07 en el suelo y con un niño (o elegir entre un checklist del taller, la lección 10 y la Fase 7).
-  **Decidir** si se mantiene el experimento de modelos (la sesión 3 de 3 terminó con la lección 07: faltan sus datos de
-  `/usage` en "Experimento de modelos").
+  **Decidir** si se mantiene el experimento de modelos (la sesión 3 de 3 terminó con la lección 07; sus datos y las
+  opciones están en "Experimento de modelos").
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
      el 16/10/2026).
@@ -247,7 +247,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   define `advisorModel`. El comando `/agents` ya no existe en Claude Code (se editan los archivos de
   `.claude/agents/`). Primera prueba de `buscador`: 3 consultas y 9 s para una búsqueda en un archivo de
   `C:\work\iot`, con resultado correcto; para un solo archivo, leerlo directamente cuesta lo mismo.
-  **Datos de `/usage`** (los pega el usuario; faltan los de la sesión 3):
+  **Datos de `/usage`** (los pega el usuario; las tres sesiones están):
   - **Sesión 1** (la larga del 17/10/2026; 11 h de reloj, 1 h de API): **36,39 $** en total. **Sonnet 5.5: 18,26 $**
     (106,5 M de lectura de caché, 339 k de salida). **Opus 5.5, el asesor: 18,11 $** (4,2 M de entrada, 72,8 k de
     salida, **0 de caché**): **el asesor costó casi la mitad (50 %)**. Haiku (`buscador`): 0,02 $, una sola consulta.
@@ -263,7 +263,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     Semana: 10 % usado (un punto más que al empezar). El 88 % del uso de las últimas 24 h fue con más de 150 k de
     contexto; el dato incluye la sesión 1.
   - **Sesión 3, al empezar** (prompt de retomar leído): 0,00 $ en `/usage` (17 s de reloj, sin peticiones aún); ventana
-    de sesión al 40 % y semana al 10 %. **Faltan los datos de cierre** (el usuario los pega con `/usage` al terminar).
+    de sesión al 40 % y semana al 10 %.
+  - **Sesión 3, al cerrar** (32 min de reloj, 11 min de API, 56 peticiones): **4,46 $** en total. **Sonnet 5.5: 2,20 $**
+    (49 %; 9,7 M de lectura de caché, 168 k de escritura, 56 k de salida). **Opus 5.5, el asesor: 2,25 $** (50 %; tres
+    llamadas, 460 k de entrada en total, unos 153 k por llamada, 21 k de salida y 0 de caché). Haiku: 0,0007 $ (no se
+    usó `buscador`). Ventana de sesión: 47 %. Semana: 11 % (un punto más que al empezar). El 85 % del uso de las últimas
+    24 h fue con más de 150 k de contexto (incluye las sesiones 1 y 2).
   - **Sesión 3, qué hizo el asesor** (tres llamadas: antes de fijar el plan, antes de mover los motores y al cerrar):
     1. *Antes del plan:* confirmó el plan y añadió comprobaciones: copiar la lógica del chip desde el fork y no
        reescribirla de memoria, no cambiar la configuración del chip, el orden de las pruebas (orden de los pads, luces,
@@ -280,6 +285,20 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     crece con la longitud de la sesión** (0,70 $ por una llamada con 139 k de entrada; 18,11 $ en la sesión 1, con 4,2 M
     de entrada en total). Una sola llamada al final, como en la sesión 2, es barata y dio dos correcciones útiles.
     Decidir al cerrar la 3.
+  - **Lectura de las tres sesiones (para decidir; la decisión es del usuario):**
+
+    | Sesión | Total | Asesor | Llamadas | Lo que cambió el asesor |
+    |---|---|---|---|---|
+    | 1 (11 h) | 36,39 $ | 18,11 $ (50 %) | muchas | No medido |
+    | 2 (31 min) | 2,49 $ | 0,70 $ (28 %) | 1 | Dos notas de `PLAN.md` con causa equivocada (cambió el contenido, no el plan) |
+    | 3 (32 min) | 4,46 $ | 2,25 $ (50 %) | 3 | Un fallo de seguridad real (la parada no reconocía los programas de prueba) y varias comprobaciones |
+
+    El asesor cuesta unos 0,70 a 0,75 $ por llamada con 140 a 150 k de entrada, sin caché, y su coste crece con la
+    sesión. Con una o dos llamadas por sesión corta, sigue siendo barato; la sesión larga es lo que más gasta
+    (la sesión 1 fue el 84 % del coste de las tres). `buscador` no se ha usado más que una vez (0,02 $).
+    **Opciones:** mantener las reglas de `AGENTS.md` como están; mantener el asesor solo en lo físico (antes de mover
+    motores con código nuevo y al publicar fuera) y quitarlo del resto; o quitar el experimento (borrar
+    `.claude/settings.json`, `.claude/agents/buscador.md` y la sección de `AGENTS.md`).
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
