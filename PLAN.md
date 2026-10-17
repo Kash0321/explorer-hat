@@ -38,8 +38,15 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     Programa de prueba (no versionado; fuente en `~/apps/GpioEvents2610/Program.cs` en la Pi), con un modo `seq` (`dotnet GpioEvents.dll 8 seq
     R1,R2,U2,E`: `R1`/`R2` registran el aviso 1 (flancos de subida y de bajada) o el 2 (solo subida), `U1`/`U2` los
     quitan, `E` hace 4 flancos y `W` es un `WaitForEvent`). Registro de la secuencia completa en la Pi:
-    `~/gpioevents-2610-c6fcf210.log`. **Sin publicar nada en dotnet/iot todavía**: falta el visto bueno del usuario
-    al texto.
+    `~/gpioevents-2610-c6fcf210.log`.
+  - **Comentario publicado en el #2610** (17/10/2026, con el visto bueno del usuario y la consulta al asesor):
+    [comentario](https://github.com/dotnet/iot/pull/2610#issuecomment-6232082492), comprobado igual que el borrador.
+    Cuenta que el arreglo del recuento de referencias funciona y los dos fallos. Antes de publicar se comprobó que
+    el PR seguía en `c6fcf210` y se leyó `RaspberryPi3LinuxDriver.WaitForEvent` (abre el pin, suma un uso y cierra al
+    llegar a 0), que sostiene la hipótesis del fallo 2. **Dato extra, no publicado:** `RemoveSubscriptions(Offset)`
+    usa el mismo `FirstOrDefault` que `RemoveCallback`, así que `ClosePin` borra una sola suscripción por pin y, con
+    dos tipos de flanco, puede dejar otra suelta. Útil si pgrawehr pide un PR de arreglo (la prueba con el modo `seq`
+    ya reproduce el fallo 1).
 - **Sesión del 16/10/2026** (desde el PC, sin la Pi: el usuario estaba fuera de casa; detalles en la Fase 6):
   - **#2613 fusionado** el 15/10/2026 por pgrawehr (`1856d767` en `upstream/main`, *squash*). Lo aprobó sin contestar
     a la pregunta de las variantes con `PwmChannel`. Rama `explorerhat-dispose` borrada (local y en el fork) después de
@@ -125,7 +132,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`), sin respuesta | Solo incidencia |
   | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`), sin respuesta | Respuesta a sus tres preguntas (forma de la API, variante que frena, si `ExplorerHat` la usa) |
   | Rama `explorerhat-analog-v2` del fork (`f39ca85c`, encima de `explorerhat-io`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2625 |
-  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Aprobado por raffaeler (no es nuestro). Con el recuento de referencias (`0f4e5718`); krwq pidió a Copilot dos arreglos más (15/10/2026) | Que lo fusionen. Probar en la Pi si arregla la #2614 |
+  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Aprobado por raffaeler (no es nuestro). Con el recuento de referencias (`0f4e5718`); krwq pidió a Copilot dos arreglos más (15/10/2026). Probado en la Pi el 17/10/2026: arregla la #2614 y tiene dos fallos nuevos, [comentados](https://github.com/dotnet/iot/pull/2610#issuecomment-6232082492) | Que lo fusionen. Mirar si responden al comentario |
 
   `upstream/main` (16/10/2026) tiene 4 commits nuevos desde el 09/10/2026; de ellos, solo el del #2613 toca nuestros
   bindings. Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*).
@@ -145,9 +152,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      src/devices/ExplorerHat`), subirla, abrir su PR y borrar `explorerhat-io` y `explorerhat-analog-v2` (local y en
      el fork). Si piden cambios en el #2625, van en commits nuevos en `explorerhat-io`; después, copiar otra vez el
      commit del analógico encima en otra rama nueva, igual.
-  3. ~~Probar en la Pi el #2610 con el recuento de referencias~~ (hecho el 17/10/2026, ver arriba): decidir con el
-     usuario si se comentan en el #2610 los dos fallos nuevos (quitar un aviso de otro tipo de evento; carrera tras
-     `WaitForEvent`).
+  3. ~~Probar en la Pi el #2610 con el recuento de referencias~~ (hecho el 17/10/2026, ver arriba) y ~~comentar sus
+     dos fallos~~ (publicado el 17/10/2026). Mirar si pgrawehr responde; si pide un PR de arreglo para el fallo 1,
+     el dato extra de arriba ayuda.
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
      **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). **Siguiente paso
