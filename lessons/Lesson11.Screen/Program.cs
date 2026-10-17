@@ -3,7 +3,7 @@ using ExplorerHat.Common;
 using Iot.Device.Hcsr04;
 using UnitsNet;
 
-// Lesson 12: The screen
+// Lesson 11: The screen
 // The robot has a screen with 4 lines of 20 characters. The lines are numbered 0, 1, 2 and 3.
 // screen.Write(1, "Hello") writes "Hello" on line 1. The screen has no accents: write "Hola", "nino", "adios"...
 // This lesson does not move the motors.

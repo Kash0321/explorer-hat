@@ -9,10 +9,10 @@
     <Project Path="lessons/Lesson07.Touch/Lesson07.Touch.csproj" />
     <Project Path="lessons/Lesson08.Analog/Lesson08.Analog.csproj" />
     <Project Path="lessons/Lesson09.Autonomous/Lesson09.Autonomous.csproj" />
-    <Project Path="lessons/Lesson11.Odometry/Lesson11.Odometry.csproj" />
-    <Project Path="lessons/Lesson11.Straight/Lesson11.Straight.csproj" />
-    <Project Path="lessons/Lesson11.Square/Lesson11.Square.csproj" />
-    <Project Path="lessons/Lesson12.Screen/Lesson12.Screen.csproj" />
+    <Project Path="lessons/Lesson10.Odometry/Lesson10.Odometry.csproj" />
+    <Project Path="lessons/Lesson10.Straight/Lesson10.Straight.csproj" />
+    <Project Path="lessons/Lesson10.Square/Lesson10.Square.csproj" />
+    <Project Path="lessons/Lesson11.Screen/Lesson11.Screen.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />

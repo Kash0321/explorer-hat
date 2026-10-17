@@ -2,7 +2,7 @@ using System.Device.Gpio;
 using System.Diagnostics;
 using ExplorerHat.Common;
 
-// Lesson 11: Counting wheel turns (odometry)
+// Lesson 10: Counting wheel turns (odometry)
 // WARNING: test it first with the wheels in the air. Then put it on the floor, with a tape measure next to it.
 // The right wheel has a disc with 20 slots. The speed sensor sees light through each slot: 20 pulses for each turn.
 // Counting pulses, the robot knows how far its wheel has gone. It is like the button of lesson 05,

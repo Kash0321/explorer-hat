@@ -70,7 +70,7 @@ fi
 
 echo "== 4. Pantalla LCD (lección 12, ~35 s; en la parte 3 acerca la mano al sensor CENTRAL)"
 read -p "Enter para empezar... "
-dotnet run --project lessons/Lesson12.Screen/Lesson12.Screen.csproj
+dotnet run --project lessons/Lesson11.Screen/Lesson11.Screen.csproj
 
 echo "== 5. Sensores de distancia: pon la mano delante de cada uno y mira qué fila cambia"
 echo "   Ctrl+C para terminar."

@@ -48,7 +48,7 @@ falta 250 ms para 90 grados: lo cambió la forma de mover los motores, ver `HatM
 un poco en arrancar, así que con tiempos muy cortos casi no gira.
 
 El tiempo correcto cambia con el suelo (baldosa, madera, alfombra), con la carga de las baterías y con la
-velocidad. Por eso el cuadrado nunca sale perfecto: el robot no mide lo que hace. En la lección 11 contaremos las
+velocidad. Por eso el cuadrado nunca sale perfecto: el robot no mide lo que hace. En la lección 10 contaremos las
 vueltas de las ruedas con sensores para hacer giros precisos.
 
 ## Retos

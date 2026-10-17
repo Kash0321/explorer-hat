@@ -1,4 +1,4 @@
-# Lección 11, segunda parte: Ir recto
+# Lección 10, segunda parte: Ir recto
 
 Ahora las dos ruedas tienen un sensor de velocidad. Dos motores nunca giran exactamente igual, así que el robot se
 tuerce. Con los dos sensores, el robot compara sus ruedas mientras avanza: si una va por delante, la frena un poco y

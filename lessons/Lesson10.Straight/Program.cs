@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Device.Gpio;
 using ExplorerHat.Common;
 
-// Lesson 11, part 2: Going straight
+// Lesson 10, part 2: Going straight
 // WARNING: test it first with the wheels in the air. Then put it on the floor, with 2 meters free in a straight line.
 // Now both wheels have a speed sensor. Two motors never turn exactly at the same speed, so the robot curves.
 // The robot counts the pulses of both wheels: if one wheel goes ahead of the other, it slows that wheel down
