@@ -169,12 +169,13 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   vueltas, Ir recto y El cuadrado perfecto) es ahora `Lesson10.*`, y `Lesson12.Screen` es `Lesson11.Screen`. Los PR, las
   ramas y los commits anteriores usan los números antiguos (por ejemplo, la rama `fase-5-leccion-12`); el texto de este
   documento ya usa los nuevos.
-  - **Limpieza pendiente en la Pi (después de fusionar el PR y de comprobar que no hay ningún programa del robot en
-    marcha):** `git pull --ff-only` deja las carpetas ignoradas `bin/` y `obj/` dentro de `lessons/Lesson11.Odometry`,
-    `Lesson11.Straight`, `Lesson11.Square` y `Lesson12.Screen`, y `~/apps` conserva sus carpetas desplegadas. Borrar
-    esas cuatro carpetas **por su nombre**, en `lessons/` y en `~/apps`. **No usar el comodín `Lesson11.*`:** después de
-    desplegar, también borraría la nueva `Lesson11.Screen`. Después, desplegar las cuatro lecciones con los nombres
-    nuevos y comprobar con `tools/parar-robot.sh` y `pinctrl` que los pines siguen en `lo`.
+  - **Limpieza de la Pi hecha (17/10/2026, tras fusionar el PR #55):** sin programas del robot en marcha, `git pull
+    --ff-only` (`530f441`), borradas **por su nombre** las cuatro carpetas viejas en `lessons/` (solo tenían `bin/` y
+    `obj/`) y en `~/apps`, y desplegadas con los nombres nuevos `Lesson10.Odometry`, `Lesson10.Straight`,
+    `Lesson10.Square` y `Lesson11.Screen` (con los mismos comandos que la tarea *Desplegar en la Pi*). Comprobado: los
+    cuatro `.dll` existen, los ocho pines están en `lo` y `get_throttled` = `0x0`. No se movieron los motores ni se
+    ejecutó ninguna lección. **Regla para otra renumeración:** borrar las carpetas viejas por su nombre, nunca con un
+    comodín como `Lesson11.*` (borraría también la lección nueva con ese número).
 - **Montaje actual** (a las 22:00 del 17/10/2026, **la pantalla LCD está desconectada**; el resto, como se describe):
   todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
   a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
