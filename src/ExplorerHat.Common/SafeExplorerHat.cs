@@ -44,12 +44,19 @@ namespace ExplorerHat.Common
         public AnalogInputs Analog { get; }
 
         /// <summary>
+        /// Explorer HAT touch pads (<c>Touch.One.IsTouched()</c>): the I2C device is opened the first time
+        /// a pad is read
+        /// </summary>
+        public TouchPads Touch { get; }
+
+        /// <summary>
         /// Initializes a <see cref="SafeExplorerHat"/> instance
         /// </summary>
         public SafeExplorerHat()
         {
             _controller = new SharedGpioController();
             Analog = new AnalogInputs();
+            Touch = new TouchPads();
             _hat = new Iot.Device.ExplorerHat.ExplorerHat(_controller, shouldDispose: false);
             Lights = _hat.Lights;
 
@@ -134,8 +141,8 @@ namespace ExplorerHat.Common
                     }
                 }
 
-                // The converter goes last: the motors and the pins are already safe, and a failure of the I2C bus
-                // must never get in the way of the emergency stop
+                // The converter and the touch sensor go last: the motors and the pins are already safe, and a failure
+                // of the I2C bus must never get in the way of the emergency stop
                 try
                 {
                     Analog.Dispose();
@@ -143,6 +150,15 @@ namespace ExplorerHat.Common
                 catch (Exception)
                 {
                     // Nothing else to do: the program is ending and the pins are already low
+                }
+
+                try
+                {
+                    Touch.Dispose();
+                }
+                catch (Exception)
+                {
+                    // Same as above
                 }
             }
         }

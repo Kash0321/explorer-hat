@@ -7,6 +7,14 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (17/10/2026)
+- **Sesión 3 de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire; **pantalla LCD
+  desconectada**, potenciómetro en Analog 1):
+  - **Lección 07 hecha** (`lessons/Lesson07.Touch`, rama `fase-5-leccion-07-pads-tactiles`): mando a distancia con los
+    pads 1 a 4 (azul = avanzar, amarilla = retroceder, roja = izquierda, verde = derecha: **cada pad enciende su luz**, en el
+    orden del HAT). Solo se mueve con `moveMotors = true`, y solo mientras el dedo está en el pad. Ayudante nuevo
+    `TouchPads` en `Common` (`hat.Touch.One.IsTouched()`). Pruebas y decisiones en la Fase 5, lección 07.
+  - **dotnet/iot, sin novedades** al empezar (comprobado: ni comentarios ni revisiones nuevas en el #2616, #2625 y
+    #2610, ni en las incidencias #2614, #2615 y #2617; `upstream/main` en `1856d767`; las comprobaciones pasan).
 - **Sesión de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
   - **Repaso de las lecciones con motores hecho** (04, 06, 11 y 09, con el `Common` nuevo): todas siguen haciendo lo
     mismo y la parada de emergencia funciona con `SIGTERM` y con Ctrl+C en la 09. Resultados, dos lecciones del
@@ -146,12 +154,13 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     (`explorerhat-inputs-outputs`) y entradas analógicas (`explorerhat-analog`). Esperan al #2613. Fase 6.
   - Todos los programas de `~/apps` están desplegados desde `main` con `HatMotor`.
 - **Fase 5, lecciones hechas y probadas** (`lessons/`): 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones,
-  06 Distancia, 08 Sensores analógicos (17/10/2026, sin motores), 09 Robot autónomo, 11 Contar vueltas (odometría, ir
+  06 Distancia, 07 Pads táctiles (17/10/2026, ruedas en el aire), 08 Sensores analógicos (17/10/2026, sin motores),
+  09 Robot autónomo, 11 Contar vueltas (odometría, ir
   recto y el cuadrado con pulsos) y 12 La pantalla. Todas con las ruedas en el aire y, las que se mueven, también en
   el suelo.
-- **Faltan de la Fase 5:** 07 Pads táctiles (necesita una versión de `Iot.Device.Bindings` con la Fase 6, o el binding
-  compilado desde el fork) y 10 Siguelíneas (dos TCRT5000, por confirmar). **La 08 está hecha (17/10/2026).**
-- **Montaje actual:** todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
+- **Falta de la Fase 5:** la 10 Siguelíneas (dos TCRT5000, por confirmar). **La 07 y la 08 están hechas (17/10/2026).**
+- **Montaje actual** (a las 22:00 del 17/10/2026, **la pantalla LCD está desconectada**; el resto, como se describe):
+  todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
   a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
   no está montado. El pulsador de la lección 05 necesita IN4: idea, moverlo al GPIO 8 (CS) con el pull-down de la Pi.
   **Desde el 17/10/2026, además:** el **potenciómetro** de la lección 08 (rojo → 5V, amarillo → GND, negro → Analog 1)
@@ -192,11 +201,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
-- **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores está hecho (17/10/2026, noche).**
-  **Tarea principal propuesta: la opción B, la lección 07 de pads táctiles con un ayudante en `Common`** (porque
-  `Cap1208` no está en el paquete 4.2.0). Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). Otras opciones: un
-  checklist del taller, la lección 10 y la Fase 7. Pedir `/usage` al empezar y al terminar (sesión 3 de 3 del
-  experimento de modelos).
+- **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores y la lección 07 están hechos
+  (17/10/2026, noche).** Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
+  probar la lección 07 en el suelo y con un niño (o elegir entre un checklist del taller, la lección 10 y la Fase 7).
+  **Decidir** si se mantiene el experimento de modelos (la sesión 3 de 3 terminó con la lección 07: faltan sus datos de
+  `/usage` en "Experimento de modelos").
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
      el 16/10/2026).
@@ -213,12 +222,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      el dato extra de arriba ayuda.
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
+     **Lección 07 hecha el 17/10/2026** (con el ayudante `TouchPads` de `Common`: ver la Fase 5, lección 07).
      **Lección 08 hecha el 17/10/2026** (opción Z, sin fork: ver la Fase 5, lección 08). **La lección 08 usa solo el
      potenciómetro** (decisión del usuario, 17/10/2026: sin LDR). Los otros dos potenciómetros se midieron con el
      multímetro (10,35 y 9,83 kΩ en total); falta ver con el programa que tienen el mismo orden de hilos. **La
      lección 10, no todavía** (decisión del usuario,
-     10/10/2026). Después, la 10 (siguelíneas, si están los dos TCRT5000), la 07 (pads, cuando fusionen el `Cap1208`) o
-     la Fase 7 (medir el LLM en el portátil).
+     10/10/2026). Después, la 10 (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
@@ -608,7 +617,36 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     dos lecturas; los ~7 cm restantes, desde la última lectura hasta pararse del todo. `dotnet` tarda ~3 s en
     arrancar el programa en la Pi (motores parados). Sin caídas de tensión (`0x0`), baterías a 7,95 V como
     mínimo y 1,02 A como máximo.
-- [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
+- [x] 07 Pads táctiles (`Lesson07.Touch`): control remoto del robot. **Hecha y probada el 17/10/2026** (ruedas en el
+      aire, con el visto bueno del asesor antes de mover los motores).
+  - **Decisión (17/10/2026): ayudante `TouchPads` en `ExplorerHat.Common`**, como `AnalogInputs` en la 08: habla por
+    I2C con el CAP1208 (0x28), con la lógica de `Cap1208` del fork (`cap1xxx-binding`, PR #2616) copiada, porque el
+    binding no está en `Iot.Device.Bindings` 4.2.0. API `hat.Touch.One.IsTouched()` a `Eight` (la forma del binding
+    futuro); el I2C se abre al primer uso (comprueba producto `0x6B` y fabricante `0x5D`); se libera en `Dispose` de
+    `SafeExplorerHat`, al final y en un `try`, igual que `Analog`. Se borra cuando el binding publicado tenga los pads.
+    **No cambia la configuración del chip** (solo borra el bit INT del registro `0x00` tras leer): un toque a la
+    vez, y no hay nada que deshacer en la parada de emergencia.
+  - **Programa:** un solo `Program.cs`. Lee los pads 1 a 4 en cada vuelta del bucle (pausa de 50 ms, `maxTime` 60 s) y,
+    con `if`/`else if`, enciende la luz del pad y fija la velocidad de las ruedas (pad 1 azul = avanzar, 2 amarilla =
+    retroceder, 3 roja = izquierda, 4 verde = derecha; derecha = `One` atrás y `Two` delante). `moveMotors = false` por
+    defecto (como la 06). **Colores:** al principio los puse como en la 03 (verde = avanzar) y el usuario pidió que
+    cada pad encienda su luz, en el orden del HAT.
+  - **Pruebas en la Pi:**
+    1. **Orden de los pads** (`PadCheck`, no versionado, sin motores): los ocho pads salen con el número impreso en el
+       HAT (1 a 8). Con dos pads a la vez, sale uno solo (el chip bloquea los toques múltiples de fábrica).
+    2. **Luces** (la lección con `moveMotors = false`): cada pad enciende su luz, la luz se apaga **al instante** al
+       soltar, un golpecito rápido parpadea y uno **rapidísimo a veces no llega a encenderse** (el programa
+       pregunta ~15–20 veces por segundo): límite explicado en el README.
+    3. **Toques fantasma** (`PhantomCheck`, no versionado; el asesor lo pidió antes de mover los motores): con nadie
+       tocando, 0 toques en las ocho fases (quieto; motor `One` y motor `Two` en los dos sentidos a 0,6; los dos
+       adelante a 0,6 y a 1,0; girar a la derecha). **El ruido de los motores no afecta a los pads.**
+    4. **Motores** (copia de la lección con `moveMotors = true`): cada pad gira hacia el lado correcto, las ruedas
+       paran al instante al soltar y ningún pad se queda "pegado". **Parada de emergencia con los motores girando:**
+       `SIGTERM` (0 pines en alto a los 0,4 s, proceso muerto) y Ctrl+C (sin `| tee`), las dos bien.
+    5. **Después de todo:** pines en `lo`, `get_throttled` = `0x0` y el chip con la configuración de fábrica
+       (`0x2A` = `0x80`, `0x1F` = `0x2F`).
+  - **Pendiente:** probar la lección en el suelo (no hecho) y con un niño de verdad (¿es cómodo mantener el dedo en
+    pads tan juntos?). No se ha probado el comportamiento con la pantalla LCD conectada (comparte el bus I2C).
 - [x] 08 Sensores analógicos (`Lesson08.Analog`): potenciómetro. **Hecha y probada el 17/10/2026.**
   - **Decisión del usuario (17/10/2026): la lección usa solo el potenciómetro, sin la LDR.** Montar la LDR pide una
     protoboard y complica el montaje, y el potenciómetro ya explica bien el tema (en el montaje del 17/10/2026 falló
@@ -1413,12 +1451,13 @@ abajo. Una rama y un PR por pieza, como en los PR #2612 y #2613, en el orden de 
    al día. De paso, quitar del `.csproj` de `ExplorerHat` las carpetas que no existen.
 7. **Para los niños:** la lección 05 pasa a `hat.Inputs.Four.Read()` y `hat.Outputs.Four.On()` (sin `GpioController`);
    la 07 usa `hat.Touch.One.IsTouched()` y la 08, `hat.Analog.One.ReadVoltage().Volts`. `SafeExplorerHat` expone las
-   cuatro colecciones nuevas y en la parada de emergencia pone a nivel bajo también OUT1–OUT4. Hasta que haya versión en
-   NuGet, la lección 07 necesitaría el binding compilado desde el fork. **La 08 ya usa `hat.Analog.One` desde el
-   17/10/2026** con el ayudante `AnalogInputs` de `Common` (el fork no sirve para las lecciones: su tipo `ExplorerHat`
-   choca con el del paquete 4.2.0, `CS0433`); se borra cuando el binding publicado tenga las entradas analógicas. La 07
-   no puede usar ese método: `Cap1208` es un binding nuevo (#2616) y no está en el paquete 4.2.0; habrá que decidir
-   entonces cómo llega a la lección.
+   cuatro colecciones nuevas y en la parada de emergencia pone a nivel bajo también OUT1–OUT4. **La 08 ya usa
+   `hat.Analog.One` desde el 17/10/2026** con el ayudante `AnalogInputs` de `Common` (el fork no sirve para las
+   lecciones: su tipo `ExplorerHat` choca con el del paquete 4.2.0, `CS0433`); se borra cuando el binding publicado
+   tenga las entradas analógicas. **La 07 usa `hat.Touch.One.IsTouched()` desde el 17/10/2026** con el ayudante
+   `TouchPads` de `Common`, que habla por I2C con el CAP1208 (`Cap1208` es un binding nuevo, #2616, y no está en el
+   paquete 4.2.0); se borra cuando el binding publicado tenga los pads. El PR 4 (pads en `ExplorerHat`) tendrá
+   `Touch` con la misma forma.
 
 ## Fase 7: Robot con IA (agente)
 Idea (02/10/2026): en los últimos talleres, el robot funciona como un agente. Entiende órdenes en lenguaje natural

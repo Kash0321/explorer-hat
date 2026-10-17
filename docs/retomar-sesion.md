@@ -58,7 +58,7 @@ Si trabajas desde la propia Raspberry Pi, el paso 2 no hace falta: los comandos 
 
 ## Variante: el repaso de las lecciones con motores (hecho el 17/10/2026)
 
-**Esta variante ya se hizo la noche del 17/10/2026** (resultados en `PLAN.md`, Fase 5). Solo sirve como receta si cambia `Common` o `SafeExplorerHat` y hay que repetirlo. La tarea principal pendiente es ahora la lección 07 (pads táctiles). El protocolo completo está en `PLAN.md`, Fase 5, "Repaso con el `Common` nuevo": qué comprobar antes, el orden, qué debe verse en cada lección y cómo parar si algo falla. Dura unos 40 minutos y necesita al usuario delante, con el robot con las ruedas en el aire.
+**Esta variante ya se hizo la noche del 17/10/2026** (resultados en `PLAN.md`, Fase 5). Solo sirve como receta si cambia `Common` o `SafeExplorerHat` y hay que repetirlo. La lección 07 (pads táctiles) también está hecha. El protocolo completo está en `PLAN.md`, Fase 5, "Repaso con el `Common` nuevo": qué comprobar antes, el orden, qué debe verse en cada lección y cómo parar si algo falla. Dura unos 40 minutos y necesita al usuario delante, con el robot con las ruedas en el aire.
 
 Pega el prompt de arriba y **añade esto al final**:
 
@@ -72,4 +72,4 @@ mirar. Si algo no cuadra, no sigas con la lección siguiente: para el robot y cu
 anota los resultados en PLAN.md en una rama nueva con su PR, y pídeme /usage.
 ```
 
-La siguiente tarea propuesta es la lección 07 (pads táctiles). Otras opciones que se ofrecieron: un checklist del taller, la lección 10 y la Fase 7. La sesión 3 de 3 del experimento de modelos es la próxima: pide `/usage` al empezar y al terminar.
+La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. La siguiente tarea propuesta es probarla en el suelo y con un niño. Otras opciones: un checklist del taller, la lección 10 y la Fase 7. Del experimento de modelos faltan los datos de `/usage` de la sesión 3 y la decisión de seguir o quitarlo ("Experimento de modelos" en `PLAN.md`).
