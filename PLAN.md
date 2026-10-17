@@ -18,7 +18,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     **Hay que volver a desplegar todo lo que usa `Common`** cuando se fusione el PR (ver `AGENTS.md`).
   - **Lección 07 en el suelo, con la pantalla conectada:** a 0,6 el robot se seguía con dificultad; con 0,4 arrancan los
     motores y con 0,3 no. La lección usa **0,45** y la prueba en el suelo a 0,45 salió bien (ver la lección 07, en la
-    Fase 5). Queda probarla con un niño.
+    Fase 5). También la probó una niña de 10 años en el suelo: sin problemas.
 - **Sesión 3 de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire; **pantalla LCD
   desconectada**, potenciómetro en Analog 1):
   - **Lección 07 hecha** (`lessons/Lesson07.Touch`, rama `fase-5-leccion-07-pads-tactiles`): mando a distancia con los
@@ -202,7 +202,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi. **Medido el 17/10/2026**
   (pantalla desconectada, multímetro en `20k`): **4,73 kΩ entre SDA y VCC y 4,67 kΩ entre SCL y VCC**, así que la
   placa sí lleva resistencias de subida de 4,7 kΩ y la regla "VCC solo a 3v3" es necesaria.
-- **Cerradas:** fases 0 a 4 y la Fase 5 (catálogo cerrado el 17/10/2026; queda probar la lección 07 con un niño). De la Fase 3 solo queda la guía de compilación ligera en la Pi (poco urgente).
+- **Cerradas:** fases 0 a 4 y la Fase 5 (catálogo cerrado el 17/10/2026; la lección 07, probada también por una niña de 10 años). De la Fase 3 solo queda la guía de compilación ligera en la Pi (poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; la Fase 5 está cerrada (17/10/2026), así que puede empezar.
 - **Fase 6, en dotnet/iot (16/10/2026):**
 
@@ -235,10 +235,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   c) Borrar por su nombre `~/apps/Lesson07.TouchFloor` y `~/apps/Lesson07.TouchStill`: mueven los motores si se les da
      un argumento de velocidad (hasta 0,8). Su fuente estaba en el scratchpad de la sesión (se pierde); cómo rehacer la
      copia que escribe velocidad 0, en la Fase 2, "Carrera en la parada de emergencia".
-  d) Tarea siguiente: probar la lección 07 con un niño, el checklist del taller o la Fase 7.
+  d) Tarea siguiente: el checklist del taller o la Fase 7 (la lección 07 ya la probó una niña de 10 años).
   **Lo de siempre:** el repaso de las lecciones con motores y la lección 07 están hechos (17/10/2026, noche); la 07 también
   en el suelo a 0,45. Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
-  probar la lección 07 con un niño (o elegir entre un checklist del taller y la Fase 7: el siguelíneas
+  elegir entre un checklist del taller y la Fase 7 (el siguelíneas
   ya no es una lección, es una idea guardada).
   **Experimento de modelos: decidido** (17/10/2026, ver "Experimento de modelos"): se mantiene como está.
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
@@ -759,7 +759,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     en `lo`, `get_throttled` = `0x0` y chip táctil en fábrica.
   - **Fallo encontrado: Ctrl+C abortaba el programa** (`Unhandled exception. System.ObjectDisposedException ... 'HatMotor'`
     y `Aborted`, sin el mensaje de la parada). Causa y arreglo en la Fase 2, "Carrera en la parada de emergencia".
-  - **Pendiente:** probar la lección con un niño de verdad (¿es cómodo mantener el dedo en pads tan juntos?).
+  - **Prueba con una niña de 10 años (17/10/2026, antes de fusionar el #57):** en el suelo, a 0,45, lo hizo todo sin
+    problemas y se adaptó a mantener el dedo en los pads. Queda por mirar con más niños (y con la edad del taller) si es
+    cómodo con pads tan juntos, pero no hay ningún fallo conocido.
 - [x] 08 Sensores analógicos (`Lesson08.Analog`): potenciómetro. **Hecha y probada el 17/10/2026.**
   - **Decisión del usuario (17/10/2026): la lección usa solo el potenciómetro, sin la LDR.** Montar la LDR pide una
     protoboard y complica el montaje, y el potenciómetro ya explica bien el tema (en el montaje del 17/10/2026 falló
