@@ -7,6 +7,14 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (17/10/2026)
+- **Sesión de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
+  - **Repaso de las lecciones con motores hecho** (04, 06, 11 y 09, con el `Common` nuevo): todas siguen haciendo lo
+    mismo y la parada de emergencia funciona con `SIGTERM` y con Ctrl+C en la 09. Resultados, dos lecciones del
+    repaso (`| tee` y `pgrep`) y lo que falta comprobar, en la Fase 5, "Repaso con el `Common` nuevo".
+  - **dotnet/iot, sin novedades** al empezar: ni comentarios ni revisiones nuevas en el #2616, #2625 y #2610, ni en las
+    incidencias #2614, #2615 y #2617; `upstream/main` sigue en `1856d767`; las comprobaciones pasan. El clon del fork
+    está limpio, con sus tres ramas iguales a las del fork.
+  - **Experimento de modelos:** esta fue la sesión 2 de 3. El usuario pasa `/usage` al terminar.
 - **Sesión del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
   - **Pi actualizada** a `main` (`2da35a5`) con `git pull --ff-only`. Sin programas del robot en marcha, pines en `lo`
     y `get_throttled` = `0x0`.
@@ -34,9 +42,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     porque la línea tiene, además de la pull-up de ~62 kΩ, una carga de **~1 MΩ hacia GND** (cálculo con el divisor:
     62 kΩ × 4,93 / 0,36 ≈ 0,85 MΩ en total, ≈ 0,9 MΩ sin los 10 MΩ del multímetro), de la salida del HAT en reposo o
     de la entrada del sensor. No importa: 4,93 V es un nivel alto claro.
-  - **Cierre de la sesión del 17/10/2026:** PR #44 a #50 de este repositorio fusionados; `main` y la Pi en `44c554a`
-    (con `git pull --ff-only`). Quedó pendiente el repaso de las lecciones con motores (ver "Al retomar"). **Experimento
-    de modelos:** esta fue la sesión 1 de 3; el usuario no pasó `/usage` (pedirlo al empezar y al terminar la próxima).
+  - **Cierre de la sesión del 17/10/2026 (tarde):** PR #44 a #50 de este repositorio fusionados; `main` y la Pi en
+    `44c554a` (con `git pull --ff-only`). Quedó pendiente el repaso de las lecciones con motores (hecho por la noche,
+    ver arriba). **Experimento de modelos:** esta fue la sesión 1 de 3; el usuario no pasó `/usage`.
     En dotnet/iot, sin respuesta nueva a nuestro comentario del #2610 ni en el #2616, el #2625 y las incidencias.
   - **Lección 08 hecha** (`lessons/Lesson08.Analog`, PR de la rama `fase-5-leccion-08-analogico`): el usuario eligió un
     ayudante `AnalogInputs` en `ExplorerHat.Common` y no el fork (choque de tipos `CS0433`, comprobado). Probada en la
@@ -183,11 +191,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
-- **Al retomar (siguiente sesión):** **Tarea principal decidida por el usuario (17/10/2026): la opción A, el repaso
-  de las lecciones con motores con el `Common` nuevo** (04, 06, 09 y 11; protocolo, orden y criterios en la Fase 5,
-  "Repaso con el `Common` nuevo"). Orden: primero el punto 1 de abajo (5 minutos, dotnet/iot) y después el repaso.
-  Después del repaso, la opción B (lección 07 de pads táctiles con un ayudante en `Common`, porque `Cap1208` no está
-  en el paquete 4.2.0). Otras opciones que se ofrecieron: un checklist del taller, la lección 10 y la Fase 7.
+- **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores está hecho (17/10/2026, noche).**
+  **Tarea principal propuesta: la opción B, la lección 07 de pads táctiles con un ayudante en `Common`** (porque
+  `Cap1208` no está en el paquete 4.2.0). Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). Otras opciones: un
+  checklist del taller, la lección 10 y la Fase 7. Pedir `/usage` al empezar y al terminar (sesión 3 de 3 del
+  experimento de modelos).
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
      el 16/10/2026).
@@ -768,7 +776,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     nivel bajo al terminar.
   - Con `HatMotor` (04/10/2026, misma zona, 60 s): 18 obstáculos, detectados casi siempre a 18–29 cm; giros de 1 paso
     (12 veces), 2 (5) y 3 (1); ninguna maniobra agotó los 10 pasos. El usuario lo vio bien. Sin cambios en la lección.
-- [ ] **Repaso con el `Common` nuevo (lecciones con motores 04, 06, 09 y 11).** Decidido por el usuario el 17/10/2026
+- [x] **Repaso con el `Common` nuevo (lecciones con motores 04, 06, 09 y 11).** Decidido por el usuario el 17/10/2026
       (opción A). Motivo: `SafeExplorerHat` cambió (propiedad `Analog` y final del `Dispose`) y solo se probó la
       lección 03 con los motores (ejecución completa y parada con `SIGTERM`; ver la lección 08). Las lecciones no
       cambian: se comprueba que **siguen haciendo lo mismo y que la parada de emergencia funciona con sus hilos y
@@ -831,6 +839,39 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - **Al terminar:** anotar los resultados en esta sección (qué lección, qué se vio, tiempos de los pines y de la
     parada), en una rama nueva desde `main` (`fase-5-repaso-motores-common`), con su PR. Pedir al usuario `/usage` (al
     empezar y al terminar la sesión) para el experimento de modelos.
+  - **Resultados (17/10/2026, noche, desde el PC; todo con las ruedas en el aire):** las seis ejecuciones salieron bien
+    y en ninguna quedó un pin de motor en alto sin programa (registro `~/pines-repaso.log` con `vigilar-pines.sh`,
+    2400 s). Antes: Pi en `main` (`69254dc`), `i2cdetect` con 0x28, 0x42 y 0x48 (pantalla desconectada) y los programas
+    desplegados desde `main` con el `Common` nuevo. Después de cada ejecución: ningún proceso, los 8 pines en `lo` y
+    `get_throttled` = `0x0`.
+    - **04 Cuadrado** (`n`): cuatro lados y cuatro giros a la derecha, bien.
+    - **06 Distancia, sin motores:** dos ejecuciones. El programa **termina** al bajar de 30 cm (`29 cm: stop!`,
+      "The end", salida 0), aunque `moveMotors` sea `false`: con la mano a menos de 30 cm al arrancar, termina al
+      instante. El usuario esperaba motores y no vio nada en la primera (la mano no se movió).
+    - **06 Distancia, con `moveMotors = true`** (receta del árbol de trabajo, restaurada y vuelta a desplegar): lejos
+      verde y rápido, entre 30 y 60 cm amarilla y lento, por debajo de 30 cm roja, paran y termina. El usuario la
+      ejecutó varias veces, bien.
+    - **11 Contar vueltas:** parte 1, 85 pulsos en 2 s (86,8 cm, 43 cm/s) y 4 pulsos de más al parar; parte 2, paró a
+      los 49 pulsos (50 cm) y 4 de más.
+    - **11 Ir recto:** izquierda 103 pulsos (105,2 cm), derecha 101 (103,1 cm), diferencia de 2 pulsos.
+    - **11 El cuadrado perfecto** (`n`): cuatro lados (30 pulsos a la izquierda y 28 a la derecha cada uno) y cuatro
+      giros de 6 pulsos en cada rueda; deslizamiento de 2 a 5 pulsos. "Square finished!".
+    - **09 Robot autónomo, parada de emergencia:** con `SIGTERM` desde el PC, a mitad de la marcha atrás (se esperó a
+      `Obstacle!`, con la mano a 9 cm del sensor izquierdo): "Parada de emergencia (SIGTERM): motores parados", salida
+      143 y los pines en `lo`; las dos ruedas pararon. Con Ctrl+C del usuario, a mitad de la marcha: "Parada de
+      emergencia (SIGINT): motores parados" y las dos ruedas pararon.
+    - **Los tiempos de los pines no se midieron:** el registro de `vigilar-pines.sh` cuenta el propio comando `ssh`
+      como programa del robot (`procs=1`), así que no sirve para ver la zona de la parada. El 17/10/2026 (lección 03) se
+      midieron 0,24 s hasta tener los pines en `lo`.
+    - **Dos lecciones del repaso:** (1) **`| tee` esconde el mensaje de parada con Ctrl+C**: Ctrl+C va a todos los
+      procesos de la línea y `tee` muere antes de que el programa escriba. Para probar la parada con Ctrl+C, ejecutar el
+      programa **sin `tee`**. (2) **`pgrep -fc "Lesson[0-9]"` cuenta el propio comando** si este contiene un nombre de
+      lección (me pasó tres veces al comprobar el despliegue): comprobar los procesos en una llamada aparte, con
+      `P=Lesson; pgrep -fc "${P}[0-9]"`. Para una ejecución con cuenta atrás, `sleep 8` en el PC y después el
+      `ssh` es suficiente, pero .NET tarda de 3 a 8 s más en arrancar: el usuario debe esperar a ver moverse las ruedas
+      (o la salida del programa) antes de poner la mano.
+    - **Sin comprobar:** el código de salida de la parada con Ctrl+C (la línea `salida=` no llegó en los dos pegados
+      del usuario). Las ruedas y los pines estaban bien.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
