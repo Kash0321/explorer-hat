@@ -7,12 +7,18 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (17/10/2026)
-- **Sesión 4 del 17/10/2026** (desde el PC, sin mover el robot): dotnet/iot sin novedades al empezar (PR #2616, #2625 y
+- **Sesión 4 del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire o en el suelo; pantalla LCD conectada): dotnet/iot sin novedades al empezar (PR #2616, #2625 y
   #2610 e incidencias #2614, #2615 y #2617 sin comentarios nuevos; `upstream/main` en `1856d767`; las comprobaciones
   pasan; el clon del fork, limpio). Pi en `main` (`59f7741`), pines en `lo`, `get_throttled` = `0x0`.
   - **Decisión del usuario: no hacer la lección 10 (siguelíneas) y renumerar.** Rama `fase-5-renumerar-lecciones`: las
     carpetas, los proyectos, la solución, las tareas de VS Code, `probar-cableado.sh` y los README usan los números
     nuevos (ver "Fase 5, catálogo cerrado", más abajo).
+  - **Parada de emergencia: carrera entre el hilo de la señal y el principal, arreglada** (rama
+    `fase-5-parada-carrera-ctrl-c`, `SafeExplorerHat`). Detalles, pruebas y reglas nuevas en la Fase 2.
+    **Hay que volver a desplegar todo lo que usa `Common`** cuando se fusione el PR (ver `AGENTS.md`).
+  - **Lección 07 en el suelo, con la pantalla conectada:** a 0,6 el robot se seguía con dificultad; con 0,4 arrancan los
+    motores y con 0,3 no. La lección usa **0,45** y la prueba en el suelo a 0,45 salió bien (ver la lección 07, en la
+    Fase 5). También la probó una niña de 10 años en el suelo: sin problemas.
 - **Sesión 3 de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire; **pantalla LCD
   desconectada**, potenciómetro en Analog 1):
   - **Lección 07 hecha** (`lessons/Lesson07.Touch`, rama `fase-5-leccion-07-pads-tactiles`): mando a distancia con los
@@ -160,7 +166,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     (`explorerhat-inputs-outputs`) y entradas analógicas (`explorerhat-analog`). Esperan al #2613. Fase 6.
   - Todos los programas de `~/apps` están desplegados desde `main` con `HatMotor`.
 - **Fase 5, lecciones hechas y probadas** (`lessons/`): 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones,
-  06 Distancia, 07 Pads táctiles (17/10/2026, ruedas en el aire), 08 Sensores analógicos (17/10/2026, sin motores),
+  06 Distancia, 07 Pads táctiles (17/10/2026, ruedas en el aire y en el suelo a 0,45), 08 Sensores analógicos (17/10/2026, sin motores),
   09 Robot autónomo, 10 Contar vueltas (odometría, ir
   recto y el cuadrado con pulsos) y 11 La pantalla. Todas con las ruedas en el aire y, las que se mueven, también en
   el suelo.
@@ -176,7 +182,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     cuatro `.dll` existen, los ocho pines están en `lo` y `get_throttled` = `0x0`. No se movieron los motores ni se
     ejecutó ninguna lección. **Regla para otra renumeración:** borrar las carpetas viejas por su nombre, nunca con un
     comodín como `Lesson11.*` (borraría también la lección nueva con ese número).
-- **Montaje actual** (a las 22:00 del 17/10/2026, **la pantalla LCD está desconectada**; el resto, como se describe):
+- **Montaje actual** (a las 22:00 del 17/10/2026, **la pantalla LCD estaba desconectada y se volvió a conectar esa noche**, con `i2cdetect` mostrando 0x27, 0x28, 0x42 y 0x48; el resto, como se describe):
   todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
   a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
   no está montado. El pulsador de la lección 05 necesita IN4: idea, moverlo al GPIO 8 (CS) con el pull-down de la Pi.
@@ -196,7 +202,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi. **Medido el 17/10/2026**
   (pantalla desconectada, multímetro en `20k`): **4,73 kΩ entre SDA y VCC y 4,67 kΩ entre SCL y VCC**, así que la
   placa sí lleva resistencias de subida de 4,7 kΩ y la regla "VCC solo a 3v3" es necesaria.
-- **Cerradas:** fases 0 a 4 y la Fase 5 (catálogo cerrado el 17/10/2026; queda probar la lección 07 en el suelo). De la Fase 3 solo queda la guía de compilación ligera en la Pi (poco urgente).
+- **Cerradas:** fases 0 a 4 y la Fase 5 (catálogo cerrado el 17/10/2026; la lección 07, probada también por una niña de 10 años). De la Fase 3 solo queda la guía de compilación ligera en la Pi (poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; la Fase 5 está cerrada (17/10/2026), así que puede empezar.
 - **Fase 6, en dotnet/iot (16/10/2026):**
 
@@ -218,9 +224,21 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
-- **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores y la lección 07 están hechos
-  (17/10/2026, noche).** Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
-  probar la lección 07 en el suelo y con un niño (o elegir entre un checklist del taller y la Fase 7: el siguelíneas
+- **Al retomar (siguiente sesión):** **PRIMERO, si el PR #57 ya está fusionado** (si no, pedírselo al usuario):
+  a) Actualizar `main` en el PC y en la Pi (`git pull --ff-only`) y borrar la rama `fase-5-parada-carrera-ctrl-c`
+     (local y en GitHub), comprobando antes que no tiene commits fuera de `origin/main`.
+  b) **Volver a desplegar todo lo que usa `Common`** (en la Pi solo `Lesson09.Autonomous` y las copias de prueba llevan
+     el `Common` nuevo; `Lesson07.Touch` sigue a 0,6 de velocidad). La lista sale de
+     `git grep -l "ExplorerHat.Common.csproj" -- '*.csproj'` (13 lecciones y `ExplorerHat.BasicSample` y
+     `ExplorerHat.ObstacleAvoidance`), no de la memoria. Mismos comandos que la tarea *Desplegar en la Pi*. Sin mover
+     los motores; al final, `pinctrl` en `lo`.
+  c) Borrar por su nombre `~/apps/Lesson07.TouchFloor` y `~/apps/Lesson07.TouchStill`: mueven los motores si se les da
+     un argumento de velocidad (hasta 0,8). Su fuente estaba en el scratchpad de la sesión (se pierde); cómo rehacer la
+     copia que escribe velocidad 0, en la Fase 2, "Carrera en la parada de emergencia".
+  d) Tarea siguiente: el checklist del taller o la Fase 7 (la lección 07 ya la probó una niña de 10 años).
+  **Lo de siempre:** el repaso de las lecciones con motores y la lección 07 están hechos (17/10/2026, noche); la 07 también
+  en el suelo a 0,45. Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
+  elegir entre un checklist del taller y la Fase 7 (el siguelíneas
   ya no es una lección, es una idea guardada).
   **Experimento de modelos: decidido** (17/10/2026, ver "Experimento de modelos"): se mantiene como está.
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
@@ -505,7 +523,35 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     (antes, 30 de 40) y ninguna repetida por seguir el obstáculo (antes, 7). Detecta a 20–30 cm (`OBSTACLE_DISTANCE`) y
     tras retroceder queda a 30–40 cm. Al usuario le pareció algo cerca; decidió dejar 30 cm.
   - Sujeción: hecha el 01/10/2026 (la UPS y la Pi, en un bloque atornillado al chasis). En campo libre, a veces no avanza en línea recta (los dos
-    motores no giran igual): se corregirá con los sensores de velocidad (lección 11).
+    motores no giran igual): se corregirá con los sensores de velocidad (lección 10).
+
+### Carrera en la parada de emergencia (17/10/2026, noche)
+- **Fallo:** con Ctrl+C en la lección 07 (`TouchFloor`, que escribe en los motores cada 50 ms), el programa terminaba con
+  `Unhandled exception. System.ObjectDisposedException ... 'HatMotor'` y `Aborted` (código 134), sin el mensaje
+  "Parada de emergencia". Los pines quedaron en `lo` esa vez.
+- **Causa:** `OnSignal` corre en otro hilo y llama a `Dispose()`. El hilo principal sigue en su bucle y, al escribir en
+  un `HatMotor` ya cerrado, lanza la excepción. `Dispose()` había quitado el aviso de excepciones no controladas al
+  empezar, así que nadie la recogía y el proceso se abortaba **a mitad de la limpieza** (sin liberar el controlador,
+  sin forzar los ocho pines a bajo, sin cerrar el I2C). Riesgo real: en otra carrera, un pin habría podido quedar sin
+  forzar. Los motores quedaban seguros porque `HatMotor.Dispose` deja sus pines en bajo antes de que el hilo principal
+  pueda fallar.
+- **Reproducción sin mover los motores:** una copia de la lección que escribe siempre velocidad 0 (`Lesson07.TouchStill`,
+  no versionada) falló **10 de 10** veces con `timeout -s INT 6`. La lección con luces (`moveMotors = false`) **no** lo
+  reproduce: las luces no lanzan nada tras cerrarse.
+- **Arreglo en `SafeExplorerHat`:** (1) el aviso de excepciones y el registro de señales se quitan **al final** de
+  `Dispose`: si el hilo principal falla, o llega una segunda señal, esperan al mismo `lock` y el proceso no se aborta
+  antes de que los pines estén en `lo`; (2) `OnSignal` termina el proceso con `Environment.Exit(128 + señal)` después
+  del mensaje (130 con INT, 143 con TERM, 129 con HUP).
+- **Pruebas:** sin motores, 10 de 10 con Ctrl+C sin error y con mensaje; códigos 130, 143 y 129; dos `SIGTERM` seguidos
+  (5 de 5): siempre sale el mensaje (a veces dos) y no hay errores. Con motores y **ruedas en el aire**: `SIGTERM` con
+  el pad 1 tocado (a 0,45), proceso muerto en 0,15 s, código 143, 8 pines en `lo`; Ctrl+C del usuario con el pad
+  tocado, mensaje y código 130; lección 09 con `SIGTERM`, 0,18 s, 8 pines en `lo`. Después: chip táctil en fábrica
+  (`0x2A` = `0x80`, `0x1F` = `0x2F`) y `get_throttled` = `0x0`.
+- **Reglas aprendidas** (también en `AGENTS.md`): (1) al cambiar `Common`, **volver a desplegar todo lo que lo usa**: cada
+  programa de `~/apps` lleva su copia; (2) un trabajo en segundo plano de un `bash` no interactivo **ignora SIGINT**
+  (`cmd & kill -INT $!` no hace nada): usar `timeout -s INT N cmd` o `kill -TERM`; (3) `pkill -f` y `pgrep -f` también
+  encuentran el comando de la propia sesión SSH si contiene la ruta o el nombre (por ejemplo en un `cd`), aunque se use
+  el truco de los corchetes: matar por PID.
 
 ## Fase 3: Despliegue y ejecución (sustituir `.vscode/`)
 Qué hacía lo antiguo: desde un PC Windows, `publish.bat` publicaba para `linux-arm` y copiaba el
@@ -671,7 +717,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     arrancar el programa en la Pi (motores parados). Sin caídas de tensión (`0x0`), baterías a 7,95 V como
     mínimo y 1,02 A como máximo.
 - [x] 07 Pads táctiles (`Lesson07.Touch`): control remoto del robot. **Hecha y probada el 17/10/2026** (ruedas en el
-      aire, con el visto bueno del asesor antes de mover los motores).
+      aire, con el visto bueno del asesor antes de mover los motores; y en el suelo, a 0,45, con la pantalla conectada).
   - **Decisión (17/10/2026): ayudante `TouchPads` en `ExplorerHat.Common`**, como `AnalogInputs` en la 08: habla por
     I2C con el CAP1208 (0x28), con la lógica de `Cap1208` del fork (`cap1xxx-binding`, PR #2616) copiada, porque el
     binding no está en `Iot.Device.Bindings` 4.2.0. API `hat.Touch.One.IsTouched()` a `Eight` (la forma del binding
@@ -703,8 +749,19 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     un punto después del número). **Se borraron de la Pi** y `AGENTS.md` tiene ahora la regla: un programa de prueba
     que mueve los motores se llama `LessonNN.Algo`. Los usé con `SafeExplorerHat`, así que Ctrl+C y `SIGTERM` los
     paraban (probado), pero `tools/parar-robot.sh` no. Los fuentes (en el scratchpad de la sesión) no se versionan.
-  - **Pendiente:** probar la lección en el suelo (no hecho) y con un niño de verdad (¿es cómodo mantener el dedo en
-    pads tan juntos?). No se ha probado el comportamiento con la pantalla LCD conectada (comparte el bus I2C).
+  - **Prueba en el suelo con la pantalla conectada (17/10/2026, noche):** el bus I2C mostró 0x27, 0x28, 0x42 y 0x48; con
+    la lección original (`moveMotors = false`) y con la copia de motores a 0,6, todo bien con la pantalla puesta. El
+    usuario dijo que a 0,6 el robot se seguía con dificultad. **Velocidad mínima en el suelo de pruebas:** con **0,4**
+    arrancan los motores siempre (los cuatro pads); con **0,3** no arranca ninguno. Por eso la lección usa **0,45**
+    (0,4 no tiene margen; en una alfombra u otro suelo podría calarse) y su README avisa ("las ruedas zumban y no se
+    mueven: sube `speed`") y propone medir la velocidad mínima como reto. **Probado en el suelo a 0,45 (el usuario, con
+    2 m libres):** los cuatro pads arrancan y todo fue bien; no hace falta una velocidad de giro aparte. Después: pines
+    en `lo`, `get_throttled` = `0x0` y chip táctil en fábrica.
+  - **Fallo encontrado: Ctrl+C abortaba el programa** (`Unhandled exception. System.ObjectDisposedException ... 'HatMotor'`
+    y `Aborted`, sin el mensaje de la parada). Causa y arreglo en la Fase 2, "Carrera en la parada de emergencia".
+  - **Prueba con una niña de 10 años (17/10/2026, antes de fusionar el #57):** en el suelo, a 0,45, lo hizo todo sin
+    problemas y se adaptó a mantener el dedo en los pads. Queda por mirar con más niños (y con la edad del taller) si es
+    cómodo con pads tan juntos, pero no hay ningún fallo conocido.
 - [x] 08 Sensores analógicos (`Lesson08.Analog`): potenciómetro. **Hecha y probada el 17/10/2026.**
   - **Decisión del usuario (17/10/2026): la lección usa solo el potenciómetro, sin la LDR.** Montar la LDR pide una
     protoboard y complica el montaje, y el potenciómetro ya explica bien el tema (en el montaje del 17/10/2026 falló

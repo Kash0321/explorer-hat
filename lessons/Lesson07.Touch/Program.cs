@@ -9,7 +9,7 @@ using ExplorerHat.Common;
 // New ideas: a remote control, a sensor that is "touched" or "not touched", and "if / else if" with four choices.
 
 bool moveMotors = false;   // first try it with false: only the lights and the text. Then change it to true
-double speed = 0.6;
+double speed = 0.45;       // slow, to follow the robot with your finger. With less than 0.4 the motors may not start
 int maxTime = 60000;       // the program ends after this time (milliseconds)
 int pauseTime = 50;        // a short wait between two readings
 
