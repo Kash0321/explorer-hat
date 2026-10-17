@@ -225,7 +225,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 
 ## 🎓 Lecciones del taller (`lessons/`)
 
-Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 09 Robot autónomo y 11 Contar vueltas (con sus partes Ir recto y El cuadrado perfecto) y 12 La pantalla.
+Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 08 Sensores analógicos, 09 Robot autónomo y 11 Contar vueltas (con sus partes Ir recto y El cuadrado perfecto) y 12 La pantalla.
 Cada lección es un proyecto pequeño con un único `Program.cs` y un README con retos. Índice y forma de
 ejecutarlas en [`lessons/README.md`](lessons/README.md).
 
@@ -236,7 +236,7 @@ ejecutarlas en [`lessons/README.md`](lessons/README.md).
 El entorno está organizado en soluciones independientes según el nivel de aprendizaje:
 
 * 🟢 **`ExplorerHat.BasicSample/`**: El laboratorio de inicio. Ideal para enseñar bucles, hilos con `Thread.Sleep`, encendido de luces LED secuenciales y movimientos básicos de los dos motores (Adelante, Atrás, Giros).
-* ⚙️ **`ExplorerHat.Common/`**: Código compartido por los ejemplos y las lecciones. `SafeExplorerHat` se usa igual que `ExplorerHat`, pero al terminar para los motores, apaga las luces y libera los pines sin errores. Sus motores (`HatMotor`) giran igual de rápido hacia delante que hacia atrás. `Screen` maneja la pantalla LCD.
+* ⚙️ **`ExplorerHat.Common/`**: Código compartido por los ejemplos y las lecciones. `SafeExplorerHat` se usa igual que `ExplorerHat`, pero al terminar para los motores, apaga las luces y libera los pines sin errores. Sus motores (`HatMotor`) giran igual de rápido hacia delante que hacia atrás. `Screen` maneja la pantalla LCD y `AnalogInputs` (`hat.Analog.One.ReadVoltage()`), las entradas analógicas.
 * 📡 **`ExplorerHat.SonarDashboard/`**: Panel en la consola con la distancia que mide cada sensor de ultrasonidos, sin mover los motores. Sirve para comprobar el montaje de los sensores. La tecla **F** activa o desactiva el mismo filtro de lecturas falsas que usa el robot autónomo. Con `--registro <archivo> [segundos]` no muestra el panel: guarda cada lectura en un archivo CSV para estudiar las lecturas falsas.
 * 🔋 **`ExplorerHat.UpsDashboard/`**: Panel en la consola con los datos de la Waveshare UPS HAT (B): tensión y carga de las baterías, corriente, potencia y si se cargan o se descargan, junto con el estado de alimentación y la temperatura de la Raspberry Pi. No mueve los motores.
 * 🔵 **`ExplorerHat.ObstacleAvoidance/`**: El robot autónomo. Integra lecturas de sensores de distancia por ultrasonidos (HC-SR04) para calcular proximidad y tomar decisiones de esquiva en tiempo real.
@@ -246,6 +246,12 @@ El entorno está organizado en soluciones independientes según el nivel de apre
 ## 🧰 Herramientas (`tools/`)
 
 Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Cada script explica su uso al principio.
+
+---
+
+## 📚 Documentos de apoyo (`docs/`)
+
+Manuales de piezas, medidas hechas, fotos y el prompt para retomar el trabajo. Índice en [`docs/README.md`](docs/README.md): el manual del multímetro (castellano e inglés), las medidas de las fotorresistencias (LDR) y el divisor de tensión, y una foto de los cables de la pantalla.
 
 ---
 

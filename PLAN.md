@@ -576,9 +576,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - **Decisión del usuario (17/10/2026): la lección usa solo el potenciómetro, sin la LDR.** Montar la LDR pide una
     protoboard y complica el montaje, y el potenciómetro ya explica bien el tema (en el montaje del 17/10/2026 falló
     justo la protoboard: el 5V iba a una fila sin unir al HAT). Se quitaron del README y del programa la sección de
-    la LDR y los retos de la luz. **Las medidas de las LDR y el divisor de 10 kΩ se conservan aquí abajo** para una
-    lección futura (por ejemplo, con dos LDR en la Fase 7: un vehículo de Braitenberg que sigue o huye de una linterna,
-    "sentir, pensar y actuar"). Las 20 LDR siguen en el material.
+    la LDR y los retos de la luz. **Las medidas de las LDR, el divisor de 10 kΩ, el texto de lección y el programa
+    `LdrCheck` se guardaron en [`docs/fotorresistencias-LDR.md`](docs/fotorresistencias-LDR.md)** (índice de `docs/`
+    en [`docs/README.md`](docs/README.md)) y aquí abajo para una lección futura (por ejemplo, con dos LDR en la Fase
+    7: un vehículo de Braitenberg que sigue o huye de una linterna, "sentir, pensar y actuar"). Las 20 LDR siguen en
+    el material.
   - **Qué es:** un único `Program.cs` con *top-level statements*: lee `hat.Analog.One.ReadVoltage().Volts`, lo pone en
     una escala de 0 a 1 (`minVolts` 0 y `maxVolts` 5,3, con `Math.Clamp`) y enciende de 0 a 4 luces (azul, amarilla,
     roja y verde) con cuatro `if` seguidos. Escribe los voltios y una barra en la terminal. Sin motores (el reto del
