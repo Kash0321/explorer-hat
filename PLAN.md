@@ -6,7 +6,36 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (16/10/2026)
+## Estado actual (17/10/2026)
+- **Sesión del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
+  - **Pi actualizada** a `main` (`2da35a5`) con `git pull --ff-only`. Sin programas del robot en marcha, pines en `lo`
+    y `get_throttled` = `0x0`.
+  - **Multímetro llegado:** ExtraStar DT830B, barato y sencillo. Manual y marcas de la carcasa transcritos en
+    castellano y en inglés en [`docs/multimetro-DT830B.md`](docs/multimetro-DT830B.md) (la foto del manual venía con
+    cinco idiomas; solo se guardan esos dos). Con él se pueden medir las LDR y comprobar el potenciómetro de la
+    lección 08 sin el ADS1015 (ver la Fase 5).
+  - **Experimento de modelos** (asesor Opus 5.5, subagente `buscador`): reglas en `AGENTS.md` y criterio para
+    seguir o quitarlo en "Sin prisa".
+  - **#2610 probado en la Pi con el último commit del PR** (`c6fcf210`, ya con el recuento de referencias `0f4e5718` y
+    los arreglos de Copilot). Mismo método que el 03/10/2026 (GPIO 8 sin nada conectado y flancos con `pinctrl set 8
+    pu`/`pd`; no mueve los motores). **Arregla lo que faltaba:** con dos avisos en el pin, quitar uno deja funcionando
+    el otro, y `WaitForEvent` repetido y registrar/quitar/registrar un aviso funcionan. **Dos fallos nuevos**, que no
+    impiden fusionarlo pero hay que contar a pgrawehr:
+    1. Con dos avisos de **tipos de evento distintos** (por ejemplo `Rising | Falling` y solo `Rising`), quitar el
+       segundo **no lo quita**: sigue recibiendo flancos. Causa: `LibGpiodV2EventObserver.RemoveCallback` busca solo
+       la primera suscripción del `offset` (`FirstOrDefault`), y cada tipo de evento es otra suscripción. El código es
+       el mismo que en `main` (el PR no lo toca); en la Pi 3 no se veía porque ni siquiera dejaba registrar un segundo
+       aviso.
+    2. **Intermitente:** dos `WaitForEvent` seguidos y después registrar un aviso: a veces el hilo que lee los eventos
+       muestra `Unhandled exception while handling libgpiodv2 edge events: GpiodException ... epoll_ctl: Error:
+       'Success'` y se pierden flancos (2 de 4 en una de las 5 ejecuciones; en otra, el aviso no vio ninguno). Con un
+       solo `WaitForEvent` no pasó. Parece una carrera entre la limpieza de la petición tras el `WaitForEvent` y el
+       hilo observador: es la zona de los hallazgos que krwq pidió arreglar a Copilot (15/10/2026).
+    Programa en el scratchpad de la sesión (no versionado), con un modo `seq` (`dotnet GpioEvents.dll 8 seq
+    R1,R2,U2,E`: `R1`/`R2` registran el aviso 1 (flancos de subida y de bajada) o el 2 (solo subida), `U1`/`U2` los
+    quitan, `E` hace 4 flancos y `W` es un `WaitForEvent`). Registro de la secuencia completa en la Pi:
+    `~/gpioevents-2610-c6fcf210.log`. **Sin publicar nada en dotnet/iot todavía**: falta el visto bueno del usuario
+    al texto.
 - **Sesión del 16/10/2026** (desde el PC, sin la Pi: el usuario estaba fuera de casa; detalles en la Fase 6):
   - **#2613 fusionado** el 15/10/2026 por pgrawehr (`1856d767` en `upstream/main`, *squash*). Lo aprobó sin contestar
     a la pregunta de las variantes con `PwmChannel`. Rama `explorerhat-dispose` borrada (local y en el fork) después de
@@ -112,7 +141,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      src/devices/ExplorerHat`), subirla, abrir su PR y borrar `explorerhat-io` y `explorerhat-analog-v2` (local y en
      el fork). Si piden cambios en el #2625, van en commits nuevos en `explorerhat-io`; después, copiar otra vez el
      commit del analógico encima en otra rama nueva, igual.
-  3. Probar en la Pi el #2610 con el recuento de referencias, si no lo fusionan antes: dos avisos en un pin (#2614).
+  3. ~~Probar en la Pi el #2610 con el recuento de referencias~~ (hecho el 17/10/2026, ver arriba): decidir con el
+     usuario si se comentan en el #2610 los dos fallos nuevos (quitar un aviso de otro tipo de evento; carrera tras
+     `WaitForEvent`).
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
      **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). **Siguiente paso
@@ -125,7 +156,14 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V.
 - **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); con un multímetro, medir si la pull-up del Trig de
   los HC-SR04P es una resistencia de la placa o la interna del chip (método en el README); repetir con carga completa
-  la batería Xiaomi (Fase 2).
+  la batería Xiaomi (Fase 2). **El multímetro ya llegó (17/10/2026)**: ese método ya se puede probar.
+- **Experimento de modelos (desde el 17/10/2026):** Sonnet 5.5 con asesor Opus 5.5 y el subagente `buscador`
+  (reglas en `AGENTS.md`, archivos en `.claude/`). Tras tres sesiones, revisar con `/usage` el coste, cuántas
+  veces el asesor cambió una decisión y si `buscador` ahorró contexto. Si no aporta, quitar
+  `.claude/settings.json`, `.claude/agents/buscador.md` y la sección de `AGENTS.md`. Se decidió **no usar JEV**
+  (modelo de decisiones de TypeSafe AI, por API y de un tercero; no es determinista y los hooks de Claude Code ya
+  resuelven las bifurcaciones simples). Pendiente de comprobar: que `advisorModel` se lea del `settings.json` del
+  proyecto (si no, `/advisor opus` lo guarda en la configuración del usuario).
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio

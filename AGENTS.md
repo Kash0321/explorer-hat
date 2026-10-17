@@ -67,3 +67,16 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
 * **Markdown:** una sublista empieza en la columna del texto de su elemento padre (2 espacios bajo `- [x] `), y sus tablas y párrafos tras una línea en blanco, en la columna del texto de la sublista. Con 4 espacios de más, GitHub pega la sublista al párrafo y muestra las tablas como código. Para comprobarlo: `gh api markdown -f mode=gfm -F text=@PLAN.md`.
 * **Actualización de Dependencias:** Al añadir paquetes, usa la sintaxis explícita apuntando al archivo `.csproj` correspondiente: `dotnet add src/[Proyecto]/[Proyecto].csproj package [Nombre]`.
 * **Alimentación:** el robot usa una **Waveshare UPS HAT (B)** (2×18650 en serie, salida de 5 V hasta 5 A) debajo de la Pi: sin caídas de tensión ni con los motores. La Pi se alimenta solo por los contactos de muelle de la UPS, **sin cable micro-USB** (probado el 04/10/2026: con cable y sin cable, igual). El cargador de la UPS (8,4 V) puede estar conectado con el robot en marcha. `tools/vigilar-tension.sh` registra también la tensión y la corriente de sus baterías. Con cargador, muchos cables micro-USB no dan la corriente suficiente. Si hay comportamientos raros, mira `vcgencmd get_throttled` (`0x0` = bien; bit 0 = tensión baja ahora; `0x80000` = la CPU llegó a 60 °C y bajó su frecuencia, pasa al compilar en la Pi). Resultados y método de las pruebas con baterías en `PLAN.md` (Fase 2).
+
+## 🧠 Modelos y asesor (experimento desde el 17/10/2026)
+* **Sesión principal:** Sonnet 5.5, con Opus 5.5 como asesor (`.claude/settings.json`).
+* **Consulta al asesor, siempre:**
+  * antes de fijar un plan;
+  * al repetir el mismo error dos veces;
+  * antes de dar por terminado un trabajo.
+* **Consulta al asesor, en este proyecto, además:**
+  * antes de la primera prueba que mueva los motores con código nuevo;
+  * antes de publicar fuera de este repositorio (después del visto bueno del usuario sobre el texto).
+* **Subagente `buscador`** (Haiku, solo lectura, `.claude/agents/buscador.md`): para búsquedas amplias, sobre todo en `C:\work\iot`. En este repositorio, usa `Grep` y `Glob` directamente.
+* **No se usa JEV** (decisiones por API de un tercero): los hooks de Claude Code ya resuelven las bifurcaciones simples sin llamar a un modelo.
+* **Criterio para seguir o quitarlo:** ver "Sin prisa" en `PLAN.md`.
