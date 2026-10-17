@@ -14,7 +14,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - **dotnet/iot, sin novedades** al empezar: ni comentarios ni revisiones nuevas en el #2616, #2625 y #2610, ni en las
     incidencias #2614, #2615 y #2617; `upstream/main` sigue en `1856d767`; las comprobaciones pasan. El clon del fork
     está limpio, con sus tres ramas iguales a las del fork.
-  - **Experimento de modelos:** esta fue la sesión 2 de 3. El usuario pasa `/usage` al terminar.
+  - **Experimento de modelos:** esta fue la sesión 2 de 3. `/usage` al empezar y al cerrar (2,49 $ en total; el
+    asesor, una llamada, 0,70 $) en "Experimento de modelos", más abajo. PR #52 fusionado; `main` y la Pi en `36a11bc`.
 - **Sesión del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
   - **Pi actualizada** a `main` (`2da35a5`) con `git pull --ff-only`. Sin programas del robot en marcha, pines en `lo`
     y `get_throttled` = `0x0`.
@@ -237,7 +238,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   define `advisorModel`. El comando `/agents` ya no existe en Claude Code (se editan los archivos de
   `.claude/agents/`). Primera prueba de `buscador`: 3 consultas y 9 s para una búsqueda en un archivo de
   `C:\work\iot`, con resultado correcto; para un solo archivo, leerlo directamente cuesta lo mismo.
-  **Datos de `/usage` hasta ahora** (los pega el usuario; faltan los de cierre de la sesión 2):
+  **Datos de `/usage`** (los pega el usuario; faltan los de la sesión 3):
   - **Sesión 1** (la larga del 17/10/2026; 11 h de reloj, 1 h de API): **36,39 $** en total. **Sonnet 5.5: 18,26 $**
     (106,5 M de lectura de caché, 339 k de salida). **Opus 5.5, el asesor: 18,11 $** (4,2 M de entrada, 72,8 k de
     salida, **0 de caché**): **el asesor costó casi la mitad (50 %)**. Haiku (`buscador`): 0,02 $, una sola consulta.
@@ -246,9 +247,17 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     escritura). Semana: 9 %.
   - **Sesión 2, qué hizo el asesor** (una llamada, al final): corrigió dos notas de `PLAN.md` con causa equivocada (el
     registro de pines sí servía; el `salida=` faltaba por bash y no por el pegado). Cambió el contenido, no el
-    plan. Pendiente: los datos de cierre (el usuario los pasa después).
-  - **Lectura provisional:** el coste lo dominan las sesiones largas con mucho contexto (el asesor lee todo el
-    historial, sin caché). Con una sola llamada, la sesión 2 dará una cifra más pequeña. Decidir al cerrar la 3.
+    plan.
+  - **Sesión 2, al cerrar** (31 min de reloj, 8 min de API, 65 peticiones): **2,49 $** en total. **Sonnet 5.5: 1,78 $**
+    (71 %; 8,8 M de lectura de caché, 41 k de salida). **Opus 5.5, el asesor: 0,70 $** (28 %; una llamada con 139 k de
+    entrada, 7 k de salida y 0 de caché). Haiku: 0,0007 $ (no se usó `buscador`: no hizo falta buscar en `C:\work\iot`).
+    Semana: 10 % usado (un punto más que al empezar). El 88 % del uso de las últimas 24 h fue con más de 150 k de
+    contexto; el dato incluye la sesión 1.
+  - **Lectura provisional (sesiones 1 y 2):** el coste lo dominan las sesiones largas con mucho contexto: la sesión 1
+    costó 14 veces más que la 2. **El asesor lee todo el historial en cada llamada y sin caché, así que su coste
+    crece con la longitud de la sesión** (0,70 $ por una llamada con 139 k de entrada; 18,11 $ en la sesión 1, con 4,2 M
+    de entrada en total). Una sola llamada al final, como en la sesión 2, es barata y dio dos correcciones útiles.
+    Decidir al cerrar la 3.
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
