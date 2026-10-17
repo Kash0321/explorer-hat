@@ -1,4 +1,4 @@
-# Lección 11, tercera parte: El cuadrado perfecto
+# Lección 10, tercera parte: El cuadrado perfecto
 
 La lección 04 otra vez, pero ahora el robot no cuenta tiempo: cuenta los pulsos de sus ruedas. Avanza 30 cm, gira
 90 grados y repite 4 veces. **Mueve los motores.**
@@ -18,7 +18,7 @@ La lección 04 otra vez, pero ahora el robot no cuenta tiempo: cuenta los pulsos
 
 ## Qué hardware usa
 
-Los dos sensores de velocidad, como en la [segunda parte](../Lesson11.Straight/README.md): el izquierdo a 3,3 V en
+Los dos sensores de velocidad, como en la [segunda parte](../Lesson10.Straight/README.md): el izquierdo a 3,3 V en
 el pin PWM de la fila lateral (GPIO 18) y el derecho en INPUT 4. Las luces verde (avanzar) y amarilla (girar).
 
 ## Las cuentas del giro

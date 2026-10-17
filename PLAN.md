@@ -7,6 +7,12 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (17/10/2026)
+- **Sesión 4 del 17/10/2026** (desde el PC, sin mover el robot): dotnet/iot sin novedades al empezar (PR #2616, #2625 y
+  #2610 e incidencias #2614, #2615 y #2617 sin comentarios nuevos; `upstream/main` en `1856d767`; las comprobaciones
+  pasan; el clon del fork, limpio). Pi en `main` (`59f7741`), pines en `lo`, `get_throttled` = `0x0`.
+  - **Decisión del usuario: no hacer la lección 10 (siguelíneas) y renumerar.** Rama `fase-5-renumerar-lecciones`: las
+    carpetas, los proyectos, la solución, las tareas de VS Code, `probar-cableado.sh` y los README usan los números
+    nuevos (ver "Fase 5, catálogo cerrado", más abajo).
 - **Sesión 3 de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire; **pantalla LCD
   desconectada**, potenciómetro en Analog 1):
   - **Lección 07 hecha** (`lessons/Lesson07.Touch`, rama `fase-5-leccion-07-pads-tactiles`): mando a distancia con los
@@ -16,7 +22,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - **dotnet/iot, sin novedades** al empezar (comprobado: ni comentarios ni revisiones nuevas en el #2616, #2625 y
     #2610, ni en las incidencias #2614, #2615 y #2617; `upstream/main` en `1856d767`; las comprobaciones pasan).
 - **Sesión de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
-  - **Repaso de las lecciones con motores hecho** (04, 06, 11 y 09, con el `Common` nuevo): todas siguen haciendo lo
+  - **Repaso de las lecciones con motores hecho** (04, 06, 10 y 09, con el `Common` nuevo): todas siguen haciendo lo
     mismo y la parada de emergencia funciona con `SIGTERM` y con Ctrl+C en la 09. Resultados, dos lecciones del
     repaso (`| tee` y `pgrep`) y lo que falta comprobar, en la Fase 5, "Repaso con el `Common` nuevo".
   - **dotnet/iot, sin novedades** al empezar: ni comentarios ni revisiones nuevas en el #2616, #2625 y #2610, ni en las
@@ -131,8 +137,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Sesión del 04/10/2026, tarde** (PR #38 y #39; detalles en las fases):
   - **Lecciones en VS Code:** *Desplegar en la Pi* y *Ejecutar en la Pi* tienen las lecciones y los programas en una
     sola lista, y **Depurar en la Pi el programa abierto** depura con F5 el proyecto del archivo abierto. Fase 3.
-  - **Rueda derecha parada:** `Lesson11.Odometry` contaba 0 pulsos. El sensor estaba bien: el cable azul del motor
-    derecho se había soltado de la borna MOTOR 1. Diagnóstico, mensajes de las lecciones 11 y README. Fase 5.
+  - **Rueda derecha parada:** `Lesson10.Odometry` contaba 0 pulsos. El sensor estaba bien: el cable azul del motor
+    derecho se había soltado de la borna MOTOR 1. Diagnóstico, mensajes de las lecciones 10 y README. Fase 5.
   - **Lección 08 (sensores analógicos), decidida como siguiente tarea:** con `ProjectReference` al binding de la rama
     `explorerhat-analog` del fork (`C:\work\iot`). Faltaba saber qué sensor analógico se usa: decidido el 10/10/2026
     (potenciómetro y fotorresistencia, por comprar). **Cambiado el 17/10/2026 (opción Z, elegida por el usuario):** sin
@@ -144,7 +150,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - **Marcha atrás más lenta** con el `DCMotor` del binding (a 0,4, al ~36 % de la velocidad hacia delante): marcha
     atrás, el DRV8833 frena en la parte apagada del PWM. **Nuevo `HatMotor`** en `ExplorerHat.Common` (PWM en los dos
     pines, como Pimoroni): los dos sentidos al 93–102 %. Informado en dotnet/iot (#2617). Fase 6.
-  - **Giros recalibrados en el suelo:** lección 04, `turnTime` 200 ms; `Lesson11.Square`, `brakePulses` 4. La 09 y
+  - **Giros recalibrados en el suelo:** lección 04, `turnTime` 200 ms; `Lesson10.Square`, `brakePulses` 4. La 09 y
     ObstacleAvoidance, sin cambios (límite de obstáculo en 30 cm, decisión del usuario). Fase 5.
   - **Alimentación:** la Pi va solo por los contactos de la UPS, **sin cable micro-USB** (con y sin cable, igual).
     Pin de 5 V: 5,30 V en reposo y 5,22 V como mínimo con los motores (0,6 V de margen). Al compilar en la Pi, la CPU
@@ -155,10 +161,14 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - Todos los programas de `~/apps` están desplegados desde `main` con `HatMotor`.
 - **Fase 5, lecciones hechas y probadas** (`lessons/`): 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones,
   06 Distancia, 07 Pads táctiles (17/10/2026, ruedas en el aire), 08 Sensores analógicos (17/10/2026, sin motores),
-  09 Robot autónomo, 11 Contar vueltas (odometría, ir
-  recto y el cuadrado con pulsos) y 12 La pantalla. Todas con las ruedas en el aire y, las que se mueven, también en
+  09 Robot autónomo, 10 Contar vueltas (odometría, ir
+  recto y el cuadrado con pulsos) y 11 La pantalla. Todas con las ruedas en el aire y, las que se mueven, también en
   el suelo.
-- **Falta de la Fase 5:** la 10 Siguelíneas (dos TCRT5000, por confirmar). **La 07 y la 08 están hechas (17/10/2026).**
+- **Fase 5, catálogo cerrado** (decisión del usuario, 17/10/2026): ya no falta ninguna lección. El siguelíneas (dos
+  TCRT5000) pasa a "Ideas para ampliar las lecciones" (Fase 5). **Renumeración del 17/10/2026:** `Lesson11.*` (Contar
+  vueltas, Ir recto y El cuadrado perfecto) es ahora `Lesson10.*`, y `Lesson12.Screen` es `Lesson11.Screen`. Los PR, las
+  ramas y los commits anteriores usan los números antiguos (por ejemplo, la rama `fase-5-leccion-12`); el texto de este
+  documento ya usa los nuevos. Las carpetas viejas de `~/apps` en la Pi se borran al desplegar.
 - **Montaje actual** (a las 22:00 del 17/10/2026, **la pantalla LCD está desconectada**; el resto, como se describe):
   todo conectado a la vez. Tres HC-SR04 (IN1–IN3), LM393 derecho en IN4 (a 5 V), LM393 izquierdo
   a **3,3 V** en GPIO 18 (fila lateral "3.3V ONLY") y pantalla LCD 2004 en I2C 0x27 (a 3,3 V). El LED de la lección 05
@@ -180,7 +190,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   (pantalla desconectada, multímetro en `20k`): **4,73 kΩ entre SDA y VCC y 4,67 kΩ entre SCL y VCC**, así que la
   placa sí lleva resistencias de subida de 4,7 kΩ y la regla "VCC solo a 3v3" es necesaria.
 - **Cerradas:** fases 0 a 4 (solo queda en la Fase 3 la guía de compilación ligera en la Pi, poco urgente).
-- **Fase 7 (robot con IA):** analizada y decidida; empieza cuando termine la Fase 5.
+- **Fase 7 (robot con IA):** analizada y decidida; la Fase 5 está cerrada (17/10/2026), así que puede empezar.
 - **Fase 6, en dotnet/iot (16/10/2026):**
 
   | Qué | Estado | Pendiente |
@@ -203,7 +213,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
 - **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores y la lección 07 están hechos
   (17/10/2026, noche).** Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
-  probar la lección 07 en el suelo y con un niño (o elegir entre un checklist del taller, la lección 10 y la Fase 7).
+  probar la lección 07 en el suelo y con un niño (o elegir entre un checklist del taller y la Fase 7: el siguelíneas
+  ya no es una lección, es una idea guardada).
   **Experimento de modelos: decidido** (17/10/2026, ver "Experimento de modelos"): se mantiene como está.
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
@@ -225,8 +236,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      **Lección 08 hecha el 17/10/2026** (opción Z, sin fork: ver la Fase 5, lección 08). **La lección 08 usa solo el
      potenciómetro** (decisión del usuario, 17/10/2026: sin LDR). Los otros dos potenciómetros se midieron con el
      multímetro (10,35 y 9,83 kΩ en total); falta ver con el programa que tienen el mismo orden de hilos. **La
-     lección 10, no todavía** (decisión del usuario,
-     10/10/2026). Después, la 10 (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
+     lección de siguelíneas se descartó** (decisión del usuario, 17/10/2026; es una idea guardada en la Fase 5).
+     Después, la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
@@ -557,7 +568,7 @@ Propuesta, dos formas de trabajar:
   - [x] **Lecciones en las tareas y en la depuración (04/10/2026).** Las lecciones solo estaban en la tarea *Ejecutar una
         lección en la Pi*, y para depurar solo estaba BasicSample. Ahora:
     - *Desplegar en la Pi* y *Ejecutar en la Pi* tienen una sola lista con las lecciones y los programas, por su carpeta
-      (`lessons/Lesson12.Screen`, `src/ExplorerHat.BasicSample`). En la Pi, el nombre de la carpeta lo da `$(basename ...)`:
+      (`lessons/Lesson11.Screen`, `src/ExplorerHat.BasicSample`). En la Pi, el nombre de la carpeta lo da `$(basename ...)`:
       lo calcula el shell de la Pi (en macOS y Linux, antes el del PC, con el mismo resultado). Quitadas *Ejecutar una
       lección en la Pi* y *Desplegar BasicSample*.
     - **Depurar en la Pi el programa abierto** (sustituye a *Depurar BasicSample en la Pi*): despliega y depura el proyecto
@@ -565,9 +576,9 @@ Propuesta, dos formas de trabajar:
       depurador usan el mismo programa sin preguntarlo dos veces (las variables `${input:...}` de `launch.json` y de
       `tasks.json` se preguntan por separado).
     - La consola de depuración no tiene teclado: los programas que leen teclas (ObstacleAvoidance, SonarDashboard y las
-      lecciones 04, 11 Odometry y 11 Square) se depuran con *Ejecutar en la Pi* y *Adjuntar a un programa en la Pi*.
-    - Probado desde el PC (comandos de las tareas en `cmd.exe`, con la lección 12): los dos despliegues borran la carpeta
-      anterior y copian la nueva; *Ejecutar en la Pi*, código 0. El usuario probó F5 con la lección 12 en VS Code: se
+      lecciones 04, 10 Odometry y 10 Square) se depuran con *Ejecutar en la Pi* y *Adjuntar a un programa en la Pi*.
+    - Probado desde el PC (comandos de las tareas en `cmd.exe`, con la lección 11): los dos despliegues borran la carpeta
+      anterior y copian la nueva; *Ejecutar en la Pi*, código 0. El usuario probó F5 con la lección 11 en VS Code: se
       detiene en el punto de interrupción y responde a F10 y F5.
     - Para probar una tarea fuera de VS Code: el comando, en un archivo `.cmd` ejecutado desde PowerShell. Desde Git Bash,
       `cmd.exe` encuentra el `ssh` de Git (sin la clave) y las comillas llegan mal.
@@ -725,7 +736,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     arrancar): salida 143, mensaje "Parada de emergencia (SIGTERM): motores parados", **los cuatro pines de los
     motores en `lo` 0,24 s después de la señal** (registro en `~/pines-prueba03-term.log`), ningún proceso y
     `get_throttled` = `0x0`; el usuario vio que las ruedas se pararon en el acto. **Quedan sin probar con el `Common`
-    nuevo** las lecciones con motores 04, 06, 09 y 11 (usan el mismo `SafeExplorerHat`; solo cambia la propiedad
+    nuevo** las lecciones con motores 04, 06, 09 y 10 (usan el mismo `SafeExplorerHat`; solo cambia la propiedad
     `Analog` y el final del `Dispose`, y la lección 03 ya ejerce los dos caminos de la parada).
   - **Sensores decididos (10/10/2026):**
     - **Potenciómetro** lineal de 10 kΩ (B10K). Pedidos 3 **ALLECIN WH148 B10K** (película de carbono, con mando y
@@ -875,7 +886,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     nivel bajo al terminar.
   - Con `HatMotor` (04/10/2026, misma zona, 60 s): 18 obstáculos, detectados casi siempre a 18–29 cm; giros de 1 paso
     (12 veces), 2 (5) y 3 (1); ninguna maniobra agotó los 10 pasos. El usuario lo vio bien. Sin cambios en la lección.
-- [x] **Repaso con el `Common` nuevo (lecciones con motores 04, 06, 09 y 11).** Decidido por el usuario el 17/10/2026
+- [x] **Repaso con el `Common` nuevo (lecciones con motores 04, 06, 09 y 10).** Decidido por el usuario el 17/10/2026
       (opción A). Motivo: `SafeExplorerHat` cambió (propiedad `Analog` y final del `Dispose`) y solo se probó la
       lección 03 con los motores (ejecución completa y parada con `SIGTERM`; ver la lección 08). Las lecciones no
       cambian: se comprueba que **siguen haciendo lo mismo y que la parada de emergencia funciona con sus hilos y
@@ -896,10 +907,10 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     5. Pines grabados con `tools/vigilar-pines.sh` (`setsid -f ... > /dev/null 2>&1 < /dev/null`, el registro en `~`).
   - **Cómo desplegar y ejecutar:** `dotnet publish lessons/LessonNN.X -c Debug -r linux-arm64 --self-contained false
     -o publish/lessons/LessonNN.X`, borrar `~/apps/LessonNN.X`, `scp.exe -r` y `chmod -R go-w` (o la tarea de VS Code
-    *Desplegar en la Pi*). Las lecciones sin teclado (06, 09 y 11 Ir recto) se pueden lanzar desde el PC por SSH con
+    *Desplegar en la Pi*). Las lecciones sin teclado (06, 09 y 10 Ir recto) se pueden lanzar desde el PC por SSH con
     `timeout`; **cada `timeout` debe superar la duración de la lección más unos 10 s de arranque de .NET** (por
     ejemplo, `timeout 90` para la 09, que dura 60 s): si no, envía un `SIGTERM` que nadie planeó. **Las que leen el
-    teclado (04, 11 Contar vueltas y 11 El cuadrado perfecto) las ejecuta el usuario en su terminal de la Pi** (es lo
+    teclado (04, 10 Contar vueltas y 10 El cuadrado perfecto) las ejecuta el usuario en su terminal de la Pi** (es lo
     normal: está delante, controla el arranque y tiene Ctrl+C), con `cd ~/apps/X && dotnet X.dll`. Alternativa, si no
     puede: mandarle las teclas por SSH, con una espera de **12 s o más** antes de la tecla (.NET tarda de 3 a 8 s en
     arrancar y la tecla antes de eso se pierde): `(sleep 12; printf 'n'; sleep 30) | timeout 70 ssh.exe -tt harlequin
@@ -911,9 +922,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     | 04 Cuadrado (responder `n`) | Sí | ~8 s | Cuatro veces: las dos ruedas adelante 1 s y un giro a la derecha (derecha atrás, izquierda adelante, 200 ms) |
     | 06 Distancia, **tal como está** (`moveMotors = false`) | No | hasta 10 s | Solo mide y enciende luces (verde, amarilla, roja) con la mano delante del sensor central. Los motores no se mueven |
     | 06 Distancia, **con `moveMotors = true`** (ver la receta debajo de la tabla) | No | hasta 10 s | Lejos: verde y rápido. Menos de 60 cm: amarilla y lento. Menos de 30 cm: roja, para y termina |
-    | 11 Contar vueltas | Sí (una tecla entre las partes) | ~2 s + hasta 5 s | Parte 1: adelante 2 s contando los pulsos de la rueda derecha. Parte 2: hasta 50 cm o 5 s |
-    | 11 Ir recto | No | hasta 6 s | Adelante 100 cm o 6 s, luces verde, amarilla o azul; los dos sensores cuentan |
-    | 11 El cuadrado perfecto (responder `n`) | Sí | hasta ~25 s | Cuatro lados y cuatro giros por pulsos |
+    | 10 Contar vueltas | Sí (una tecla entre las partes) | ~2 s + hasta 5 s | Parte 1: adelante 2 s contando los pulsos de la rueda derecha. Parte 2: hasta 50 cm o 5 s |
+    | 10 Ir recto | No | hasta 6 s | Adelante 100 cm o 6 s, luces verde, amarilla o azul; los dos sensores cuentan |
+    | 10 El cuadrado perfecto (responder `n`) | Sí | hasta ~25 s | Cuatro lados y cuatro giros por pulsos |
     | 09 Robot autónomo | No | 60 s o Ctrl+C | Mano en el sensor izquierdo: retrocede y gira a la derecha; en el derecho: gira a la izquierda; sin obstáculo: adelante. **Aquí se prueba la parada de emergencia, en dos ejecuciones**, con tres sensores y los hilos de los motores en marcha: una con `SIGTERM` desde el PC y otra con Ctrl+C del usuario en su terminal, a mitad (ver la receta debajo de la tabla) |
 
   - **Receta de la lección 06 con motores:** el `.csproj` de la lección hereda `TargetFramework` de
@@ -950,10 +961,10 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     - **06 Distancia, con `moveMotors = true`** (receta del árbol de trabajo, restaurada y vuelta a desplegar): lejos
       verde y rápido, entre 30 y 60 cm amarilla y lento, por debajo de 30 cm roja, paran y termina. El usuario la
       ejecutó varias veces, bien.
-    - **11 Contar vueltas:** parte 1, 85 pulsos en 2 s (86,8 cm, 43 cm/s) y 4 pulsos de más al parar; parte 2, paró a
+    - **10 Contar vueltas:** parte 1, 85 pulsos en 2 s (86,8 cm, 43 cm/s) y 4 pulsos de más al parar; parte 2, paró a
       los 49 pulsos (50 cm) y 4 de más.
-    - **11 Ir recto:** izquierda 103 pulsos (105,2 cm), derecha 101 (103,1 cm), diferencia de 2 pulsos.
-    - **11 El cuadrado perfecto** (`n`): cuatro lados (30 pulsos a la izquierda y 28 a la derecha cada uno) y cuatro
+    - **10 Ir recto:** izquierda 103 pulsos (105,2 cm), derecha 101 (103,1 cm), diferencia de 2 pulsos.
+    - **10 El cuadrado perfecto** (`n`): cuatro lados (30 pulsos a la izquierda y 28 a la derecha cada uno) y cuatro
       giros de 6 pulsos en cada rueda; deslizamiento de 2 a 5 pulsos. "Square finished!".
     - **09 Robot autónomo, parada de emergencia:** con `SIGTERM` desde el PC, a mitad de la marcha atrás (se esperó a
       `Obstacle!`, con la mano a 9 cm del sensor izquierdo): "Parada de emergencia (SIGTERM): motores parados", salida
@@ -977,11 +988,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       la terminal de la Pi, `sleep 5; echo hecho` y Ctrl+C **no escribe "hecho"**. Bash interactivo no ejecuta el resto de
       la lista (`cmd; echo ...`) cuando el programa en primer plano muere por `SIGINT`. Para ver el código de salida
       tras Ctrl+C, escribir `echo $?` en la línea siguiente (se espera 130); no se midió con la lección 09.
-- [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
-      ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
-      de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
-      entradas digitales: mismo problema que el segundo sensor de la lección 11 (solo IN4 está libre).
-- [x] 11 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
+- [x] 10 Odometría: contar vueltas con los discos de 20 ranuras del chasis (vienen en el kit) y dos sensores
       ópticos de horquilla en las entradas digitales del HAT.
       Ideas: medir velocidad, avanzar una distancia exacta y corregir la diferencia entre motores para ir recto.
   - [x] Comprados 10 sensores de velocidad LM393 (horquilla óptica con salida digital) para probarlos.
@@ -1001,7 +1008,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     - Fallo de `System.Device.Gpio` 4.2.0 en la Pi 3 (`RaspberryPi3Driver`): `UnregisterCallbackForPinValueChangedEvent`
       lanza `GpiodException: Device or resource busy` (intenta volver a abrir la línea). Registrar una sola vez y no
       quitarlo. Informado en dotnet/iot#2614 (Fase 6). Con la excepción, `SafeExplorerHat` paró el motor (`Error inesperado: motores parados`).
-  - [x] Lección `Lesson11.Odometry` con un sensor (03/10/2026): parte 1 mide la velocidad (2 s), espera una tecla para
+  - [x] Lección `Lesson10.Odometry` con un sensor (03/10/2026): parte 1 mide la velocidad (2 s), espera una tecla para
         medir con la cinta; parte 2 avanza 50 cm (`while` con distancia `&&` tiempo máximo de 5 s, por si falla el
         sensor); después de cada parte cuenta 0,5 s más lo que resbala. Con las ruedas en el aire (versión sin tecla):
         85 pulsos en 2 s (43 cm/s), parada a 49 pulsos (50 cm) y 4 pulsos más por la inercia; código 0 y pines a nivel
@@ -1023,9 +1030,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         la pantalla (0x27). Diagnóstico con motores en el aire: el LM393 a 3,3 V cuenta igual que el de 5 V
         (0,4 → 34,7 frente a 33,7 pulsos/s; 1,0 → 57,0 frente a 55,7) y con **0 saltos** en GPIO 18, frente a 46–70 en
         IN4: la entrada de la Pi tiene histéresis (disparador de Schmitt) y el búfer de las entradas IN del HAT, por lo
-        visto, no. `Lesson11.Straight` y `Lesson11.Square` leen ahora la rueda izquierda en GPIO 18. Probado `Lesson11.Straight` en el aire:
+        visto, no. `Lesson10.Straight` y `Lesson10.Square` leen ahora la rueda izquierda en GPIO 18. Probado `Lesson10.Straight` en el aire:
         104 y 102 pulsos en 1 m, código 0 y pines a nivel bajo.
-  - [x] Corregir la desviación en línea recta: `Lesson11.Straight` (03/10/2026). Cuenta los dos sensores cada ~1 ms
+  - [x] Corregir la desviación en línea recta: `Lesson10.Straight` (03/10/2026). Cuenta los dos sensores cada ~1 ms
         y corrige con un control proporcional sobre la diferencia de pulsos (`speed ∓ difference * correction`,
         `correction` 0,02, `Math.Clamp` 0–1); `correct` permite compararlo sin corrección. Luces: verde = iguales,
         amarilla = derecha por delante, azul = izquierda por delante. Avanza 100 cm (media de las dos ruedas).
@@ -1038,7 +1045,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       rueda derecha y puso la izquierda a tope (el robot giraba sobre una rueda). Añadida una protección: con la
       corrección, si la diferencia pasa de `maxDifference` (10 pulsos), se para y avisa. Probada con el sensor fuera
       del disco y las ruedas en el aire: parada a los 11 pulsos con el aviso.
-  - [x] Girar ángulos exactos con los pulsos y el cuadrado de la lección 04 con pulsos: `Lesson11.Square`
+  - [x] Girar ángulos exactos con los pulsos y el cuadrado de la lección 04 con pulsos: `Lesson10.Square`
         (03/10/2026, rama `fase-5-giros-exactos`). Lados de 30 cm con la corrección de la parte 2; giros sobre sí
         mismo en los que cada rueda se para por separado al llegar a sus pulsos, menos `brakePulses` por lo que resbala;
         modo calibración (se para tras cada giro y muestra lo que ha resbalado cada rueda). 90° = 10 pulsos (9° por
@@ -1056,7 +1063,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       rueda para a los 6–7, la izquierda resbala 2–3 y la derecha 3–6: ~10 de media, ±10° entre esquinas). Lados: 28–30
       pulsos y 6–8 más al frenar, como antes; algo desviados. Sin caídas de tensión en estas pruebas (`0x0`; baterías
       a 7,78 V como mínimo, 1,13 A como máximo).
-    - **Avería del 04/10/2026 (tarde): `Lesson11.Odometry` contaba 0 pulsos** en las dos partes (también con F5), sin
+    - **Avería del 04/10/2026 (tarde): `Lesson10.Odometry` contaba 0 pulsos** en las dos partes (también con F5), sin
       ningún error. Diagnóstico:
       - Grabación de los pines cada ~11 ms durante la lección (script en `/tmp`, como `tools/vigilar-pines.sh` pero con
         las entradas; en `pinctrl get`, el nivel de una entrada es el campo anterior a `//`): PWM en los pines 19 y 21,
@@ -1066,7 +1073,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
         las dos.
       - Causa: **el cable azul del motor derecho, suelto en la borna MOTOR 1.** Apretado, la lección cuenta bien en el
         aire: 92 pulsos en 2 s (47 cm/s, con `HatMotor`) y parada a los 49 pulsos con 5 más de inercia.
-      - Cambios: el mensaje `Time is up!` de `Lesson11.Odometry` y `Lesson11.Straight` pregunta también si giran las
+      - Cambios: el mensaje `Time is up!` de `Lesson10.Odometry` y `Lesson10.Straight` pregunta también si giran las
         ruedas, y el README de la lección tiene la sección "Si no cuenta ningún pulso".
       - Método para otra vez: si un sensor no cuenta, girar la rueda a mano (descarta el sensor) y mirar si la rueda gira
         con el motor (los pines solo dicen lo que manda la Pi).
@@ -1074,7 +1081,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       con `runtimeconfig.json` vacío (el corte llegó antes de escribir la caché en la microSD): las tareas de
       despliegue de VS Code ejecutan ahora `sync` después de copiar. `git fsck` en la Pi, sin daños. Distancia entre las ruedas: **13 cm** (medida por el usuario): una vuelta sobre sí mismo son 40,8 cm de
         cada rueda y 90° unos 10 pulsos.
-- [x] 12 Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
+- [x] 11 Pantalla: LCD de 20×4 caracteres (2004A) con adaptador I2C (PCF8574). Ideas: escribir texto y
       variables, encajar un mensaje en 20 columnas, y un panel del robot sin terminal (distancias, batería de la UPS,
       obstáculos esquivados) para las pruebas en el suelo. `Iot.Device.Bindings` 4.2.0 trae `Lcd2004` y `Pcf8574`.
       Antes de conectarla:
@@ -1090,17 +1097,29 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     RW 1, E 2, luz 3, datos 4–7) escribe bien las 4 líneas; al principio no se veían las letras y aparecieron,
     perfectas, girando el potenciómetro de contraste. **No hace falta conversor de niveles ni quitar las
     resistencias de 4,7 kΩ:** a 3,3 V el bus no pasa de 3,3 V. Programa de prueba aparte (no versionado).
-  - **Lección `Lesson12.Screen` (03/10/2026, rama `fase-5-leccion-12`):** clase `Screen` en `ExplorerHat.Common`
+  - **Lección `Lesson11.Screen` (03/10/2026, rama `fase-5-leccion-12`):** clase `Screen` en `ExplorerHat.Common`
     (`Clear()` y `Write(línea, texto)`, que corta o rellena a 20 caracteres). Tres partes, sin motores: texto con el
     nombre del niño y una línea demasiado larga, contar del 1 al 10 con su doble y un panel de 20 s con la distancia
     del sensor central (filtro de la 06) y una barra de `#` (uno por cada 10 cm) y "Too near!" a menos de 30 cm.
     Probada en la Pi: código 0; el usuario vio la línea cortada en 20 caracteres, la cuenta, la barra siguiendo a
     la mano con fluidez, "Too near!" y la despedida.
 
+### Ideas para ampliar las lecciones
+- **Siguelíneas con dos sensores infrarrojos TCRT5000** (antes, lección 10). **Descartada por ahora** (decisión del
+  usuario, 17/10/2026): aporta poca variedad (otra entrada digital o analógica, como las lecciones 05, 08 y 10) y obliga
+  a cambiar el cableado de un montaje que ya está probado. No se borra, se guarda como idea. Lo que sabemos:
+  * La rama `features/line-tracker` (2020–2022), ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin
+    lógica y un ejemplo en Python copiado de un tutorial. Hay que hacerla desde cero.
+  * Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesitan dos entradas digitales: mismo problema que el
+    segundo sensor de la lección 10 (solo IN4 está libre).
+  * Con la salida analógica (`A0`), la tensión depende de la altura y del color del suelo (ver los motivos del
+    descarte en la lección 08). Con la salida digital (`D0`), el potenciómetro del módulo fija el umbral.
+  * Hace falta una pista (cinta aislante negra sobre un suelo claro) y, por tanto, un espacio para el taller.
+
 ### Componentes disponibles (03/10/2026)
-- 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 11 y, si hace falta, 05.
-- 2 módulos TCRT5000 (infrarrojo por reflexión, con potenciómetro; por confirmar): lección 10.
-- Pantalla LCD 2004A con adaptador I2C PCF8574: lección 12 (propuesta).
+- 10 sensores de velocidad LM393 (horquilla óptica, 4 pines: VCC, GND, D0, A0): lección 10 y, si hace falta, 05.
+- 2 módulos TCRT5000 (infrarrojo por reflexión, con potenciómetro; por confirmar): idea de la lección siguelíneas (ver "Ideas para ampliar las lecciones").
+- Pantalla LCD 2004A con adaptador I2C PCF8574: lección 11 (propuesta).
 - 4 pulsadores táctiles de 12 mm (4 patas, 2 contactos): lección 05.
 - Resistencias de 10 kΩ (pull-down si hiciera falta) y de 330 Ω (para LED), y LED rojos y amarillos de 5 mm.
 - 3 módulos láser KY-008 (650 nm, pines S, centro y −). **Peligro para los ojos:** solo con el monitor, nunca

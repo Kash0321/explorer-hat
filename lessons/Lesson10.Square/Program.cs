@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Device.Gpio;
 using ExplorerHat.Common;
 
-// Lesson 11, part 3: The perfect square
+// Lesson 10, part 3: The perfect square
 // WARNING: test it first with the wheels in the air. Then put it on the floor, with 1 meter free around it.
 // Lesson 04 drew a square with times: "turn for 250 milliseconds". But the angle changed with the floor and the
 // batteries. Now the robot counts the pulses of its wheels: "turn until each wheel has done 10 pulses".

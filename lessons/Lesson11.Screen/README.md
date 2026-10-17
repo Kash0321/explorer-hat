@@ -1,4 +1,4 @@
-# Lección 12: La pantalla
+# Lección 11: La pantalla
 
 El robot tiene una pantalla de 4 líneas con 20 caracteres cada una. Con ella puede enseñar mensajes y datos sin
 necesidad de un ordenador: la distancia a un obstáculo, la batería, lo que está haciendo... **No mueve los motores.**
@@ -64,4 +64,4 @@ borrar lo que hubiera antes.
 * **Barra al revés.** Que la barra crezca cuando el obstáculo se **acerca**.
 * **Los tres sensores.** Muestra la distancia de la izquierda, del centro y de la derecha, una en cada línea.
 * **El robot habla.** Añade la pantalla a la lección 09: que escriba "Avanzo", "Obstaculo!" o "Giro a la derecha".
-* **Cuentakilómetros.** Añade la pantalla a la lección 11: que muestre los centímetros recorridos mientras avanza.
+* **Cuentakilómetros.** Añade la pantalla a la lección 10: que muestre los centímetros recorridos mientras avanza.

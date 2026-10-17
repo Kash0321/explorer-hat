@@ -72,4 +72,4 @@ mirar. Si algo no cuadra, no sigas con la lección siguiente: para el robot y cu
 anota los resultados en PLAN.md en una rama nueva con su PR, y pídeme /usage.
 ```
 
-La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. La siguiente tarea propuesta es probarla en el suelo y con un niño. Otras opciones: un checklist del taller, la lección 10 y la Fase 7. El experimento de modelos está decidido (17/10/2026): se mantiene como está, con el asesor y `buscador` ("Experimento de modelos" en `PLAN.md`).
+La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. La siguiente tarea propuesta es probarla en el suelo y con un niño. Otras opciones: un checklist del taller y la Fase 7 (la lección 10 de siguelíneas se descartó el 17/10/2026 y quedó como idea; las lecciones 11 y 12 pasaron a ser la 10 y la 11). El experimento de modelos está decidido (17/10/2026): se mantiene como está, con el asesor y `buscador` ("Experimento de modelos" en `PLAN.md`).

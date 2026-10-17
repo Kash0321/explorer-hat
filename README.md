@@ -25,7 +25,7 @@
 * **Pimoroni Explorer HAT Pro**: va **encima** de la Raspberry Pi. Maneja los motores, las luces y las entradas y salidas.
 * **Dos motores TT amarillos** con reductora 1:48. El motor **One** es la rueda **derecha** y el motor **Two** es la rueda **izquierda**.
 * **Tres sensores de distancia HC-SR04P** (ultrasonidos): izquierda, centro y derecha. El HC-SR04P es la versión del HC-SR04 que funciona con cualquier tensión de 3 a 5,5 V. En el resto del documento los llamamos HC-SR04.
-* **Dos discos de 20 ranuras**, uno en cada motor. Servirán para contar vueltas (lección 11 de `PLAN.md`).
+* **Dos discos de 20 ranuras**, uno en cada motor. Servirán para contar vueltas (lección 10 de `PLAN.md`).
 * **Chasis** con soportes para los motores.
 
 ### Pasos
@@ -225,7 +225,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 
 ## 🎓 Lecciones del taller (`lessons/`)
 
-Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 08 Sensores analógicos, 09 Robot autónomo y 11 Contar vueltas (con sus partes Ir recto y El cuadrado perfecto) y 12 La pantalla.
+Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 07 Pads táctiles, 08 Sensores analógicos, 09 Robot autónomo, 10 Contar vueltas (con sus partes Ir recto y El cuadrado perfecto) y 11 La pantalla.
 Cada lección es un proyecto pequeño con un único `Program.cs` y un README con retos. Índice y forma de
 ejecutarlas en [`lessons/README.md`](lessons/README.md).
 
@@ -327,7 +327,7 @@ sudo sysctl --system
 
 * **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige la lección (`lessons/...`) o el programa (`src/...`). Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir. *Desplegar en la Pi* solo lo copia, sin ejecutarlo.
 * **Depurar:** abre en el editor el `Program.cs` de la lección o del programa. En la pestaña *Run and Debug*, elige la configuración **Depurar en la Pi el programa abierto** y pulsa F5. Despliega el proyecto de ese archivo y lo ejecuta en la Pi con el depurador. Si el archivo abierto no es de una lección ni de un programa (por ejemplo, un README), la compilación falla.
-* **Depurar programas que leen el teclado** (ObstacleAvoidance, SonarDashboard, LdrCheck y las lecciones 04, 11 Contar vueltas y 11 El cuadrado perfecto): la consola de depuración no tiene teclado. Primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
+* **Depurar programas que leen el teclado** (ObstacleAvoidance, SonarDashboard, LdrCheck y las lecciones 04, 10 Contar vueltas y 10 El cuadrado perfecto): la consola de depuración no tiene teclado. Primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
 * **Parar el robot:** la tarea **Parar el robot** para los programas del robot y pone a nivel bajo los pines de motores y luces, y la salida OUT4.
 
 > ⚠️ **Puntos de interrupción y motores:** la velocidad de los motores se controla desde el propio programa (PWM por software). Cuando el depurador se detiene en un punto de interrupción congela todo el programa, y cada motor se queda como estuviera en ese instante: **parado o a toda velocidad**. Depura siempre con las ruedas en el aire.

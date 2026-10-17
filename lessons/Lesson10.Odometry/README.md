@@ -1,4 +1,4 @@
-# Lección 11: Contar vueltas (odometría)
+# Lección 10: Contar vueltas (odometría)
 
 El robot cuenta las vueltas de su rueda derecha con un sensor de velocidad. Así sabe qué distancia ha recorrido:
 primero mide su velocidad y después avanza una distancia exacta. **Mueve los motores.**
