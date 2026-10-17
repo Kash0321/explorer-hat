@@ -137,7 +137,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   sentido esperado; sensores de distancia 20/20. **La pantalla falló** (`IOException: Error 5 (Input/output error)`
   en la primera escritura al PCF8574; `i2cdetect` no veía el 0x27, y sí el 0x28, 0x42 y 0x48): el usuario había
   desconectado los cuatro cables de la pantalla para trabajar y los volvió a conectar con **SDA y SCL intercambiados**.
-  Al corregirlos, `i2cdetect` vuelve a mostrar 0x27. **Lección:** con la pantalla apagada, `Error 5` en el
+  Al corregirlos, `i2cdetect` vuelve a mostrar 0x27, y **el script completo salió bien en la segunda pasada** (LM393
+  derecho 81 y 0, izquierdo 0 y 129; motores en el sentido esperado; texto en la pantalla; sensores de distancia
+  20/20). **Lección:** con la pantalla apagada, `Error 5` en el
   constructor de `Screen` quiere decir que nadie contesta en 0x27 (alimentación, SDA/SCL cruzados o cable suelto);
   con la luz de fondo encendida, la alimentación está bien y se mira SDA/SCL. Si VCC fuera a 5V en vez de a 3,3 V, las
   resistencias de subida de la placa de la pantalla pondrían 5 V en los pines I2C de la Pi: comprobarlo con la Pi apagada.
