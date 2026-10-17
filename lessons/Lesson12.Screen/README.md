@@ -15,12 +15,12 @@ necesidad de un ordenador: la distancia a un obstáculo, la batería, lo que est
 
 ## Qué hardware usa
 
-* **La pantalla LCD 2004** (20 columnas × 4 líneas) con su adaptador I2C, en la dirección 0x27. Se conecta a la fila
-  lateral del Explorer HAT marcada "3.3V ONLY":
+* **La pantalla LCD 2004** (20 columnas × 4 líneas) con su adaptador I2C, en la dirección 0x27. VCC, SDA y SCL se
+  conectan a la fila lateral del Explorer HAT marcada "3.3V ONLY" (que no tiene GND: GND va a un pin GND del HAT):
 
   | Adaptador | Explorer HAT |
   |---|---|
-  | GND | GND |
+  | GND | un pin GND |
   | VCC | **3v3** (nunca a 5V: el bus I2C llega directo a la Raspberry Pi) |
   | SDA | SDA |
   | SCL | SCL |

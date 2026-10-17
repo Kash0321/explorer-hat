@@ -88,12 +88,14 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 
 **Cables de la pantalla LCD en este robot.** La pantalla no está fijada al chasis y se quita a menudo. Se conecta con **cuatro cables Dupont independientes**, que se enchufan de uno en uno en los cuatro pines de su placa (aunque encajen juntos y parezcan un bloque). El color de cada cable es el mismo en los dos extremos:
 
-| Color | Pin de la placa de la pantalla | Pin del HAT (fila lateral "3.3V ONLY") |
+| Color | Pin de la placa de la pantalla | Pin del HAT |
 |---|---|---|
-| Amarillo | GND | GND |
-| Verde | VCC | **3v3** (nunca a 5V) |
-| Azul | SDA | SDA |
-| Blanco | SCL | SCL |
+| Amarillo | GND | un pin GND del HAT |
+| Verde | VCC | **3v3** de la fila lateral (nunca a 5V) |
+| Azul | SDA | SDA de la fila lateral |
+| Blanco | SCL | SCL de la fila lateral |
+
+SDA, SCL y 3v3 van a la fila lateral marcada "3.3V ONLY", que no tiene GND: el cable amarillo va a cualquier pin GND del HAT.
 
 ![Los cuatro cables Dupont en la placa de la pantalla: de arriba abajo, amarillo (GND), verde (VCC), azul (SDA) y blanco (SCL)](docs/img/pantalla-conexion.jpg)
 
@@ -105,7 +107,8 @@ Esta tabla recoge qué va a cada conector del Explorer HAT Pro y a qué GPIO de 
 * **Mira cada cable por su color, no por su posición:** los cables se cruzan y se enredan. El 17/10/2026 se cruzaron SDA y SCL al volver a conectarla: el programa falló con `Error 5 (Input/output error)` y `i2cdetect` no veía la dirección `0x27`, aunque la luz de fondo estaba encendida.
 * Si la Pi está encendida, **conecta en este orden: GND, VCC, SDA y SCL.** Para **desconectar, al revés: SCL, SDA, VCC y GND.** La masa y la alimentación van antes que los datos. Con VCC desconectado y SDA y SCL conectados, la placa puede alimentarse a medias a través de esas dos líneas y molestar al bus.
 * **No quites solo el cable VCC para "apagar" la pantalla.** Quita los cuatro.
-* **VCC va al pin 3v3, nunca a 5V:** las resistencias de la placa suben SDA y SCL hasta su VCC, y esas líneas llegan directas a la Raspberry Pi, que solo admite 3,3 V.
+* **VCC va al pin 3v3, nunca a 5V:** las placas de este tipo suelen llevar resistencias que suben SDA y SCL hasta su VCC, y esas líneas llegan directas a la Raspberry Pi, que solo admite 3,3 V. En esta placa no lo hemos comprobado: con la pantalla desconectada y el multímetro en `20k`, mide entre SDA y VCC y entre SCL y VCC de la placa. Unos kΩ quieren decir que lleva resistencias; "1" (fuera de rango), que no.
+* **Aparta los extremos sueltos** de las piezas metálicas (el eje del potenciómetro, el chasis) cuando desconectes con la Pi encendida: el cable verde queda con 3,3 V y el amarillo con GND.
 * **Después de conectarla, comprueba:** `/usr/sbin/i2cdetect -y 1` debe mostrar `27` (además de `28`, `42` y `48`).
 
 > ℹ️ Cada sensor HC-SR04 tiene cuatro cables: **VCC** (alimentación), **TRIG**, **ECHO** y **GND** (masa). **VCC va al pin 5V del HAT** y **GND al pin GND del HAT**. TRIG va a una salida OUT del HAT y ECHO a una entrada IN. Todos los GND (Pi, HAT y sensores) tienen que estar unidos: es la *masa común*, la referencia de 0 V con la que se miden todas las señales.
