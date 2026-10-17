@@ -237,6 +237,18 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   define `advisorModel`. El comando `/agents` ya no existe en Claude Code (se editan los archivos de
   `.claude/agents/`). Primera prueba de `buscador`: 3 consultas y 9 s para una búsqueda en un archivo de
   `C:\work\iot`, con resultado correcto; para un solo archivo, leerlo directamente cuesta lo mismo.
+  **Datos de `/usage` hasta ahora** (los pega el usuario; faltan los de cierre de la sesión 2):
+  - **Sesión 1** (la larga del 17/10/2026; 11 h de reloj, 1 h de API): **36,39 $** en total. **Sonnet 5.5: 18,26 $**
+    (106,5 M de lectura de caché, 339 k de salida). **Opus 5.5, el asesor: 18,11 $** (4,2 M de entrada, 72,8 k de
+    salida, **0 de caché**): **el asesor costó casi la mitad (50 %)**. Haiku (`buscador`): 0,02 $, una sola consulta.
+    El 95 % del uso fue con más de 150 k de contexto. Semana: 9 % usado.
+  - **Sesión 2, al empezar** (prompt de retomar leído): 0,29 $ (Sonnet 5.5: 259 k de lectura de caché y 56 k de
+    escritura). Semana: 9 %.
+  - **Sesión 2, qué hizo el asesor** (una llamada, al final): corrigió dos notas de `PLAN.md` con causa equivocada (el
+    registro de pines sí servía; el `salida=` faltaba por bash y no por el pegado). Cambió el contenido, no el
+    plan. Pendiente: los datos de cierre (el usuario los pasa después).
+  - **Lectura provisional:** el coste lo dominan las sesiones largas con mucho contexto (el asesor lee todo el
+    historial, sin caché). Con una sola llamada, la sesión 2 dará una cifra más pequeña. Decidir al cerrar la 3.
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
@@ -874,12 +886,10 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       Para una ejecución con cuenta atrás, `sleep 8` en el PC y después el `ssh` es suficiente, pero .NET tarda de 3 a
       8 s más en arrancar: el usuario debe esperar a ver moverse las ruedas (o la salida del programa) antes de poner la
       mano.
-    - **Código de salida con Ctrl+C, sin comprobar:** la línea `salida=` no salió en ninguno de los dos pegados del
-      usuario (con `tee` y sin `tee`). Hipótesis (sin comprobar): bash interactivo no ejecuta el resto de la lista
-      (`cmd; echo ...`) cuando el programa en primer plano muere por `SIGINT`. Se comprueba sin motores: en la terminal
-      de la Pi, `sleep 5; echo hecho` y Ctrl+C (si no sale "hecho", la hipótesis es cierta). Para ver el código, escribir
-      `echo $?` en la línea siguiente (se espera 130). Las ruedas y los pines estaban bien, y el mensaje de la segunda
-      ejecución llegó.
+    - **La línea `salida=` no sale con Ctrl+C, y no es un fallo del robot** (comprobado el 17/10/2026, sin motores): en
+      la terminal de la Pi, `sleep 5; echo hecho` y Ctrl+C **no escribe "hecho"**. Bash interactivo no ejecuta el resto de
+      la lista (`cmd; echo ...`) cuando el programa en primer plano muere por `SIGINT`. Para ver el código de salida
+      tras Ctrl+C, escribir `echo $?` en la línea siguiente (se espera 130); no se midió con la lección 09.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
