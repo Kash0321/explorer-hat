@@ -28,7 +28,7 @@ conservan aquí.
 | Con un dedo encima | unos **110 kΩ** |
 | A oscuras | **más de 2 MΩ** (el multímetro marca "1": fuera de rango) |
 | Modelo probable | GL5539 (o GL5537-2). Solo orientativo |
-| Resistencia fija recomendada para el divisor | **10 kΩ** (ya la hay). Con 20 kΩ (dos de 10 kΩ en serie) o 22 kΩ, más margen |
+| Resistencia fija del divisor (**decisión del usuario, 17/10/2026**) | Empezar con **10 kΩ** (ya la hay) y dejar 22 kΩ como reto. **No hay de 22 kΩ: queda por estudiar** (dos de 10 kΩ en serie dan 20 kΩ) |
 
 ## El material
 
@@ -79,10 +79,9 @@ unos 170 lux. Es orientativo.
 
 ## Qué modelo parece ser
 
-Valores aproximados de las hojas de datos de la serie GL55xx (de memoria; sin confirmar con la hoja de datos de cada
-modelo):
+Valores aproximados de las hojas de datos de la serie GL55xx, sin confirmar con la hoja de datos de cada modelo:
 
-| Modelo | Con 10 lux | A oscuras (mínimo) |
+| Modelo | Con 10 lux | A oscuras |
 |---|---|---|
 | GL5506 | 2–5 kΩ | 0,2 MΩ |
 | GL5516 | 5–10 kΩ | 0,5 MΩ |
@@ -133,6 +132,10 @@ Una LDR es una resistencia que **baja** cuando le da la luz. Con una resistencia
   mitad de la escala. Cambiar la resistencia fija es un reto bueno para los niños: ver qué hace.
 * **Dos resistencias de 10 kΩ en serie dan 20 kΩ** (no hay de 22 kΩ).
 
+**Decisión del usuario (17/10/2026):** empezar con 10 kΩ y dejar el cambio a 22 kΩ como un reto para los niños. Como
+no hay resistencias de 22 kΩ, ese reto **queda por estudiar**: se podría comprar alguna, o usar 20 kΩ con dos de
+10 kΩ en serie (la tabla de arriba incluye ese caso).
+
 ## Cómo conectarlo al robot
 
 Con el robot **apagado**:
@@ -141,7 +144,9 @@ Con el robot **apagado**:
    ejemplo, el nodo de 5V de la protoboard de la Pi. **Una protoboard no lleva alimentación por sí sola.** El 17/10/2026,
    el potenciómetro se quedó a 0,02 V porque su cable 5V iba a una fila sin unir al HAT.
 2. **Prueba de continuidad** (multímetro en el zumbador, sin corriente): debe sonar entre la fila del 5V y el pin 5V
-   del HAT, y entre la fila de GND y un pin GND del HAT. Entre la fila del 5V y la de GND no debe sonar.
+   del HAT, y entre la fila de GND y un pin GND del HAT. Entre la fila del 5V y la de GND no debe sonar de forma
+   continua. **Un pitido breve es normal:** con el robot conectado, los condensadores de la Pi y de la UPS se cargan
+   un instante con la corriente del multímetro. **Un pitido continuo es un cortocircuito.**
 3. **Un cable del nodo a una entrada analógica del HAT** (Analog 1 a 4). Las entradas admiten **de 0 a 5 V**. En el
    código, `hat.Analog.One` a `hat.Analog.Four` (ver `ExplorerHat.Common`).
 4. **Síntomas de una entrada mal conectada:** sin nada conectado, una entrada flota y marca **unos 0,5 V**. Atada a

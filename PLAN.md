@@ -644,8 +644,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       luz: con 57 lux y 23 kΩ, y una ley de R ∝ lux^−0,6, saldrían unos 65 kΩ con 10 lux: **GL5539 (o GL5537-2)**.
       Para que fuera una GL5528 (10–20 kΩ con 10 lux), la sala tendría que estar a unos 5 lux. Solo orientativo (el
       sensor de luz del móvil es poco exacto). No hace falta el modelo exacto.
-    - **Propuesta del divisor para una lección futura (la lección 08 ya no usa la LDR):** 5V → LDR → nodo →
-      **10 kΩ** → GND, y el nodo a una entrada analógica: más luz, más voltios. Tensiones esperadas (5 V × Rf / (R_LDR + Rf); con los 5,30 V reales del pin 5V, multiplicar por 1,06):
+    - **Divisor para una lección futura (la lección 08 ya no usa la LDR). Decisión del usuario (17/10/2026):
+      empezar con 10 kΩ y dejar 22 kΩ como reto; no hay de 22 kΩ, así que queda por estudiar** (dos de 10 kΩ en serie
+      dan 20 kΩ): 5V → LDR → nodo → **10 kΩ** → GND, y el nodo a una entrada analógica: más luz, más voltios. Tensiones esperadas (5 V × Rf / (R_LDR + Rf); con los 5,30 V reales del pin 5V, multiplicar por 1,06):
 
       | Condición | R de la LDR | Con 10 kΩ | Con 22 kΩ (rojo, rojo, naranja; reto opcional) |
       |---|---|---|---|
@@ -710,7 +711,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     | GL5539 | 50–100 kΩ | 5 MΩ |
     | GL5549 | 100–200 kΩ | 10 MΩ |
 
-    - **Programa `~/apps/LdrCheck`** (no versionado; su código, en `~/apps/LdrCheck/src` de la Pi): `Ads1115` de
+    - **Programa `LdrCheck`** (versionado desde el 17/10/2026 en `docs/ldr/LdrCheck`; también desplegado en
+      `~/apps/LdrCheck` de la Pi, con su código en `~/apps/LdrCheck/src`): `Ads1115` de
       4.2.0, sin el HAT (no toca ningún pin). Para cada LDR pide su nombre, los lux de la sala (opcional, de una
       aplicación del móvil) y tres medidas de 2 s que empiezan con Enter: luz de la sala, tapada con un dedo y a
       oscuras (espera 10 s). Al final, una tabla. Calcula R = 10 kΩ × (Vfuente / V − 1). Cada lectura usa la escala
