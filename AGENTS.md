@@ -80,4 +80,4 @@ Este archivo define las restricciones operativas, limitaciones de hardware y dir
   * antes de publicar fuera de este repositorio (después del visto bueno del usuario sobre el texto).
 * **Subagente `buscador`** (Haiku, solo lectura, `.claude/agents/buscador.md`): para búsquedas amplias, sobre todo en `C:\work\iot`. En este repositorio, usa `Grep` y `Glob` directamente.
 * **No se usa JEV** (decisiones por API de un tercero): los hooks de Claude Code ya resuelven las bifurcaciones simples sin llamar a un modelo.
-* **Criterio para seguir o quitarlo:** ver "Sin prisa" en `PLAN.md`.
+* **Decidido el 17/10/2026 (tras las tres sesiones): se mantiene como está** (opción 1). Los datos y la lectura están en "Experimento de modelos" de `PLAN.md`. Para volver a revisarlo, usa `/usage` en una sesión nueva.

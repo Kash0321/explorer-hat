@@ -72,4 +72,4 @@ mirar. Si algo no cuadra, no sigas con la lección siguiente: para el robot y cu
 anota los resultados en PLAN.md en una rama nueva con su PR, y pídeme /usage.
 ```
 
-La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. La siguiente tarea propuesta es probarla en el suelo y con un niño. Otras opciones: un checklist del taller, la lección 10 y la Fase 7. Del experimento de modelos están los datos de las tres sesiones; falta la decisión del usuario de seguir o quitarlo ("Experimento de modelos" en `PLAN.md`).
+La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. La siguiente tarea propuesta es probarla en el suelo y con un niño. Otras opciones: un checklist del taller, la lección 10 y la Fase 7. El experimento de modelos está decidido (17/10/2026): se mantiene como está, con el asesor y `buscador` ("Experimento de modelos" en `PLAN.md`).

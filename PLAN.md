@@ -204,8 +204,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 - **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores y la lección 07 están hechos
   (17/10/2026, noche).** Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
   probar la lección 07 en el suelo y con un niño (o elegir entre un checklist del taller, la lección 10 y la Fase 7).
-  **Decidir** si se mantiene el experimento de modelos (la sesión 3 de 3 terminó con la lección 07; sus datos y las
-  opciones están en "Experimento de modelos").
+  **Experimento de modelos: decidido** (17/10/2026, ver "Experimento de modelos"): se mantiene como está.
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
      el 16/10/2026).
@@ -237,7 +236,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   (Fase 2). La pull-up del Trig de los HC-SR04P ya está medida (17/10/2026, ver el README y el "Estado actual").
   Duda pequeña que queda: si la pull-up de unos 62 kΩ es una pieza suelta o está dentro del chip (se ve en la
   placa). El 4,93 V del Trig frente a los 5,29 V de VCC ya está explicado (ver el "Estado actual").
-- **Experimento de modelos (desde el 17/10/2026):** Sonnet 5.5 con asesor Opus 5.5 y el subagente `buscador`
+- **Experimento de modelos (desde el 17/10/2026):** **decidido el 17/10/2026, al cerrar la sesión 3: el usuario
+  elige la opción 1, mantener las reglas de `AGENTS.md` como están** (el asesor en las consultas de siempre y en las
+  del proyecto, y el subagente `buscador`). No se quita ni se recorta nada. Lo de abajo es el historial de la
+  decisión. Sonnet 5.5 con asesor Opus 5.5 y el subagente `buscador`
   (reglas en `AGENTS.md`, archivos en `.claude/`). Tras tres sesiones, revisar con `/usage` el coste, cuántas
   veces el asesor cambió una decisión y si `buscador` ahorró contexto. Si no aporta, quitar
   `.claude/settings.json`, `.claude/agents/buscador.md` y la sección de `AGENTS.md`. Se decidió **no usar JEV**
@@ -296,7 +298,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     El asesor cuesta unos 0,70 a 0,75 $ por llamada con 140 a 150 k de entrada, sin caché, y su coste crece con la
     sesión. Con una o dos llamadas por sesión corta, sigue siendo barato; la sesión larga es lo que más gasta
     (la sesión 1 fue el 84 % del coste de las tres). `buscador` no se ha usado más que una vez (0,02 $).
-    **Opciones:** mantener las reglas de `AGENTS.md` como están; mantener el asesor solo en lo físico (antes de mover
+    **Decisión del usuario (17/10/2026): la opción 1, mantener las reglas como están.** Las tres opciones eran:
+    mantener las reglas de `AGENTS.md` como están; mantener el asesor solo en lo físico (antes de mover
     motores con código nuevo y al publicar fuera) y quitarlo del resto; o quitar el experimento (borrar
     `.claude/settings.json`, `.claude/agents/buscador.md` y la sección de `AGENTS.md`).
 - Actualiza esta sección al final de cada sesión de trabajo.
