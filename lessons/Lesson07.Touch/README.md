@@ -67,7 +67,7 @@ Lo comprobamos en el robot (17/10/2026):
 | Qué pasa | Qué hacer |
 |---|---|
 | Falla al empezar con una excepción de `IOException` | El chip no contesta en la dirección 0x28 (o contesta otro chip). Mira `/usr/sbin/i2cdetect -y 1`: deben salir 0x28 y 0x48 (y 0x42 de la UPS). |
-| Ningún pad responde | Comprueba con `/usr/sbin/i2cdetect -y 1` que sale 0x28. Si sale, apaga y enciende el robot con las manos lejos de los pads. |
+| Ningún pad responde | Comprueba con `/usr/sbin/i2cdetect -y 1` que sale 0x28. |
 | La luz de un pad no coincide | Comprueba el número impreso junto al pad en el HAT. |
 | El robot avanza al revés | Comprueba los cables de los motores (ver el README del repositorio). |
 

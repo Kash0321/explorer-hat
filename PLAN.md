@@ -262,6 +262,19 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     entrada, 7 k de salida y 0 de caché). Haiku: 0,0007 $ (no se usó `buscador`: no hizo falta buscar en `C:\work\iot`).
     Semana: 10 % usado (un punto más que al empezar). El 88 % del uso de las últimas 24 h fue con más de 150 k de
     contexto; el dato incluye la sesión 1.
+  - **Sesión 3, al empezar** (prompt de retomar leído): 0,00 $ en `/usage` (17 s de reloj, sin peticiones aún); ventana
+    de sesión al 40 % y semana al 10 %. **Faltan los datos de cierre** (el usuario los pega con `/usage` al terminar).
+  - **Sesión 3, qué hizo el asesor** (tres llamadas: antes de fijar el plan, antes de mover los motores y al cerrar):
+    1. *Antes del plan:* confirmó el plan y añadió comprobaciones: copiar la lógica del chip desde el fork y no
+       reescribirla de memoria, no cambiar la configuración del chip, el orden de las pruebas (orden de los pads, luces,
+       motores, parada) y preguntar qué pads usar.
+    2. *Antes de mover los motores:* aprobó `PhantomCheck`; añadió que la lección con `moveMotors = true` debía
+       probar la suelta con el motor girando (un pad "pegado" no lo ve `PhantomCheck`), usar una copia fuera del
+       repositorio en vez de editar el `Program.cs`, y la lista de documentos que faltaban.
+    3. *Al cerrar:* encontró un fallo real: los programas de prueba que mueven los motores no los reconoce la
+       parada de emergencia (ver la Fase 5, lección 07), y que faltaba este registro. **Cambió una decisión de
+       seguridad** (borrar los programas y fijar la regla de nombres); las dos primeras llamadas añadieron
+       comprobaciones sin cambiar el plan.
   - **Lectura provisional (sesiones 1 y 2):** el coste lo dominan las sesiones largas con mucho contexto: la sesión 1
     costó 14 veces más que la 2. **El asesor lee todo el historial en cada llamada y sin caché, así que su coste
     crece con la longitud de la sesión** (0,70 $ por una llamada con 139 k de entrada; 18,11 $ en la sesión 1, con 4,2 M
@@ -645,6 +658,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
        `SIGTERM` (0 pines en alto a los 0,4 s, proceso muerto) y Ctrl+C (sin `| tee`), las dos bien.
     5. **Después de todo:** pines en `lo`, `get_throttled` = `0x0` y el chip con la configuración de fábrica
        (`0x2A` = `0x80`, `0x1F` = `0x2F`).
+  - **Fallo encontrado por el asesor al cerrar (17/10/2026):** los dos programas de prueba que mueven los motores
+    (`Lesson07Motors` y `PhantomCheck`, en `~/apps`) no los reconoce la parada de emergencia (`[L]esson[0-9]+[.]` pide
+    un punto después del número). **Se borraron de la Pi** y `AGENTS.md` tiene ahora la regla: un programa de prueba
+    que mueve los motores se llama `LessonNN.Algo`. Los usé con `SafeExplorerHat`, así que Ctrl+C y `SIGTERM` los
+    paraban (probado), pero `tools/parar-robot.sh` no. Los fuentes (en el scratchpad de la sesión) no se versionan.
   - **Pendiente:** probar la lección en el suelo (no hecho) y con un niño de verdad (¿es cómodo mantener el dedo en
     pads tan juntos?). No se ha probado el comportamiento con la pantalla LCD conectada (comparte el bus I2C).
 - [x] 08 Sensores analógicos (`Lesson08.Analog`): potenciómetro. **Hecha y probada el 17/10/2026.**
