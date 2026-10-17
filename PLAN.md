@@ -23,6 +23,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     luz fuerte, ~23 kΩ con la luz de la sala, ~110 kΩ con un dedo encima y > 2 MΩ a oscuras) y el potenciómetro
     tiene el cursor en el hilo **negro**. Resultados, tablas y propuestas en la Fase 5 (lección 08). Sin tocar el
     robot ni la Pi.
+  - **Potenciómetro probado en la Pi** (17/10/2026): de 0,01 V a 5,31 V con `~/apps/PotCheck`. Fallo del primer
+    intento: el 5V iba a una fila de protoboard sin unir al pin 5V del HAT. Detalles en la lección 08.
   - **#2610 probado en la Pi con el último commit del PR** (`c6fcf210`, ya con el recuento de referencias `0f4e5718` y
     los arreglos de Copilot). Mismo método que el 03/10/2026 (GPIO 8 sin nada conectado y flancos con `pinctrl set 8
     pu`/`pd`; no mueve los motores). **Arregla lo que faltaba:** con dos avisos en el pin, quitar uno deja funcionando
@@ -596,6 +598,24 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       cualquier posición (si en un extremo da ~0 Ω, el cableado está mal). **Para el código:** el pin 5V del HAT da
       ~5,30 V, no 5,0: con el mando al máximo, Analog 1 leerá ~5,3 V. No suponer 5,0 V como tope al pasar la
       lectura a velocidad o a luces (usar un tope o dividir entre la tensión medida).
+    - **Probado en la Pi el 17/10/2026** con `~/apps/PotCheck` (no versionado; fuente en `~/apps/PotCheck/src`; lee
+      Analog 1 con `Ads1115` de 4.2.0 y muestra voltios y una barra; `dotnet PotCheck.dll all` muestra las cuatro
+      entradas). Adaptador: tres Dupont macho–macho en la carcasa hembra XH2.54 del potenciómetro (sirven los
+      contactos de la carcasa, hechos para pines de 0,64 mm), con etiquetas "5V", "SEÑAL" y "GND". Primer intento:
+      Analog 1 fija en **0,02 V** (Analog 2–4 flotantes a ~0,5 V): el cable SEÑAL llegaba, pero el 5V iba a una fila de
+      una protoboard **sin unir al pin 5V del HAT**. La pista no tenía tensión y el cursor leía 0 V con cualquier giro.
+      Solución: el cable 5V al nodo de 5V de la protoboard de la Pi (el del sensor de velocidad LM393 de la rueda
+      derecha). Resultado: de **0,01 V** (mando al mínimo) a **5,31 V** (al máximo, igual que los 5,30 V del pin 5V),
+      lineal, y bajando igual al girar al revés. `get_throttled` = `0x0` y los 8 pines en `lo`. **Lección para los
+      niños:** una protoboard no lleva alimentación por sí sola; una entrada flotante marca ~0,5 V y una entrada atada
+      a masa, ~0,02 V. La prueba de continuidad (zumbador del multímetro) entre la fila y el pin 5V comprueba esa
+      unión sin dar corriente.
+    - **Problema para usar el fork en la lección (17/10/2026):** `SafeExplorerHat` usa `Iot.Device.ExplorerHat.ExplorerHat`
+      del paquete `Iot.Device.Bindings` 4.2.0, y el proyecto `ExplorerHat` del fork tiene un tipo con el mismo nombre
+      completo. Comprobado con un proyecto que referencia `ExplorerHat.Common` y el `.csproj` del fork: `error CS0433:
+      el tipo 'ExplorerHat' existe en 'ExplorerHat' y en 'Iot.Device.Bindings'`. Con el fork, `Common` tendría que dejar
+      el paquete y depender del fork para todos sus enlaces (`ExplorerHat`, `DCMotor`, `Hcsr04`, pantalla, ...), y las
+      11 lecciones habría que probarlas otra vez. Opciones y decisión del usuario: ver "Al retomar".
   - **Medir las LDR con el robot (preparado el 10/10/2026; ya no hace falta: se midieron con el multímetro).** Plan
     antiguo, sin multímetro. Las LDR no llevan marca;
     las de 5 mm suelen ser de la serie GL55xx, iguales por fuera (una bolsa puede ser un surtido de varios modelos).
