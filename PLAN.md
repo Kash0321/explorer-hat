@@ -839,8 +839,8 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - **Al terminar:** anotar los resultados en esta sección (qué lección, qué se vio, tiempos de los pines y de la
     parada), en una rama nueva desde `main` (`fase-5-repaso-motores-common`), con su PR. Pedir al usuario `/usage` (al
     empezar y al terminar la sesión) para el experimento de modelos.
-  - **Resultados (17/10/2026, noche, desde el PC; todo con las ruedas en el aire):** las seis ejecuciones salieron bien
-    y en ninguna quedó un pin de motor en alto sin programa (registro `~/pines-repaso.log` con `vigilar-pines.sh`,
+  - **Resultados (17/10/2026, noche, desde el PC; todo con las ruedas en el aire):** los seis programas (unas doce
+    ejecuciones) salieron bien y en ninguna quedó un pin de motor en alto sin programa (registro `~/pines-repaso.log` con `vigilar-pines.sh`,
     2400 s). Antes: Pi en `main` (`69254dc`), `i2cdetect` con 0x28, 0x42 y 0x48 (pantalla desconectada) y los programas
     desplegados desde `main` con el `Common` nuevo. Después de cada ejecución: ningún proceso, los 8 pines en `lo` y
     `get_throttled` = `0x0`.
@@ -860,18 +860,26 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       `Obstacle!`, con la mano a 9 cm del sensor izquierdo): "Parada de emergencia (SIGTERM): motores parados", salida
       143 y los pines en `lo`; las dos ruedas pararon. Con Ctrl+C del usuario, a mitad de la marcha: "Parada de
       emergencia (SIGINT): motores parados" y las dos ruedas pararon.
-    - **Los tiempos de los pines no se midieron:** el registro de `vigilar-pines.sh` cuenta el propio comando `ssh`
-      como programa del robot (`procs=1`), así que no sirve para ver la zona de la parada. El 17/10/2026 (lección 03) se
-      midieron 0,24 s hasta tener los pines en `lo`.
+    - **Tiempos de los pines en la parada** (registro de `vigilar-pines.sh`, una muestra cada 0,25 s): con `SIGTERM`,
+      la muestra con la marcha atrás (pines 20 y 26 en `hi`) es la de las 21:21:59.4 y la siguiente (21:21:59.6, cuando
+      ya no hay proceso de la lección) tiene los 4 pines en `lo`: **menos de 0,25 s**. Con Ctrl+C, en las dos ejecuciones
+      los pines pasan a `lo` **en la misma muestra en que desaparece el proceso** (menos de 0,3 s). Para leer el
+      registro durante una prueba lanzada por SSH, no filtrar por `procs=1`: el `bash -c`, `setsid`, `timeout` y
+      `dotnet` cuentan como programas del robot (`procs=4`). Mirar el tramo completo (por ejemplo,
+      `sed -n 2485,2515p ~/pines-repaso.log`).
     - **Dos lecciones del repaso:** (1) **`| tee` esconde el mensaje de parada con Ctrl+C**: Ctrl+C va a todos los
       procesos de la línea y `tee` muere antes de que el programa escriba. Para probar la parada con Ctrl+C, ejecutar el
-      programa **sin `tee`**. (2) **`pgrep -fc "Lesson[0-9]"` cuenta el propio comando** si este contiene un nombre de
-      lección (me pasó tres veces al comprobar el despliegue): comprobar los procesos en una llamada aparte, con
-      `P=Lesson; pgrep -fc "${P}[0-9]"`. Para una ejecución con cuenta atrás, `sleep 8` en el PC y después el
-      `ssh` es suficiente, pero .NET tarda de 3 a 8 s más en arrancar: el usuario debe esperar a ver moverse las ruedas
-      (o la salida del programa) antes de poner la mano.
-    - **Sin comprobar:** el código de salida de la parada con Ctrl+C (la línea `salida=` no llegó en los dos pegados
-      del usuario). Las ruedas y los pines estaban bien.
+      programa **sin `tee`** (en `AGENTS.md`). (2) **`pgrep -fc "Lesson[0-9]"` cuenta el propio comando** si este
+      contiene un nombre de lección (pasó tres veces al comprobar el despliegue; la regla ya está en `AGENTS.md`).
+      Para una ejecución con cuenta atrás, `sleep 8` en el PC y después el `ssh` es suficiente, pero .NET tarda de 3 a
+      8 s más en arrancar: el usuario debe esperar a ver moverse las ruedas (o la salida del programa) antes de poner la
+      mano.
+    - **Código de salida con Ctrl+C, sin comprobar:** la línea `salida=` no salió en ninguno de los dos pegados del
+      usuario (con `tee` y sin `tee`). Hipótesis (sin comprobar): bash interactivo no ejecuta el resto de la lista
+      (`cmd; echo ...`) cuando el programa en primer plano muere por `SIGINT`. Se comprueba sin motores: en la terminal
+      de la Pi, `sleep 5; echo hecho` y Ctrl+C (si no sale "hecho", la hipótesis es cierta). Para ver el código, escribir
+      `echo $?` en la línea siguiente (se espera 130). Las ruedas y los pines estaban bien, y el mensaje de la segunda
+      ejecución llegó.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos
