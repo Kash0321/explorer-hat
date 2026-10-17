@@ -196,9 +196,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      el dato extra de arriba ayuda.
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
-     **Lección 08 hecha el 17/10/2026** (opción Z, sin fork: ver la Fase 5, lección 08). **Siguiente paso:** probar la
-     lección 08 con la LDR en Analog 2 (divisor de 10 kΩ, propuesta que el usuario aún no ha confirmado) y comprobar
-     los otros dos potenciómetros (mismo orden de hilos). **La lección 10, no todavía** (decisión del usuario,
+     **Lección 08 hecha el 17/10/2026** (opción Z, sin fork: ver la Fase 5, lección 08). **La lección 08 usa solo el
+     potenciómetro** (decisión del usuario, 17/10/2026: sin LDR). Los otros dos potenciómetros se midieron con el
+     multímetro (10,35 y 9,83 kΩ en total); falta ver con el programa que tienen el mismo orden de hilos. **La
+     lección 10, no todavía** (decisión del usuario,
      10/10/2026). Después, la 10 (siguelíneas, si están los dos TCRT5000), la 07 (pads, cuando fusionen el `Cap1208`) o
      la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
@@ -571,13 +572,21 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     arrancar el programa en la Pi (motores parados). Sin caídas de tensión (`0x0`), baterías a 7,95 V como
     mínimo y 1,02 A como máximo.
 - [ ] 07 Pads táctiles: control remoto del robot (requiere Fase 6).
-- [x] 08 Sensores analógicos (`Lesson08.Analog`): luz o potenciómetro. **Hecha y probada con el potenciómetro el
-      17/10/2026** (la LDR en Analog 2 se probó solo midiendo con el multímetro, no con el programa).
+- [x] 08 Sensores analógicos (`Lesson08.Analog`): potenciómetro. **Hecha y probada el 17/10/2026.**
+  - **Decisión del usuario (17/10/2026): la lección usa solo el potenciómetro, sin la LDR.** Montar la LDR pide una
+    protoboard y complica el montaje, y el potenciómetro ya explica bien el tema (en el montaje del 17/10/2026 falló
+    justo la protoboard: el 5V iba a una fila sin unir al HAT). Se quitaron del README y del programa la sección de
+    la LDR y los retos de la luz. **Las medidas de las LDR, el divisor de 10 kΩ, y el texto de lección
+    se guardaron en [`docs/fotorresistencias-LDR.md`](docs/fotorresistencias-LDR.md)** (índice de `docs/` en
+    [`docs/README.md`](docs/README.md)); el programa `LdrCheck` pasó a `src/ExplorerHat.LdrCheck`, y las medidas están
+    también aquí abajo para una lección futura (por ejemplo, con dos LDR en la Fase
+    7: un vehículo de Braitenberg que sigue o huye de una linterna, "sentir, pensar y actuar"). Las 20 LDR siguen en
+    el material.
   - **Qué es:** un único `Program.cs` con *top-level statements*: lee `hat.Analog.One.ReadVoltage().Volts`, lo pone en
     una escala de 0 a 1 (`minVolts` 0 y `maxVolts` 5,3, con `Math.Clamp`) y enciende de 0 a 4 luces (azul, amarilla,
     roja y verde) con cuatro `if` seguidos. Escribe los voltios y una barra en la terminal. Sin motores (el reto del
     motor va solo como texto, con aviso de las ruedas en el aire). 30 s y 10 lecturas por segundo. README con montaje,
-    la trampa del cable negro, tabla de síntomas, la LDR y los retos.
+    la trampa del cable negro, tabla de síntomas y los retos (sin LDR desde la decisión de arriba).
   - **Cómo lee las entradas (opción Z, elegida por el usuario el 17/10/2026):** ayudante `AnalogInputs` y `AnalogInput`
     en `ExplorerHat.Common`, con la forma del binding de dotnet/iot (`hat.Analog.One.ReadVoltage()`), sobre `Ads1115`
     de `Iot.Device.Bindings` 4.2.0. `SafeExplorerHat.Analog` abre el I2C al leer por primera vez y se libera al final del
@@ -636,9 +645,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       luz: con 57 lux y 23 kΩ, y una ley de R ∝ lux^−0,6, saldrían unos 65 kΩ con 10 lux: **GL5539 (o GL5537-2)**.
       Para que fuera una GL5528 (10–20 kΩ con 10 lux), la sala tendría que estar a unos 5 lux. Solo orientativo (el
       sensor de luz del móvil es poco exacto). No hace falta el modelo exacto.
-    - **Propuesta del divisor (pendiente de confirmar por el usuario):** 5V → LDR → nodo → **10 kΩ** → GND, y el
-      nodo a Analog 1 (el README de la lección lo pone en **Analog 2**, para no recablear el potenciómetro): más luz,
-      más voltios. Tensiones esperadas (5 V × Rf / (R_LDR + Rf); con los 5,30 V reales del pin 5V, multiplicar por 1,06):
+    - **Divisor para una lección futura (la lección 08 ya no usa la LDR). Decisión del usuario (17/10/2026):
+      empezar con 10 kΩ y dejar 22 kΩ como reto; no hay de 22 kΩ, así que queda por estudiar** (dos de 10 kΩ en serie
+      dan 20 kΩ): 5V → LDR → nodo → **10 kΩ** → GND, y el nodo a una entrada analógica: más luz, más voltios. Tensiones esperadas (5 V × Rf / (R_LDR + Rf); con los 5,30 V reales del pin 5V, multiplicar por 1,06):
 
       | Condición | R de la LDR | Con 10 kΩ | Con 22 kΩ (rojo, rojo, naranja; reto opcional) |
       |---|---|---|---|
@@ -703,7 +712,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     | GL5539 | 50–100 kΩ | 5 MΩ |
     | GL5549 | 100–200 kΩ | 10 MΩ |
 
-    - **Programa `~/apps/LdrCheck`** (no versionado; su código, en `~/apps/LdrCheck/src` de la Pi): `Ads1115` de
+    - **Programa `ExplorerHat.LdrCheck`** (en `src/ExplorerHat.LdrCheck` y en la solución desde el 17/10/2026, con su
+      README; antes solo existía en la Pi, en `~/apps/LdrCheck`, que se hizo a mano y puede quedarse: vale la de
+      `~/apps/ExplorerHat.LdrCheck`; el nodo va a Analog 1, donde está el potenciómetro): `Ads1115` de
       4.2.0, sin el HAT (no toca ningún pin). Para cada LDR pide su nombre, los lux de la sala (opcional, de una
       aplicación del móvil) y tres medidas de 2 s que empiezan con Enter: luz de la sala, tapada con un dedo y a
       oscuras (espera 10 s). Al final, una tabla. Calcula R = 10 kΩ × (Vfuente / V − 1). Cada lectura usa la escala
@@ -715,7 +726,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       fila y la línea − (bandas marrón, negro, naranja; o marrón, negro, negro, rojo con 5 bandas), y un cable del nodo
       a Analog 1. Opcional: Analog 2 → 10 kΩ → 5V. Numerar las LDR (son iguales). Cambiar solo la LDR con el robot
       encendido no es peligroso: limita la corriente ella misma (unos pocos mA como mucho).
-    - **Comando** para la terminal del usuario: `cd ~/apps/LdrCheck && dotnet LdrCheck.dll | tee ~/ldr.log` (en
+    - **Comando** para la terminal del usuario: `cd ~/apps/ExplorerHat.LdrCheck && dotnet ExplorerHat.LdrCheck.dll | tee ~/ldr.log` (en
       `~`, no en `/tmp`: en la Pi, `/tmp` es `tmpfs` y se borra al reiniciar). Después, leer `~/ldr.log`, comparar con
       la tabla y anotar aquí los resultados.
     - Los dos, a 5 V y con menos de 1 mA: el ADS1015 del HAT admite de 0 a 5 V (Fase 6).

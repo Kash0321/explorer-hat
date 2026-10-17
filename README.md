@@ -225,7 +225,7 @@ Un robot con motores puede hacerse daño y hacer daño. Estas normas valen para 
 
 ## 🎓 Lecciones del taller (`lessons/`)
 
-Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 09 Robot autónomo y 11 Contar vueltas (con sus partes Ir recto y El cuadrado perfecto) y 12 La pantalla.
+Itinerario para los niños, de lo más sencillo a lo más difícil: 01 Luces, 02 Semáforo, 03 Motores, 04 Cuadrado, 05 Botones, 06 Distancia, 08 Sensores analógicos, 09 Robot autónomo y 11 Contar vueltas (con sus partes Ir recto y El cuadrado perfecto) y 12 La pantalla.
 Cada lección es un proyecto pequeño con un único `Program.cs` y un README con retos. Índice y forma de
 ejecutarlas en [`lessons/README.md`](lessons/README.md).
 
@@ -236,8 +236,9 @@ ejecutarlas en [`lessons/README.md`](lessons/README.md).
 El entorno está organizado en soluciones independientes según el nivel de aprendizaje:
 
 * 🟢 **`ExplorerHat.BasicSample/`**: El laboratorio de inicio. Ideal para enseñar bucles, hilos con `Thread.Sleep`, encendido de luces LED secuenciales y movimientos básicos de los dos motores (Adelante, Atrás, Giros).
-* ⚙️ **`ExplorerHat.Common/`**: Código compartido por los ejemplos y las lecciones. `SafeExplorerHat` se usa igual que `ExplorerHat`, pero al terminar para los motores, apaga las luces y libera los pines sin errores. Sus motores (`HatMotor`) giran igual de rápido hacia delante que hacia atrás. `Screen` maneja la pantalla LCD.
+* ⚙️ **`ExplorerHat.Common/`**: Código compartido por los ejemplos y las lecciones. `SafeExplorerHat` se usa igual que `ExplorerHat`, pero al terminar para los motores, apaga las luces y libera los pines sin errores. Sus motores (`HatMotor`) giran igual de rápido hacia delante que hacia atrás. `Screen` maneja la pantalla LCD y `AnalogInputs` (`hat.Analog.One.ReadVoltage()`), las entradas analógicas.
 * 📡 **`ExplorerHat.SonarDashboard/`**: Panel en la consola con la distancia que mide cada sensor de ultrasonidos, sin mover los motores. Sirve para comprobar el montaje de los sensores. La tecla **F** activa o desactiva el mismo filtro de lecturas falsas que usa el robot autónomo. Con `--registro <archivo> [segundos]` no muestra el panel: guarda cada lectura en un archivo CSV para estudiar las lecturas falsas.
+* 🔆 **`ExplorerHat.LdrCheck/`**: Mide la resistencia de una fotorresistencia (LDR) con el conversor analógico del HAT, sin multímetro: tres medidas por LDR (sala, con un dedo encima y a oscuras) y una tabla al final. No mueve los motores. Las medidas hechas están en [`docs/fotorresistencias-LDR.md`](docs/fotorresistencias-LDR.md).
 * 🔋 **`ExplorerHat.UpsDashboard/`**: Panel en la consola con los datos de la Waveshare UPS HAT (B): tensión y carga de las baterías, corriente, potencia y si se cargan o se descargan, junto con el estado de alimentación y la temperatura de la Raspberry Pi. No mueve los motores.
 * 🔵 **`ExplorerHat.ObstacleAvoidance/`**: El robot autónomo. Integra lecturas de sensores de distancia por ultrasonidos (HC-SR04) para calcular proximidad y tomar decisiones de esquiva en tiempo real.
 
@@ -246,6 +247,12 @@ El entorno está organizado en soluciones independientes según el nivel de apre
 ## 🧰 Herramientas (`tools/`)
 
 Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Cada script explica su uso al principio.
+
+---
+
+## 📚 Documentos de apoyo (`docs/`)
+
+Manuales de piezas, medidas hechas, fotos y el prompt para retomar el trabajo. Índice en [`docs/README.md`](docs/README.md): el manual del multímetro (castellano e inglés), las medidas de las fotorresistencias (LDR) y el divisor de tensión, y una foto de los cables de la pantalla.
 
 ---
 
@@ -320,7 +327,7 @@ sudo sysctl --system
 
 * **Ejecutar:** `Terminal > Run Task... > Ejecutar en la Pi` y elige la lección (`lessons/...`) o el programa (`src/...`). Para pararlo, **Ctrl+C** en el terminal: el programa para los motores antes de salir. *Desplegar en la Pi* solo lo copia, sin ejecutarlo.
 * **Depurar:** abre en el editor el `Program.cs` de la lección o del programa. En la pestaña *Run and Debug*, elige la configuración **Depurar en la Pi el programa abierto** y pulsa F5. Despliega el proyecto de ese archivo y lo ejecuta en la Pi con el depurador. Si el archivo abierto no es de una lección ni de un programa (por ejemplo, un README), la compilación falla.
-* **Depurar programas que leen el teclado** (ObstacleAvoidance, SonarDashboard y las lecciones 04, 11 Contar vueltas y 11 El cuadrado perfecto): la consola de depuración no tiene teclado. Primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
+* **Depurar programas que leen el teclado** (ObstacleAvoidance, SonarDashboard, LdrCheck y las lecciones 04, 11 Contar vueltas y 11 El cuadrado perfecto): la consola de depuración no tiene teclado. Primero *Ejecutar en la Pi*, después **Adjuntar a un programa en la Pi** y elige el proceso `dotnet` del programa.
 * **Parar el robot:** la tarea **Parar el robot** para los programas del robot y pone a nivel bajo los pines de motores y luces, y la salida OUT4.
 
 > ⚠️ **Puntos de interrupción y motores:** la velocidad de los motores se controla desde el propio programa (PWM por software). Cuando el depurador se detiene en un punto de interrupción congela todo el programa, y cada motor se queda como estuviera en ese instante: **parado o a toda velocidad**. Depura siempre con las ruedas en el aire.

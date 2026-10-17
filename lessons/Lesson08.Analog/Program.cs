@@ -2,8 +2,8 @@ using System.Diagnostics;
 using ExplorerHat.Common;
 
 // Lesson 08: Analog sensors
-// A potentiometer (or a photoresistor with a fixed resistor) gives a voltage that changes little by little,
-// not only "on" or "off". The analog input of the HAT measures it, from 0 to 5 volts.
+// A potentiometer gives a voltage that changes little by little, not only "on" or "off".
+// The analog input of the HAT measures it, from 0 to 5 volts.
 // The four lights show the level as a bar: the more volts, the more lights.
 // New ideas: a voltage that changes, a number that has to fit in a scale, and "if" one after the other.
 
@@ -13,7 +13,6 @@ int maxTime = 30000;       // the program ends after this time (milliseconds)
 int pauseTime = 100;       // a short wait between two readings
 
 // Potentiometer: red wire to 5V, yellow wire to GND and black wire (the middle one) to Analog 1.
-// To use the photoresistor, connect it to Analog 2, change "hat.Analog.One" to "hat.Analog.Two" and try maxVolts = 2.5.
 
 using (var hat = new SafeExplorerHat())
 {
