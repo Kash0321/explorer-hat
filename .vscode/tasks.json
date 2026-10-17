@@ -73,6 +73,7 @@
                 "lessons/Lesson11.Square",
                 "lessons/Lesson12.Screen",
                 "src/ExplorerHat.BasicSample",
+                "src/ExplorerHat.LdrCheck",
                 "src/ExplorerHat.ObstacleAvoidance",
                 "src/ExplorerHat.SonarDashboard",
                 "src/ExplorerHat.UpsDashboard"

@@ -197,26 +197,12 @@ El README completo de la lección 08, con la sección de la LDR, está en el his
 
 ## El programa LdrCheck
 
-[`docs/ldr/LdrCheck`](ldr/LdrCheck/Program.cs) mide la resistencia de LDR con el **ADS1015 del HAT**, sin
-multímetro. Se escribió el 10/10/2026, antes de tener multímetro. Se probó sin nada conectado y no se llegó a usar con
-LDR (después llegó el multímetro). **No está en la solución** (`ExplorerHatSandbox.slnx`): es un programa auxiliar
-suelto.
-
-* **Montaje:** `5V del HAT → LDR → nodo → 10 kΩ → GND`, y el nodo a **Analog 1**. Opcional: `Analog 2 → 10 kΩ → 5V`
-  para medir la alimentación en lugar de suponer 5,30 V.
-* **Qué hace:** para cada LDR pide un nombre y los lux del móvil (opcional), y hace tres medidas de 2 s que empiezan
-  con Enter: luz de la sala, con un dedo encima y a oscuras (espera 10 s). Al final muestra una tabla. Cada lectura
-  usa la escala más pequeña del ADS1015 que admite la tensión (hasta ±0,256 V, con 0,125 mV por paso): así mide bien
-  varios MΩ. No toca ningún pin ni los motores.
-* **Cómo ejecutarlo:** desplegarlo como cualquier programa suelto, por ejemplo:
-
-```bash
-dotnet publish docs/ldr/LdrCheck -c Release -r linux-arm64 --self-contained false
-# copiar la carpeta publish a ~/apps/LdrCheck en la Pi, y en su terminal:
-cd ~/apps/LdrCheck && dotnet LdrCheck.dll | tee ~/ldr.log
-```
-
-(El resultado va a `~`, no a `/tmp`: en la Pi, `/tmp` es `tmpfs` y se borra al reiniciar.)
+[`src/ExplorerHat.LdrCheck`](../src/ExplorerHat.LdrCheck/README.md) mide la resistencia de una LDR con el **ADS1015
+del HAT**, sin multímetro: tres medidas por LDR (luz de la sala, con un dedo encima y a oscuras) y una tabla al final.
+Se escribió el 10/10/2026, antes de tener multímetro. Se probó sin nada conectado y no se llegó a usar con LDR (después
+llegó el multímetro). Es un programa de la solución (`ExplorerHatSandbox.slnx`), como `UpsDashboard` y
+`SonarDashboard`. Su README explica el montaje, los avisos (el nodo va a Analog 1, donde está el potenciómetro) y cómo
+ejecutarlo.
 
 ## Dónde está el resto y qué falta por saber
 

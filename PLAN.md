@@ -576,9 +576,10 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - **Decisión del usuario (17/10/2026): la lección usa solo el potenciómetro, sin la LDR.** Montar la LDR pide una
     protoboard y complica el montaje, y el potenciómetro ya explica bien el tema (en el montaje del 17/10/2026 falló
     justo la protoboard: el 5V iba a una fila sin unir al HAT). Se quitaron del README y del programa la sección de
-    la LDR y los retos de la luz. **Las medidas de las LDR, el divisor de 10 kΩ, el texto de lección y el programa
-    `LdrCheck` se guardaron en [`docs/fotorresistencias-LDR.md`](docs/fotorresistencias-LDR.md)** (índice de `docs/`
-    en [`docs/README.md`](docs/README.md)) y aquí abajo para una lección futura (por ejemplo, con dos LDR en la Fase
+    la LDR y los retos de la luz. **Las medidas de las LDR, el divisor de 10 kΩ, y el texto de lección
+    se guardaron en [`docs/fotorresistencias-LDR.md`](docs/fotorresistencias-LDR.md)** (índice de `docs/` en
+    [`docs/README.md`](docs/README.md)); el programa `LdrCheck` pasó a `src/ExplorerHat.LdrCheck`, y las medidas están
+    también aquí abajo para una lección futura (por ejemplo, con dos LDR en la Fase
     7: un vehículo de Braitenberg que sigue o huye de una linterna, "sentir, pensar y actuar"). Las 20 LDR siguen en
     el material.
   - **Qué es:** un único `Program.cs` con *top-level statements*: lee `hat.Analog.One.ReadVoltage().Volts`, lo pone en
@@ -711,8 +712,9 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     | GL5539 | 50–100 kΩ | 5 MΩ |
     | GL5549 | 100–200 kΩ | 10 MΩ |
 
-    - **Programa `LdrCheck`** (versionado desde el 17/10/2026 en `docs/ldr/LdrCheck`; también desplegado en
-      `~/apps/LdrCheck` de la Pi, con su código en `~/apps/LdrCheck/src`): `Ads1115` de
+    - **Programa `ExplorerHat.LdrCheck`** (en `src/ExplorerHat.LdrCheck` y en la solución desde el 17/10/2026, con su
+      README; antes solo existía en la Pi, en `~/apps/LdrCheck`, que se hizo a mano y puede quedarse: vale la de
+      `~/apps/ExplorerHat.LdrCheck`; el nodo va a Analog 1, donde está el potenciómetro): `Ads1115` de
       4.2.0, sin el HAT (no toca ningún pin). Para cada LDR pide su nombre, los lux de la sala (opcional, de una
       aplicación del móvil) y tres medidas de 2 s que empiezan con Enter: luz de la sala, tapada con un dedo y a
       oscuras (espera 10 s). Al final, una tabla. Calcula R = 10 kΩ × (Vfuente / V − 1). Cada lectura usa la escala
@@ -724,7 +726,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       fila y la línea − (bandas marrón, negro, naranja; o marrón, negro, negro, rojo con 5 bandas), y un cable del nodo
       a Analog 1. Opcional: Analog 2 → 10 kΩ → 5V. Numerar las LDR (son iguales). Cambiar solo la LDR con el robot
       encendido no es peligroso: limita la corriente ella misma (unos pocos mA como mucho).
-    - **Comando** para la terminal del usuario: `cd ~/apps/LdrCheck && dotnet LdrCheck.dll | tee ~/ldr.log` (en
+    - **Comando** para la terminal del usuario: `cd ~/apps/ExplorerHat.LdrCheck && dotnet ExplorerHat.LdrCheck.dll | tee ~/ldr.log` (en
       `~`, no en `/tmp`: en la Pi, `/tmp` es `tmpfs` y se borra al reiniciar). Después, leer `~/ldr.log`, comparar con
       la tabla y anotar aquí los resultados.
     - Los dos, a 5 V y con menos de 1 mA: el ADS1015 del HAT admite de 0 a 5 V (Fase 6).

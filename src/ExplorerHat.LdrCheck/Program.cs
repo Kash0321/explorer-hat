@@ -2,6 +2,10 @@
 // Wiring (voltage divider): HAT 5V -> LDR -> node -> fixed resistor -> HAT GND, and the node -> Analog 1.
 // Optional: Analog 2 -> 10 kOhm -> HAT 5V, to measure the supply instead of using 5.30 V.
 // R(LDR) = R(fixed) * (Vsupply / Vnode - 1). Nothing else of the HAT is used: no motors, no pins.
+// It uses Ads1115 and not hat.Analog of ExplorerHat.Common on purpose: hat.Analog reads with a fixed scale of
+// +-6.144 V (3 mV per step). To measure several MOhm this program needs the small scales of the ADS1015
+// (down to +-0.256 V, 0.125 mV per step), so do not "simplify" it with hat.Analog.
+// The node is read on Analog 1: disconnect the potentiometer of lesson 08 first, or change "Node" below.
 using System.Device.I2c;
 using System.Diagnostics;
 using Iot.Device.Ads1115;
