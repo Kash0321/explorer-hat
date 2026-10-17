@@ -7,6 +7,14 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (17/10/2026)
+- **Sesión de la noche del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
+  - **Repaso de las lecciones con motores hecho** (04, 06, 11 y 09, con el `Common` nuevo): todas siguen haciendo lo
+    mismo y la parada de emergencia funciona con `SIGTERM` y con Ctrl+C en la 09. Resultados, dos lecciones del
+    repaso (`| tee` y `pgrep`) y lo que falta comprobar, en la Fase 5, "Repaso con el `Common` nuevo".
+  - **dotnet/iot, sin novedades** al empezar: ni comentarios ni revisiones nuevas en el #2616, #2625 y #2610, ni en las
+    incidencias #2614, #2615 y #2617; `upstream/main` sigue en `1856d767`; las comprobaciones pasan. El clon del fork
+    está limpio, con sus tres ramas iguales a las del fork.
+  - **Experimento de modelos:** esta fue la sesión 2 de 3. El usuario pasa `/usage` al terminar.
 - **Sesión del 17/10/2026** (desde el PC, con la Pi y el robot montado, ruedas en el aire):
   - **Pi actualizada** a `main` (`2da35a5`) con `git pull --ff-only`. Sin programas del robot en marcha, pines en `lo`
     y `get_throttled` = `0x0`.
@@ -34,9 +42,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     porque la línea tiene, además de la pull-up de ~62 kΩ, una carga de **~1 MΩ hacia GND** (cálculo con el divisor:
     62 kΩ × 4,93 / 0,36 ≈ 0,85 MΩ en total, ≈ 0,9 MΩ sin los 10 MΩ del multímetro), de la salida del HAT en reposo o
     de la entrada del sensor. No importa: 4,93 V es un nivel alto claro.
-  - **Cierre de la sesión del 17/10/2026:** PR #44 a #50 de este repositorio fusionados; `main` y la Pi en `44c554a`
-    (con `git pull --ff-only`). Quedó pendiente el repaso de las lecciones con motores (ver "Al retomar"). **Experimento
-    de modelos:** esta fue la sesión 1 de 3; el usuario no pasó `/usage` (pedirlo al empezar y al terminar la próxima).
+  - **Cierre de la sesión del 17/10/2026 (tarde):** PR #44 a #50 de este repositorio fusionados; `main` y la Pi en
+    `44c554a` (con `git pull --ff-only`). Quedó pendiente el repaso de las lecciones con motores (hecho por la noche,
+    ver arriba). **Experimento de modelos:** esta fue la sesión 1 de 3; el usuario no pasó `/usage`.
     En dotnet/iot, sin respuesta nueva a nuestro comentario del #2610 ni en el #2616, el #2625 y las incidencias.
   - **Lección 08 hecha** (`lessons/Lesson08.Analog`, PR de la rama `fase-5-leccion-08-analogico`): el usuario eligió un
     ayudante `AnalogInputs` en `ExplorerHat.Common` y no el fork (choque de tipos `CS0433`, comprobado). Probada en la
@@ -183,11 +191,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
-- **Al retomar (siguiente sesión):** **Tarea principal decidida por el usuario (17/10/2026): la opción A, el repaso
-  de las lecciones con motores con el `Common` nuevo** (04, 06, 09 y 11; protocolo, orden y criterios en la Fase 5,
-  "Repaso con el `Common` nuevo"). Orden: primero el punto 1 de abajo (5 minutos, dotnet/iot) y después el repaso.
-  Después del repaso, la opción B (lección 07 de pads táctiles con un ayudante en `Common`, porque `Cap1208` no está
-  en el paquete 4.2.0). Otras opciones que se ofrecieron: un checklist del taller, la lección 10 y la Fase 7.
+- **Al retomar (siguiente sesión):** **El repaso de las lecciones con motores está hecho (17/10/2026, noche).**
+  **Tarea principal propuesta: la opción B, la lección 07 de pads táctiles con un ayudante en `Common`** (porque
+  `Cap1208` no está en el paquete 4.2.0). Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). Otras opciones: un
+  checklist del taller, la lección 10 y la Fase 7. Pedir `/usage` al empezar y al terminar (sesión 3 de 3 del
+  experimento de modelos).
   1. Mirar comentarios y revisiones en los PR #2616, #2625 y #2610 y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
      el 16/10/2026).
@@ -229,6 +237,18 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   define `advisorModel`. El comando `/agents` ya no existe en Claude Code (se editan los archivos de
   `.claude/agents/`). Primera prueba de `buscador`: 3 consultas y 9 s para una búsqueda en un archivo de
   `C:\work\iot`, con resultado correcto; para un solo archivo, leerlo directamente cuesta lo mismo.
+  **Datos de `/usage` hasta ahora** (los pega el usuario; faltan los de cierre de la sesión 2):
+  - **Sesión 1** (la larga del 17/10/2026; 11 h de reloj, 1 h de API): **36,39 $** en total. **Sonnet 5.5: 18,26 $**
+    (106,5 M de lectura de caché, 339 k de salida). **Opus 5.5, el asesor: 18,11 $** (4,2 M de entrada, 72,8 k de
+    salida, **0 de caché**): **el asesor costó casi la mitad (50 %)**. Haiku (`buscador`): 0,02 $, una sola consulta.
+    El 95 % del uso fue con más de 150 k de contexto. Semana: 9 % usado.
+  - **Sesión 2, al empezar** (prompt de retomar leído): 0,29 $ (Sonnet 5.5: 259 k de lectura de caché y 56 k de
+    escritura). Semana: 9 %.
+  - **Sesión 2, qué hizo el asesor** (una llamada, al final): corrigió dos notas de `PLAN.md` con causa equivocada (el
+    registro de pines sí servía; el `salida=` faltaba por bash y no por el pegado). Cambió el contenido, no el
+    plan. Pendiente: los datos de cierre (el usuario los pasa después).
+  - **Lectura provisional:** el coste lo dominan las sesiones largas con mucho contexto (el asesor lee todo el
+    historial, sin caché). Con una sola llamada, la sesión 2 dará una cifra más pequeña. Decidir al cerrar la 3.
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
@@ -768,7 +788,7 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     nivel bajo al terminar.
   - Con `HatMotor` (04/10/2026, misma zona, 60 s): 18 obstáculos, detectados casi siempre a 18–29 cm; giros de 1 paso
     (12 veces), 2 (5) y 3 (1); ninguna maniobra agotó los 10 pasos. El usuario lo vio bien. Sin cambios en la lección.
-- [ ] **Repaso con el `Common` nuevo (lecciones con motores 04, 06, 09 y 11).** Decidido por el usuario el 17/10/2026
+- [x] **Repaso con el `Common` nuevo (lecciones con motores 04, 06, 09 y 11).** Decidido por el usuario el 17/10/2026
       (opción A). Motivo: `SafeExplorerHat` cambió (propiedad `Analog` y final del `Dispose`) y solo se probó la
       lección 03 con los motores (ejecución completa y parada con `SIGTERM`; ver la lección 08). Las lecciones no
       cambian: se comprueba que **siguen haciendo lo mismo y que la parada de emergencia funciona con sus hilos y
@@ -831,6 +851,45 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
   - **Al terminar:** anotar los resultados en esta sección (qué lección, qué se vio, tiempos de los pines y de la
     parada), en una rama nueva desde `main` (`fase-5-repaso-motores-common`), con su PR. Pedir al usuario `/usage` (al
     empezar y al terminar la sesión) para el experimento de modelos.
+  - **Resultados (17/10/2026, noche, desde el PC; todo con las ruedas en el aire):** los seis programas (unas doce
+    ejecuciones) salieron bien y en ninguna quedó un pin de motor en alto sin programa (registro `~/pines-repaso.log` con `vigilar-pines.sh`,
+    2400 s). Antes: Pi en `main` (`69254dc`), `i2cdetect` con 0x28, 0x42 y 0x48 (pantalla desconectada) y los programas
+    desplegados desde `main` con el `Common` nuevo. Después de cada ejecución: ningún proceso, los 8 pines en `lo` y
+    `get_throttled` = `0x0`.
+    - **04 Cuadrado** (`n`): cuatro lados y cuatro giros a la derecha, bien.
+    - **06 Distancia, sin motores:** dos ejecuciones. El programa **termina** al bajar de 30 cm (`29 cm: stop!`,
+      "The end", salida 0), aunque `moveMotors` sea `false`: con la mano a menos de 30 cm al arrancar, termina al
+      instante. El usuario esperaba motores y no vio nada en la primera (la mano no se movió).
+    - **06 Distancia, con `moveMotors = true`** (receta del árbol de trabajo, restaurada y vuelta a desplegar): lejos
+      verde y rápido, entre 30 y 60 cm amarilla y lento, por debajo de 30 cm roja, paran y termina. El usuario la
+      ejecutó varias veces, bien.
+    - **11 Contar vueltas:** parte 1, 85 pulsos en 2 s (86,8 cm, 43 cm/s) y 4 pulsos de más al parar; parte 2, paró a
+      los 49 pulsos (50 cm) y 4 de más.
+    - **11 Ir recto:** izquierda 103 pulsos (105,2 cm), derecha 101 (103,1 cm), diferencia de 2 pulsos.
+    - **11 El cuadrado perfecto** (`n`): cuatro lados (30 pulsos a la izquierda y 28 a la derecha cada uno) y cuatro
+      giros de 6 pulsos en cada rueda; deslizamiento de 2 a 5 pulsos. "Square finished!".
+    - **09 Robot autónomo, parada de emergencia:** con `SIGTERM` desde el PC, a mitad de la marcha atrás (se esperó a
+      `Obstacle!`, con la mano a 9 cm del sensor izquierdo): "Parada de emergencia (SIGTERM): motores parados", salida
+      143 y los pines en `lo`; las dos ruedas pararon. Con Ctrl+C del usuario, a mitad de la marcha: "Parada de
+      emergencia (SIGINT): motores parados" y las dos ruedas pararon.
+    - **Tiempos de los pines en la parada** (registro de `vigilar-pines.sh`, una muestra cada 0,25 s): con `SIGTERM`,
+      la muestra con la marcha atrás (pines 20 y 26 en `hi`) es la de las 21:21:59.4 y la siguiente (21:21:59.6, cuando
+      ya no hay proceso de la lección) tiene los 4 pines en `lo`: **menos de 0,25 s**. Con Ctrl+C, en las dos ejecuciones
+      los pines pasan a `lo` **en la misma muestra en que desaparece el proceso** (menos de 0,3 s). Para leer el
+      registro durante una prueba lanzada por SSH, no filtrar por `procs=1`: el `bash -c`, `setsid`, `timeout` y
+      `dotnet` cuentan como programas del robot (`procs=4`). Mirar el tramo completo (por ejemplo,
+      `sed -n 2485,2515p ~/pines-repaso.log`).
+    - **Dos lecciones del repaso:** (1) **`| tee` esconde el mensaje de parada con Ctrl+C**: Ctrl+C va a todos los
+      procesos de la línea y `tee` muere antes de que el programa escriba. Para probar la parada con Ctrl+C, ejecutar el
+      programa **sin `tee`** (en `AGENTS.md`). (2) **`pgrep -fc "Lesson[0-9]"` cuenta el propio comando** si este
+      contiene un nombre de lección (pasó tres veces al comprobar el despliegue; la regla ya está en `AGENTS.md`).
+      Para una ejecución con cuenta atrás, `sleep 8` en el PC y después el `ssh` es suficiente, pero .NET tarda de 3 a
+      8 s más en arrancar: el usuario debe esperar a ver moverse las ruedas (o la salida del programa) antes de poner la
+      mano.
+    - **La línea `salida=` no sale con Ctrl+C, y no es un fallo del robot** (comprobado el 17/10/2026, sin motores): en
+      la terminal de la Pi, `sleep 5; echo hecho` y Ctrl+C **no escribe "hecho"**. Bash interactivo no ejecuta el resto de
+      la lista (`cmd; echo ...`) cuando el programa en primer plano muere por `SIGINT`. Para ver el código de salida
+      tras Ctrl+C, escribir `echo $?` en la línea siguiente (se espera 130); no se midió con la lección 09.
 - [ ] 10 Siguelíneas con dos sensores infrarrojos TCRT5000. La rama `features/line-tracker` (2020–2022),
       ya borrada de GitHub, solo tenía el esqueleto: un `Program.cs` sin lógica y un ejemplo en Python copiado
       de un tutorial. Hacerlo desde cero. Hay dos módulos TCRT5000 (03/10/2026, por confirmar). Necesita dos

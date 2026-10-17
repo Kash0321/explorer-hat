@@ -56,9 +56,9 @@ PLAN.md, no solo en tu memoria de la sesión.
 
 Si trabajas desde la propia Raspberry Pi, el paso 2 no hace falta: los comandos se ejecutan directamente. El clon de dotnet/iot solo está en el PC con Windows.
 
-## Variante: empezar directamente con el repaso de las lecciones con motores
+## Variante: el repaso de las lecciones con motores (hecho el 17/10/2026)
 
-Desde el 17/10/2026, la tarea principal pendiente es probar las lecciones con motores (04, 06, 09 y 11) con el `Common` nuevo (opción A de la última sesión). El protocolo completo está en `PLAN.md`, Fase 5, "Repaso con el `Common` nuevo": qué comprobar antes, el orden, qué debe verse en cada lección y cómo parar si algo falla. Dura unos 40 minutos y necesita al usuario delante, con el robot con las ruedas en el aire.
+**Esta variante ya se hizo la noche del 17/10/2026** (resultados en `PLAN.md`, Fase 5). Solo sirve como receta si cambia `Common` o `SafeExplorerHat` y hay que repetirlo. La tarea principal pendiente es ahora la lección 07 (pads táctiles). El protocolo completo está en `PLAN.md`, Fase 5, "Repaso con el `Common` nuevo": qué comprobar antes, el orden, qué debe verse en cada lección y cómo parar si algo falla. Dura unos 40 minutos y necesita al usuario delante, con el robot con las ruedas en el aire.
 
 Pega el prompt de arriba y **añade esto al final**:
 
@@ -72,4 +72,4 @@ mirar. Si algo no cuadra, no sigas con la lección siguiente: para el robot y cu
 anota los resultados en PLAN.md en una rama nueva con su PR, y pídeme /usage.
 ```
 
-Después de ese repaso, la siguiente tarea propuesta es la lección 07 (pads táctiles). Otras opciones que se ofrecieron: un checklist del taller, la lección 10 y la Fase 7.
+La siguiente tarea propuesta es la lección 07 (pads táctiles). Otras opciones que se ofrecieron: un checklist del taller, la lección 10 y la Fase 7. La sesión 3 de 3 del experimento de modelos es la próxima: pide `/usage` al empezar y al terminar.
