@@ -28,8 +28,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - **Pull-up del Trig de los HC-SR04P medida** (17/10/2026, multímetro, mismos resultados en los tres sensores): con
     el robot apagado y en `200k` (en `20k` marcaba "1"), **unos 62–65 kΩ entre Trig y VCC, igual en los dos sentidos**
     (una resistencia, no un diodo: el valor encaja con una de 62 kΩ, 5 %); con el robot encendido y sin programa,
-    **4,93 V entre Trig y GND**. El multímetro no dice si es una pieza soldada o está dentro del chip (U3). Queda
-    sin explicar por qué marca 4,93 V y no 5,30 V (ver "Sin prisa").
+    **4,93 V entre Trig y GND**. El multímetro no dice si es una pieza soldada o está dentro del chip (U3).
+    **VCC–GND del mismo sensor, con el robot encendido: 5,29 V en los tres** (coincide con los 5,30 V del ADS1015: el
+    multímetro y el ADS1015 se confirman entre sí). El Trig queda 0,36 V por debajo de VCC (4,93 V frente a 5,29 V)
+    porque la línea tiene, además de la pull-up de ~62 kΩ, una carga de **~1 MΩ hacia GND** (cálculo con el divisor:
+    62 kΩ × 4,93 / 0,36 ≈ 0,85 MΩ en total, ≈ 0,9 MΩ sin los 10 MΩ del multímetro), de la salida del HAT en reposo o
+    de la entrada del sensor. No importa: 4,93 V es un nivel alto claro.
   - **Lección 08 hecha** (`lessons/Lesson08.Analog`, PR de la rama `fase-5-leccion-08-analogico`): el usuario eligió un
     ayudante `AnalogInputs` en `ExplorerHat.Common` y no el fork (choque de tipos `CS0433`, comprobado). Probada en la
     Pi con el potenciómetro, sin motores. Detalles y lo que falta probar en la Fase 5, lección 08.
@@ -202,9 +206,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      comprobar si su placa tiene un puente de la luz de fondo (sin él se apagaría; sin comprobar en esta placa).
 - **Sin prisa:** la guía de compilación ligera en la Pi (Fase 3); repetir con carga completa la batería Xiaomi
   (Fase 2). La pull-up del Trig de los HC-SR04P ya está medida (17/10/2026, ver el README y el "Estado actual").
-  Dudas pequeñas que quedan: por qué el Trig marca 4,93 V con el multímetro si el pin 5V del HAT da 5,30 V con el
-  ADS1015 (medir VCC–GND en el mismo sensor, con el robot encendido, diría si el aparato o el cableado), y si la
-  pull-up de unos 62 kΩ es una pieza suelta o está dentro del chip (se ve en la placa).
+  Duda pequeña que queda: si la pull-up de unos 62 kΩ es una pieza suelta o está dentro del chip (se ve en la
+  placa). El 4,93 V del Trig frente a los 5,29 V de VCC ya está explicado (ver el "Estado actual").
 - **Experimento de modelos (desde el 17/10/2026):** Sonnet 5.5 con asesor Opus 5.5 y el subagente `buscador`
   (reglas en `AGENTS.md`, archivos en `.claude/`). Tras tres sesiones, revisar con `/usage` el coste, cuántas
   veces el asesor cambió una decisión y si `buscador` ahorró contexto. Si no aporta, quitar
