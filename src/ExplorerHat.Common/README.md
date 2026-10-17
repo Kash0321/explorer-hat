@@ -1,8 +1,8 @@
 # Código compartido (Common)
 
 Biblioteca con `SafeExplorerHat`, que usan los ejemplos y las lecciones que mueven los motores o encienden las
-luces, con `HatMotor`, que mueve cada motor, con `Screen`, para la pantalla LCD, y con `AnalogInputs`, para las
-entradas analógicas. No es un programa: no se ejecuta sola.
+luces, con `HatMotor`, que mueve cada motor, con `Screen`, para la pantalla LCD, con `AnalogInputs`, para las
+entradas analógicas, y con `TouchPads`, para los pads táctiles. No es un programa: no se ejecuta sola.
 
 ## `HatMotor`: los dos sentidos a la misma velocidad
 
@@ -58,6 +58,38 @@ ADS1015 (I2C, dirección 0x48), que va alimentado a 5 V. La usa la lección 08.
 * **Una entrada sin nada conectado no marca 0 V,** sino unos 0,5 V (flota). Una atada a GND marca unos 0,02 V.
 * **El pin 5V del HAT da unos 5,3 V,** no 5,0: un potenciómetro al máximo marca unos 5,3 V.
 
+## `TouchPads`: los pads táctiles
+
+`SafeExplorerHat.Touch` da los ocho pads táctiles del HAT (`Touch.One` a `Touch.Eight`). Cada uno se lee con
+`IsTouched()`, que dice si hay un dedo encima. Los lee el chip CAP1208 (I2C, dirección 0x28). La usa la lección 07.
+
+* **Misma forma que el binding futuro** (`hat.Touch.One.IsTouched()`). Sigue el binding `Cap1208` de dotnet/iot
+  ([PR #2616](https://github.com/dotnet/iot/pull/2616)), que no está en `Iot.Device.Bindings` 4.2.0, así que
+  `TouchPads` habla con el chip por I2C directamente. Cuando una versión publicada del binding tenga los pads, se
+  borran `TouchPads` y `TouchPad` y las lecciones no cambian.
+* **El I2C se abre al leer por primera vez** y entonces se comprueba que el chip es un CAP1208 (producto `0x6B`,
+  fabricante `0x5D`). Los programas que no leen un pad no dependen del chip.
+* **Los números del HAT no coinciden con los del chip:**
+
+  | HAT | Chip (bit del registro `0x03`) |
+  |---|---|
+  | Pads 1, 2, 3, 4 | Entradas 5, 6, 7, 8 (`0x10`, `0x20`, `0x40`, `0x80`) |
+  | Pads 5, 6, 7, 8 | Entradas 1, 2, 3, 4 (`0x01`, `0x02`, `0x04`, `0x08`) |
+
+  Comprobado en el robot (17/10/2026): al tocar cada pad, el número que sale es el que está impreso en el HAT.
+* **No cambia la configuración del chip.** La única escritura es borrar el bit INT del registro `0x00` después de
+  cada lectura. **Es imprescindible:** sin ese borrado, un pad soltado seguiría "tocado" para siempre y, en un mando
+  que mueve el robot mientras tocas, el motor no pararía al levantar el dedo.
+* **Un toque a la vez.** De fábrica, el chip solo cuenta un toque cada vez (`MULT_BLK_EN`): con dos pads, solo sale
+  uno. Cambiarlo es una escritura que el chip conserva hasta apagarse, y habría que deshacerla también en la parada de
+  emergencia: por eso no se cambia.
+* **Los toques cortos pueden perderse.** Cada lectura de un pad borra el INT de todos. Un pad que se mantiene sigue
+  "tocado" en cada lectura, pero un golpecito entre dos lecturas puede perderse. Se pregunta a todos los pads una vez
+  en cada vuelta del bucle.
+* **Los motores no producen toques falsos** (probado el 17/10/2026 con los dos motores en los dos sentidos, también a
+  velocidad máxima, 0 toques en ~40 s). Tras las pruebas, los registros `0x2A` y `0x1F` siguen en `0x80` y `0x2F` (de
+  fábrica).
+
 ## Para qué sirve `SafeExplorerHat`
 
 Se usa igual que `Iot.Device.ExplorerHat.ExplorerHat` (tiene las mismas propiedades `Motors` y `Lights`),
@@ -103,8 +135,9 @@ En este orden:
    de pines.
 5. Fuerza a nivel bajo los ocho pines de salida (19, 20, 21, 26, 4, 17, 27 y 5). El programa puede seguir
    ejecutándose durante una parada de emergencia y haber escrito un pin justo antes de liberarlo.
-6. Libera las entradas analógicas (`Analog`), si se leyó alguna. Va al final y dentro de un `try`: un fallo del bus
-   I2C no puede retrasar la parada de emergencia, y `Analog` no espera más de 0,5 s a una lectura colgada.
+6. Libera las entradas analógicas (`Analog`) y los pads táctiles (`Touch`), si se leyó alguno. Va al final y cada
+   uno dentro de un `try`: un fallo del bus I2C no puede retrasar la parada de emergencia, y ninguno espera más de
+   0,5 s a una lectura colgada.
 
 Es seguro llamarlo más de una vez.
 
