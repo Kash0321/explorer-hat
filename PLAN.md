@@ -739,12 +739,11 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
     usuario dijo que a 0,6 el robot se seguía con dificultad. **Velocidad mínima en el suelo de pruebas:** con **0,4**
     arrancan los motores siempre (los cuatro pads); con **0,3** no arranca ninguno. Por eso la lección usa **0,45**
     (0,4 no tiene margen; en una alfombra u otro suelo podría calarse) y su README avisa ("las ruedas zumban y no se
-    mueven: sube `speed`") y propone medir la velocidad mínima como reto. Con 0,45 queda por ver en el suelo que los
-    giros arrancan (los giros arrastran las ruedas y piden más fuerza).
+    mueven: sube `speed`") y propone medir la velocidad mínima como reto. **Probado en el suelo a 0,45 (el usuario, con 2 m libres):**
+    los cuatro pads arrancan y todo fue bien; no hace falta una velocidad de giro aparte. Pines en `lo`, `get_throttled` = `0x0` y chip táctil en fábrica después.
   - **Fallo encontrado: Ctrl+C abortaba el programa** (`Unhandled exception. System.ObjectDisposedException ... 'HatMotor'`
     y `Aborted`, sin el mensaje de la parada). Causa y arreglo en la Fase 2, "Carrera en la parada de emergencia".
-  - **Pendiente:** probar la lección en el suelo a 0,45 (los giros) y con un niño de verdad (¿es cómodo mantener el dedo
-    en pads tan juntos?).
+  - **Pendiente:** probar la lección con un niño de verdad (¿es cómodo mantener el dedo en pads tan juntos?).
 - [x] 08 Sensores analógicos (`Lesson08.Analog`): potenciómetro. **Hecha y probada el 17/10/2026.**
   - **Decisión del usuario (17/10/2026): la lección usa solo el potenciómetro, sin la LDR.** Montar la LDR pide una
     protoboard y complica el montaje, y el potenciómetro ya explica bien el tema (en el montaje del 17/10/2026 falló
