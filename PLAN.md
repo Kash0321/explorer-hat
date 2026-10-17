@@ -18,7 +18,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     coincide con la marca `2000k` del selector). Una LDR a oscuras puede pasar de 2 MΩ: la pantalla mostrará solo
     "1" (fuera de rango).
   - **Experimento de modelos** (asesor Opus 5.5, subagente `buscador`): reglas en `AGENTS.md` y criterio para
-    seguir o quitarlo en "Sin prisa".
+    seguir o quitarlo en "Sin prisa". Configuración comprobada en una sesión nueva.
+  - **Medidas con el multímetro** (lección 08, tarde del 17/10/2026): las tres LDR son casi iguales (~12 kΩ con una
+    luz fuerte, ~23 kΩ con la luz de la sala, ~110 kΩ con un dedo encima y > 2 MΩ a oscuras) y el potenciómetro
+    tiene el cursor en el hilo **negro**. Resultados, tablas y decisiones en la Fase 5 (lección 08). Sin tocar el
+    robot ni la Pi.
   - **#2610 probado en la Pi con el último commit del PR** (`c6fcf210`, ya con el recuento de referencias `0f4e5718` y
     los arreglos de Copilot). Mismo método que el 03/10/2026 (GPIO 8 sin nada conectado y flancos con `pinctrl set 8
     pu`/`pd`; no mueve los motores). **Arregla lo que faltaba:** con dos avisos en el pin, quitar uno deja funcionando
@@ -158,9 +162,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4), cuando fusionen el `Cap1208` (#2616).
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
      **Decidido (04/10/2026, tarde): la lección 08** con `ProjectReference` al fork (ver arriba). **Siguiente paso
-     (10/10/2026):** medir 3 o 4 LDR con `~/apps/LdrCheck` (Fase 5, lección 08), anotar los valores y elegir la
-     resistencia fija. Los potenciómetros ya llegaron (16/10/2026): comprobar el cable (ver la lección 08). Después,
-     programar la lección. **La lección 10, no todavía** (decisión del usuario, 10/10/2026). Después de la 08, la 10
+     (17/10/2026):** programar la lección 08 con las medidas ya hechas (Fase 5, lección 08): divisor de la LDR con
+     10 kΩ y potenciómetro (rojo → 5V, amarillo → GND, negro → Analog 1). Antes, comprobar los otros dos
+     potenciómetros. **La lección 10, no todavía** (decisión del usuario, 10/10/2026). Después de la 08, la 10
      (siguelíneas, si están los dos TCRT5000) o la Fase 7 (medir el LLM en el portátil).
   5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
@@ -173,8 +177,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   veces el asesor cambió una decisión y si `buscador` ahorró contexto. Si no aporta, quitar
   `.claude/settings.json`, `.claude/agents/buscador.md` y la sección de `AGENTS.md`. Se decidió **no usar JEV**
   (modelo de decisiones de TypeSafe AI, por API y de un tercero; no es determinista y los hooks de Claude Code ya
-  resuelven las bifurcaciones simples). Pendiente de comprobar: que `advisorModel` se lea del `settings.json` del
-  proyecto (si no, `/advisor opus` lo guarda en la configuración del usuario).
+  resuelven las bifurcaciones simples). **Comprobado (17/10/2026, sesión nueva):** `/model` dice Sonnet 5.5 (la
+  configuración global dice Opus, así que el proyecto se lee), `/advisor` marca Opus y la configuración global no
+  define `advisorModel`. El comando `/agents` ya no existe en Claude Code (se editan los archivos de
+  `.claude/agents/`). Primera prueba de `buscador`: 3 consultas y 9 s para una búsqueda en un archivo de
+  `C:\work\iot`, con resultado correcto; para un solo archivo, leerlo directamente cuesta lo mismo.
 - Actualiza esta sección al final de cada sesión de trabajo.
 
 ## Fase 0: Preparar la Raspberry Pi y el repositorio
@@ -539,7 +546,52 @@ la tarea *Parar el robot* reconocen los procesos `LessonNN.*`.
       resistencia fija, pero así se pierde construir el divisor. **Ya las hay:** una bolsa de 20, de modelo sin
       confirmar (10/10/2026). La resistencia fija debe parecerse a la de la LDR con la luz de la sala, para que la
       tensión cambie mucho entre luz y sombra: medir la LDR con el ADS1015 y elegir la resistencia con ese dato.
-  - **Medir las LDR con el robot (preparado el 10/10/2026, sin hacer).** No hay multímetro. Las LDR no llevan marca;
+  - **Resultados de las medidas con el multímetro (17/10/2026).** ExtraStar DT830B, con los componentes sueltos y
+    pinchados en una protoboard (así no se tocan con los dedos):
+    - **El multímetro:** puntas juntas en `200`: 0,5–0,6 Ω (cables y contactos). Puntas separadas: "1" (fuera de
+      rango). Resistencia de 10 kΩ con la cuarta banda dorada (5 %) en `20k`: 9,65 kΩ, dentro de las dos
+      tolerancias.
+    - **LDR** (se midieron 3, casi idénticas: mismo modelo):
+
+      | Condición | Lectura | Resistencia |
+      |---|---|---|
+      | Luz de la sala (55–60 lux con el móvil), rango `2000k` | 22–24 | ~23 kΩ (error de ese rango: ±10 kΩ) |
+      | Luz de unas gafas con lupa apuntando a la LDR, rango `200k` | 12,1–12,4 | ~12,2 kΩ (~170 lux, estimado) |
+      | Dedo encima, rango `200k` | 108,1–112,5 | ~110 kΩ |
+      | A oscuras (cuarto sin luz), rango `2000k` | "1" | > 2 MΩ |
+
+      A oscuras da fuera de rango, así que no son GL5506, GL5516 ni GL5528 (darían de 0,2 a 1 MΩ). Con 57 lux y
+      23 kΩ, y una ley de R ∝ lux^−0,6, saldrían unos 65 kΩ con 10 lux: **GL5539 (o GL5537-2)**, solo orientativo
+      (el sensor de luz del móvil es poco exacto). No hace falta el modelo exacto.
+    - **Decisión del divisor:** 5V → LDR → nodo → **10 kΩ** → GND, y el nodo a Analog 1: más luz, más voltios.
+      Tensiones esperadas (5 V × Rf / (R_LDR + Rf)):
+
+      | Condición | R de la LDR | Con 10 kΩ | Con 22 kΩ (rojo, rojo, naranja; reto opcional) |
+      |---|---|---|---|
+      | Oscuridad | > 2 MΩ | < 0,03 V | < 0,06 V |
+      | Dedo encima | 110 kΩ | 0,42 V | 0,83 V |
+      | Luz de la sala | 23 kΩ | 1,52 V | 2,44 V |
+      | Luz de las gafas | 12,2 kΩ | 2,25 V | 3,22 V |
+    - **Potenciómetro WH148 B10K** (conector XH de 3 hilos; se midió uno, falta comprobar los otros dos). Con las
+      patas hacia arriba, de izquierda a derecha: rojo, negro, amarillo. Rojo–amarillo: 9,33 kΩ siempre (la pista
+      entera, dentro del ±20 % habitual y del error del multímetro). **El negro es la pata central (el cursor), no
+      un GND:**
+
+      | Mando | Rojo–negro | Negro–amarillo |
+      |---|---|---|
+      | Mínimo | 9,33 kΩ | 0,00 kΩ |
+      | 1/4 | 7,45 kΩ | 1,97 kΩ |
+      | 1/2 | 4,76 kΩ | 4,41 kΩ |
+      | 3/4 | 2,06 kΩ | 7,31 kΩ |
+      | Máximo | 0,00 kΩ | 9,33 kΩ |
+
+      Las dos mitades suman 9,2–9,4 kΩ en todas las posiciones, y negro–amarillo / total da 0, 0,21, 0,47, 0,78 y 1
+      (casi lineal, como una B). **Montaje: rojo → 5V, amarillo → GND, negro → Analog 1:** da 0 V con el mando al
+      mínimo y 5 V al máximo (~1,1, 2,4 y 3,9 V a 1/4, 1/2 y 3/4). **Trampa:** por el color, el negro parecería ir a
+      GND; así el cursor iría a GND y, al girar el mando hacia el rojo, 5V quedaría unido a GND casi sin resistencia.
+      Etiquetar el conector ("NEGRO = SEÑAL").
+  - **Medir las LDR con el robot (preparado el 10/10/2026; ya no hace falta: se midieron con el multímetro).** Plan
+    antiguo, sin multímetro. Las LDR no llevan marca;
     las de 5 mm suelen ser de la serie GL55xx, iguales por fuera (una bolsa puede ser un surtido de varios modelos).
     Se distinguen por la resistencia con 10 lux y a oscuras (tras 10 s), según sus hojas de datos (aproximado):
 
