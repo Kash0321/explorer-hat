@@ -224,19 +224,16 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
   un PR, también las revisiones (`.../pulls/<n>/reviews`) y los comentarios en el código (`.../pulls/<n>/comments`).
-- **Al retomar (siguiente sesión):** **PRIMERO, si el PR #57 ya está fusionado** (si no, pedírselo al usuario):
-  a) Actualizar `main` en el PC y en la Pi (`git pull --ff-only`) y borrar la rama `fase-5-parada-carrera-ctrl-c`
-     (local y en GitHub), comprobando antes que no tiene commits fuera de `origin/main`.
-  b) **Volver a desplegar todo lo que usa `Common`** (en la Pi solo `Lesson09.Autonomous` y las copias de prueba llevan
-     el `Common` nuevo; `Lesson07.Touch` sigue a 0,6 de velocidad). La lista sale de
-     `git grep -l "ExplorerHat.Common.csproj" -- '*.csproj'` (13 lecciones y `ExplorerHat.BasicSample` y
-     `ExplorerHat.ObstacleAvoidance`), no de la memoria. Mismos comandos que la tarea *Desplegar en la Pi*. Sin mover
-     los motores; al final, `pinctrl` en `lo`.
-  c) Borrar por su nombre `~/apps/Lesson07.TouchFloor` y `~/apps/Lesson07.TouchStill`: mueven los motores si se les da
-     un argumento de velocidad (hasta 0,8). Su fuente estaba en el scratchpad de la sesión (se pierde); cómo rehacer la
-     copia que escribe velocidad 0, en la Fase 2, "Carrera en la parada de emergencia".
-  d) Tarea siguiente: el checklist del taller o la Fase 7 (la lección 07 ya la probó una niña de 10 años).
-  **Lo de siempre:** el repaso de las lecciones con motores y la lección 07 están hechos (17/10/2026, noche); la 07 también
+- **Cierre de la sesión 4 (17/10/2026, noche):** PR #55, #56 y #57 fusionados; `main` y la Pi en `e65fc9f`. **Hecho tras
+  fusionar el #57:** desplegados de nuevo con el `Common` nuevo los 15 proyectos que lo usan (13 lecciones,
+  `ExplorerHat.BasicSample` y `ExplorerHat.ObstacleAvoidance`; `Lesson07.Touch` ya va a 0,45), borradas las copias de
+  prueba `Lesson07.TouchFloor` y `Lesson07.TouchStill`, y comprobada la parada sin motores (`Lesson07.Touch` con SIGINT
+  da 130 y `Lesson08.Analog` con SIGTERM da 143, con mensaje y sin errores). Pi: ningún programa en marcha, 8 pines en
+  `lo`, `get_throttled` = `0x0`, `i2cdetect` con 0x27, 0x28, 0x42 y 0x48, 2,4 GB libres. dotnet/iot sin novedades (PR
+  #2616, #2625 y #2610 e incidencias #2614, #2615 y #2617 sin comentarios nuevos; `upstream/main` en `1856d767`).
+  **La Fase 5 está cerrada** (catálogo de 11 lecciones; la 07 probada también por una niña de 10 años).
+- **Al retomar (siguiente sesión):**
+  El repaso de las lecciones con motores y la lección 07 están hechos (17/10/2026, noche); la 07 también
   en el suelo a 0,45. Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
   elegir entre un checklist del taller y la Fase 7 (el siguelíneas
   ya no es una lección, es una idea guardada).

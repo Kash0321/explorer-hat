@@ -6,7 +6,7 @@ Prompt para empezar una sesión nueva de Claude Code (u otro asistente) en cualq
 
 1. Abre el asistente en la carpeta del repositorio, estando en `main` y al día (`git pull`).
 2. Comprueba la configuración del experimento de modelos (`.claude/settings.json`): `/model` debe decir Sonnet 5.5 y `/advisor`, Opus. El subagente `buscador` aparece entre los agentes disponibles.
-3. Escribe `/usage` y apunta el resultado: es la base para medir el coste de la sesión (el experimento pide compararlo tras tres sesiones; la primera fue la del 17/10/2026).
+3. El experimento de modelos está decidido (17/10/2026, se mantiene como está): ya no hace falta pasar `/usage` al empezar ni al cerrar, salvo que quieras volver a revisarlo.
 4. Si la sesión va a mover el robot: la Raspberry Pi encendida y con wifi, la UPS cargada, el robot **sobre un bote o un libro, con las ruedas en el aire**, y una terminal SSH abierta en la Pi.
 
 Esa sesión no tendrá las conversaciones anteriores, sino lo que quedó escrito: `AGENTS.md`, `PLAN.md`, el `README.md`, `tools/` y el historial de git y de los PR. Si echas en falta algo, añádelo a `AGENTS.md` o a `PLAN.md` para que no vuelva a perderse. Al terminar cada sesión, pide al asistente que actualice la sección "Estado actual" de `PLAN.md`.
@@ -23,7 +23,7 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #51, cuyas descripciones resumen cada fase y cada lección.
+     sobre todo los #4 a #57, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
      actual" de PLAN.md (el 17/10/2026: PR #2616 y #2625, incidencias #2614, #2615 y #2617,
      y el PR #2610 de pgrawehr, donde comentamos dos fallos), con sus comprobaciones, comentarios y revisiones
