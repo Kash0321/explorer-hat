@@ -32,8 +32,6 @@ como una barra: cuanto más giras, más luces se encienden. **No mueve los motor
   * **negro**: el cursor (la patilla del medio), a **Analog 1**.
 * La entrada **Analog 1** del HAT.
 * Las cuatro luces.
-* Para el reto de la luz: una **fotorresistencia** y una resistencia de **10 kΩ** (marrón, negro, naranja), en
-  **Analog 2**.
 
 ## Montaje del potenciómetro (con el robot apagado)
 
@@ -97,42 +95,12 @@ Mira en la terminal qué tensión marca con el mando al mínimo y al máximo.
 | Unos **5,3 V** y no cambia | Falta GND, o SEÑAL está unido a 5V. |
 | Va de 5,3 V a 0 V al girar a la derecha | Está al revés. Intercambia los cables 5V y GND, o gira hacia el otro lado. No pasa nada. |
 
-## La fotorresistencia (LDR)
-
-Una fotorresistencia (LDR) es una resistencia que **baja** cuando le da la luz. Con una resistencia fija forma un
-divisor de tensión, igual que el potenciómetro, pero lo cambia la luz y no tu mano:
-
-```
-5V ── LDR ──┬── 10 kΩ ── GND
-            │
-            └── Analog 2
-```
-
-Más luz: la LDR baja de resistencia y sube la tensión del nodo (el punto entre las dos). Con la fórmula del
-potenciómetro, `V = 5,3 V × 10 kΩ / (R de la LDR + 10 kΩ)`.
-
-> ⚠️ **Cuidado con la protoboard:** el cable 5V del divisor tiene que ir a un punto unido al pin 5V del HAT. Una
-> fila suelta no lleva alimentación (es lo que falló con el potenciómetro). Con el robot apagado, comprueba con el
-> zumbador del multímetro que esa fila y el pin 5V están unidos.
-
-Nuestras medidas (tres LDR casi iguales, con 10 kΩ):
-
-| Condición | Resistencia de la LDR | Tensión esperada |
-|---|---|---|
-| A oscuras | más de 2 MΩ | menos de 0,03 V |
-| Con un dedo encima | unos 110 kΩ | unos 0,4 V |
-| Luz de la sala (55 a 60 lux) | unos 23 kΩ | unos 1,6 V |
-| Una linterna de frente cerca | unos 12 kΩ | unos 2,4 V |
-
-Tus valores serán distintos: dependen de la luz de tu sala. Mira en la terminal qué marca con luz y con la mano
-encima, y ajusta `maxVolts` (por ejemplo, 2,5).
-
 ## Retos
 
-* **La barra de la luz.** Conecta la LDR y la resistencia de 10 kΩ a **Analog 2**. Cambia `hat.Analog.One` por
-  `hat.Analog.Two` y `maxVolts` por 2,5. Pon la mano encima y quítala: ¿cuántas luces se encienden en la sala?
-* **La luz de noche.** Quita la barra. Si la tensión baja de un valor que elijas (`darkVolts`), enciende las
-  cuatro luces. Si no, apágalas. ¿Con qué valor se enciende al tapar la LDR con la mano y no se enciende en la sala?
+* **La alarma.** Si la tensión pasa de un valor que elijas (`alarmVolts`), enciende solo la luz roja. ¿Con qué valor
+  se enciende al girar el mando hasta el último cuarto?
+* **Tu propio rango.** Cambia `minVolts` y `maxVolts` (por ejemplo, a 1,0 y 4,0). ¿Qué pasa con las luces en los
+  extremos del mando? ¿Por qué?
 * **El nivel en porcentaje.** Escribe en la terminal el nivel de 0 a 100 (`level * 100`) y no los voltios.
 * **La barra al revés.** Que se enciendan más luces cuantas menos voltios haya (`1 - level`).
 * **Los cuatro colores.** Haz que solo se encienda una luz cada vez: azul con un nivel bajo, verde con un nivel alto.
