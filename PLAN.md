@@ -246,9 +246,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   **La Fase 5 está cerrada** (catálogo de 11 lecciones; la 07 probada también por una niña de 10 años).
 - **Al retomar (siguiente sesión):**
   El repaso de las lecciones con motores y la lección 07 están hechos (17/10/2026, noche); la 07 también
-  en el suelo a 0,45. Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **Tarea principal propuesta:**
-  elegir entre un checklist del taller y la Fase 7 (el siguelíneas
-  ya no es una lección, es una idea guardada).
+  en el suelo a 0,45. Empezar por el punto 1 de abajo (5 minutos, dotnet/iot). **El checklist del taller está hecho**
+  (25/10/2026, [`docs/checklist-taller.md`](docs/checklist-taller.md): material, portátiles, red del aula, comprobaciones del
+  día antes, ritmo de la sesión, normas y fallos frecuentes). **Tarea principal propuesta:** la Fase 7 (el siguelíneas
+  ya no es una lección, es una idea guardada). Antes de un taller con más de un robot hay que resolver que **cada robot
+  tenga un nombre distinto en la red** y que cada portátil apunte al suyo (hoy las tareas de `.vscode/` y el alias SSH
+  apuntan a `harlequin`): ver el apartado "Portátiles" del checklist.
   **Experimento de modelos: decidido** (17/10/2026, ver "Experimento de modelos"): se mantiene como está.
   1. Mirar comentarios y revisiones en los PR #2625 y #2610 (el #2616 ya está fusionado) y en las incidencias #2614, #2615 y #2617. Si hay
      comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
