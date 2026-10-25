@@ -241,12 +241,13 @@ El entorno está organizado en soluciones independientes según el nivel de apre
 * 🔆 **`ExplorerHat.LdrCheck/`**: Mide la resistencia de una fotorresistencia (LDR) con el conversor analógico del HAT, sin multímetro: tres medidas por LDR (sala, con un dedo encima y a oscuras) y una tabla al final. No mueve los motores. Las medidas hechas están en [`docs/fotorresistencias-LDR.md`](docs/fotorresistencias-LDR.md).
 * 🔋 **`ExplorerHat.UpsDashboard/`**: Panel en la consola con los datos de la Waveshare UPS HAT (B): tensión y carga de las baterías, corriente, potencia y si se cargan o se descargan, junto con el estado de alimentación y la temperatura de la Raspberry Pi. No mueve los motores.
 * 🔵 **`ExplorerHat.ObstacleAvoidance/`**: El robot autónomo. Integra lecturas de sensores de distancia por ultrasonidos (HC-SR04) para calcular proximidad y tomar decisiones de esquiva en tiempo real.
+* 🧠 **`ExplorerHat.Orders/`**: Servicio de órdenes de la Fase 7 (robot con IA). Recibe por HTTP una acción cada vez desde un portátil, la valida contra una lista cerrada, la recorta a sus límites (3 s como máximo) y la ejecuta, con parada por obstáculo y parada propia. Tiene tres modos (`--simulado`, `--velocidad-cero` y `--real`). Mueve los motores, así que cuenta como programa del robot: [`README`](src/ExplorerHat.Orders/README.md).
 
 ---
 
 ## 🧰 Herramientas (`tools/`)
 
-Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Cada script explica su uso al principio.
+Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Para la Fase 7: `medir-llm/` (mide un modelo de lenguaje local con 24 órdenes en español), `probar-ordenes/` (pruebas del servicio de órdenes por HTTP) y `probar-obstaculo.sh` (su capa de obstáculos con los sensores reales, sin mover las ruedas). Cada script explica su uso al principio.
 
 ---
 

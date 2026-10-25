@@ -7,15 +7,31 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (25/10/2026)
-- **Sesión de la tarde del 25/10/2026: Fase 7, primer paso (medir el LLM) hecho** (rama `fase-7-medir-llm`; desde el PC, sin
-  mover el robot; la Pi, actualizada a `main` (`32d1b06`), pines en `lo`, `get_throttled` = `0x0`). Controlador NVIDIA del
-  portátil actualizado por el usuario a la 621.01; Ollama 0.40.11 instalado con `winget`. Resultados, lectura y fallos en la
-  Fase 7 ("Medida del 25/10/2026"); la herramienta está en [`tools/medir-llm/`](tools/medir-llm/README.md). **Resumen:**
-  `qwen2.5:7b` acierta la herramienta en 24/24 órdenes pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b` tarda
-  0,7 s pero confunde "Para." con `avanzar`; `Qwen3-4B-Instruct-2507` queda en medio (1,1 s) pero no ejecuta `¡¡PARA YA!!`. **Pendiente de decidir con el usuario:** modelo y qué hacer con la parada, y la
-  prueba con la API de reserva (necesita clave y revisar la protección de datos de menores).
-  **La red a la que estaba conectado el portátil (por cable, con y sin VPN) bloquea el servidor de archivos de Ollama** (`*.r2.cloudflarestorage.com`): los modelos
-  se bajaron de Hugging Face (ver el README de `tools/medir-llm`).
+- **Cierre de la sesión de la tarde del 25/10/2026: Fase 7, medida del LLM y servicio de órdenes hechos** (desde el PC; el robot
+  solo se movió en las pruebas con las ruedas en el aire, con la confirmación del usuario).
+  * **PR #63 (medida del LLM) fusionado.** **PR #64 (servicio de órdenes, rama `fase-7-servicio-ordenes`) abierto, esperando el
+    merge del usuario.** Si al empezar el #64 no está fusionado, empieza en esa rama y no en `main`: el `PLAN.md` de `main` no
+    tiene el servicio.
+  * **Medida del LLM** (ver "Medida del 25/10/2026", Fase 7; herramienta en [`tools/medir-llm/`](tools/medir-llm/README.md)):
+    `qwen2.5:7b` acierta la herramienta en 24/24 órdenes pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b`
+    tarda 0,7 s pero confunde "Para." con `avanzar`; `Qwen3-4B-Instruct-2507` queda en medio (1,1 s) pero no ejecuta `¡¡PARA
+    YA!!`. **Decisión del modelo: el usuario la dejó para más tarde** (nada depende de ella hasta escribir el cerebro). Tampoco
+    se probó la API de reserva (necesita clave y revisar la protección de datos de menores).
+  * **Servicio de órdenes** (`src/ExplorerHat.Orders`; ver "Servicio de órdenes (25/10/2026)", Fase 7): protocolo HTTP,
+    decidido por el usuario. Probado sin mover las ruedas (29 casos en el PC, 23 en la Pi, 4 de 4 en obstáculos con los sensores
+    reales, señales y códigos de salida) y con las ruedas en el aire (7 de 7, incluido el Ctrl+C, y el corte de red: el robot se
+    para solo a los 3 s). **No se probó en el suelo.**
+  * **Portátil:** controlador NVIDIA 621.01; Ollama 0.40.11 con cinco modelos (los de Hugging Face; **la red a la que estaba
+    conectado el portátil, por cable y con o sin VPN, bloquea el servidor de archivos de Ollama**, `*.r2.cloudflarestorage.com`;
+    ver el README de `tools/medir-llm`). Quedan ~8 GB de descargas incompletas (`*-partial`) en `~\.ollama\models\blobs`, que
+    sirven para reanudar `ollama pull` desde otra red.
+  * **Pi:** en `main` en `32d1b06` (**sin** el #63 ni el #64), en reposo: 8 pines en `lo`, `get_throttled` = `0x0`, ningún
+    programa del robot en marcha. Tiene desplegado `~/apps/ExplorerHat.Orders` (compilación Release del #64), la clave en
+    `~/.explorerhat-clave` y la copia provisional `~/apps/tools-orders/` de los scripts nuevos (su `tools/parar-robot.sh`
+    de `main` NO conoce `Orders`). **Tras fusionar el #64: `git pull --ff-only` en la Pi y `rm -rf ~/apps/tools-orders`.**
+  * **dotnet/iot:** sin cambios mirados por la tarde (al empezar la sesión: #2625 en `CHANGES_REQUESTED` esperando a pgrawehr,
+    comprobaciones en verde; clon `C:\work\iot` en `explorerhat-io`, `c4119033`, limpio). La red bloqueada del portátil no
+    afectó a GitHub.
 - **Sesión del 25/10/2026** (desde el PC; solo dotnet/iot, sin mover el robot; la Pi, en `main` (`a68e53c`), pines en `lo`, `get_throttled` = `0x0`):
   - **#2610 fusionado** el 22/10/2026 (`efe9e367` en `upstream/main`). La incidencia #2614 sigue abierta (pgrawehr dijo que
     la arreglaba el #2610): se puede pedir que la cierren, o comentar que ya está arreglada. Queda el fallo 1 de nuestro
@@ -334,12 +350,18 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   5. **#2617 (motor con PWM en las dos entradas):** pgrawehr dejó la API a nuestro criterio (22/10/2026). Es un PR
      aparte en `C:\work\iot` (rama nueva desde `upstream/main`); el modelo es `HatMotor` de `Common`. Mejor después de que
      revisen el #2625, para no tener tres ramas abiertas a la vez.
-  6. **Fase 7. La medida del LLM está hecha (25/10/2026, ver "Medida del 25/10/2026" en la Fase 7).** Siguiente: decidir con
+  6. **Fase 7. La medida del LLM y el servicio de órdenes están hechos (25/10/2026, ver "Medida del 25/10/2026" y "Servicio
+     de órdenes" en la Fase 7), con las pruebas con motores en el aire (7 de 7 y corte de red).** Siguiente: (a) decidir con
      el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s) y
-     si se prueba la API de reserva. Después, el protocolo entre el portátil y la Pi y el servicio de órdenes en la Pi.
-     **No se mueve el robot hasta tener el servicio con la lista cerrada de acciones, la validación y la parada por
-     pérdida de conexión**, y la primera prueba será con órdenes escritas a mano, sin LLM, con las ruedas en el aire.
-     Antes de fijar el plan, consultar al asesor (regla de `AGENTS.md`).
+     si se prueba la API de reserva; (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
+     pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
+  6b. **Al fusionar las ramas de la Fase 7** (`fase-7-medir-llm`, ya fusionada con el PR #63 el 25/10/2026, y después
+     `fase-7-servicio-ordenes`): en la Pi, `git pull --ff-only`
+     y `rm -rf ~/apps/tools-orders` (copia provisional de `parar-robot.sh` y `vigilar-pines.sh`, para no dejar dos
+     paradas de emergencia distintas), y volver a desplegar `~/apps/ExplorerHat.Orders` si el código cambió. **Al escribir el
+     cerebro:** `tools/medir-llm/herramientas.json` dice "hasta 3 s" en `retroceder` y el servicio recorta a **1 s**
+     (la medida de los modelos se hizo con 3 s); cambiar la descripción de la herramienta a 1 s y repetir la medida si
+     importa. El README del servicio dice "la misma lista cerrada": es la lista, no los límites.
   7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
@@ -1702,11 +1724,14 @@ Pasos:
 - [~] Medir el LLM en el portátil candidato: Ollama con `qwen2.5:3b` y `llama3.2:3b`, y `qwen2.5:7b` para comparar.
       Unas 20 órdenes de prueba en español: tiempo de respuesta y aciertos en la herramienta y en sus valores.
       **Hecho el 25/10/2026** (24 órdenes, ver "Medida del 25/10/2026", más abajo). **Falta repetir con la API de reserva.**
-- [ ] Decidir el protocolo entre el portátil y la Pi (HTTP sencillo, WebSocket o MQTT, que necesita un servidor más)
-      y cómo detecta la Pi que se ha perdido la conexión.
-- [ ] Servicio de órdenes en la Pi (C#, con `SafeExplorerHat`): lista cerrada de acciones, validación, duración
+- [x] Decidir el protocolo entre el portátil y la Pi (HTTP sencillo, WebSocket o MQTT, que necesita un servidor más)
+      y cómo detecta la Pi que se ha perdido la conexión. **Decidido por el usuario el 25/10/2026: HTTP sencillo.** La
+      pérdida de conexión no se detecta: la cubre la duración máxima de cada acción (ver "Servicio de órdenes").
+- [~] Servicio de órdenes en la Pi (C#, con `SafeExplorerHat`): lista cerrada de acciones, validación, duración
       máxima, parada al perder la conexión y parada por obstáculo. Probarlo con las ruedas en el aire y con órdenes
       escritas a mano, sin LLM. Repetir la prueba de corte de wifi de la Fase 3.
+      **Escrito y probado sin mover las ruedas el 25/10/2026** (`src/ExplorerHat.Orders`, ver "Servicio de órdenes",
+      más abajo). **Pruebas con motores hechas el 25/10/2026 (7 de 7 y corte de red).** **Falta:** probarlo en el suelo y el cerebro.
 - [ ] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
       el estado de los sensores (distancias y batería).
 - [ ] Voz: Whisper local en el portátil (por ejemplo, whisper.cpp) con *push-to-talk*. Probar con ruido de fondo.
@@ -1773,3 +1798,74 @@ unsloth y `think: false` (opción `--sin-pensar` de `medir.py`) las llamadas lle
   `phi4-mini`, cuya plantilla puede no admitir herramientas); mejorar el mensaje de sistema (por ejemplo, con
   "`tira palante` = avanzar" y "si piden más de 3 segundos, usa 3"); modelos que cuenten mejor los pasos. **Decisión pendiente con el usuario:** elegir entre rapidez
   (3B, con la parada fuera del modelo) y fiabilidad (7B, con más espera).
+
+### Servicio de órdenes (25/10/2026)
+Código en [`src/ExplorerHat.Orders`](src/ExplorerHat.Orders/README.md) y pruebas en
+[`tools/probar-ordenes`](tools/probar-ordenes/probar.py). Decisiones de diseño (con la consulta al asesor):
+* **HTTP sencillo** (Kestrel, que ya está en la Pi: `Microsoft.AspNetCore.App` 10.0.12). `POST /accion` espera a que
+  termine la acción y responde por qué terminó (`tiempo`, `parada`, `obstaculo` o `sensores`) y cuánto duró.
+* **Sin detección de desconexión ni cola.** Un corte de wifi no cierra la conexión TCP (Kestrel tarda ~30 s en
+  verlo, o no lo ve), así que no se confía en eso. La protección es la duración máxima: 3 s en `avanzar` y `girar`, **1 s
+  en `retroceder`** (va a ciegas; decisión del usuario). El portátil manda una acción, espera la respuesta y manda la
+  siguiente; si llega otra con una en curso, 409. Con un corte, el robot se para en 3 s como mucho.
+* **Seguridad en la Pi:** lista cerrada; tipos estrictos (un número escrito como texto se rechaza con 400, como hacía
+  Llama); recorte de segundos y velocidad, que se avisa en `ajustes`; obstáculo a 30 cm con los tres HC-SR04 (filtro de
+  la lección 06, parada si algún sensor mide menos de 30; sin datos de los sensores no se avanza, 503); clave en la
+  cabecera `X-Clave` (archivo `~/.explorerhat-clave` con permisos 600, creado al azar la primera vez).
+* **Un solo hilo escribe en los motores**, con un `lock`; el movimiento corre en su propio hilo y mira cada 20 ms la
+  hora, la parada y el obstáculo. `/parar` cancela y pone los motores a 0 bajo el mismo `lock`.
+* **Tres modos de arranque, y hay que elegir uno:** `--simulado` (sin pines), `--velocidad-cero` (pines reales; las
+  ruedas no giran nunca, pero `/estado` dice lo que se mandó) y `--real`.
+* **El nombre `ExplorerHat.Orders`** se añadió a `tools/parar-robot.sh`, `tools/vigilar-pines.sh` y la tarea de VS Code.
+
+Resultados (sin mover las ruedas):
+* **29 casos de caja negra** (`probar.py`, con el resultado esperado escrito antes que el servicio): 29 de 29 en `--simulado`
+  en el PC; 23 de 23 en la Pi con `--velocidad-cero` (los 6 del simulador se omiten) y los sensores reales (275, 115 y
+  50 cm). **Se metieron cinco fallos a propósito** (retroceder de 3 s, "sin datos" tomado como libre, `Stop()` sin
+  cancelar, `<=` en lugar de `<` y número como texto aceptado) y las pruebas detectaron los cinco.
+* **Señales con Kestrel** (SIGTERM, SIGHUP, SIGINT y SIGQUIT, a mitad de `avanzar 3 s`, en `--velocidad-cero`): el servicio
+  termina en 0,2 s, imprime "Parada de emergencia", y los 8 pines quedan en `lo`. Los manejadores de Kestrel y los de
+  `SafeExplorerHat` conviven bien. `bash tools/parar-robot.sh` desde el PC también lo para. Memoria de la Pi con el
+  servicio en marcha: 191 MB usados.
+* **Códigos de salida de las señales** (`timeout --preserve-status`, a mitad de `avanzar 3 s`): SIGTERM 143, SIGINT 130 y
+  SIGHUP 129, los mismos que en las lecciones. Los scripts nuevos (`parar-robot.sh`, `vigilar-pines.sh`) se copiaron a
+  `~/apps/tools-orders/` de la Pi sin subir la rama: con ellos, la parada encuentra el servicio y `vigilar-pines` cuenta
+  `procs=1`. **Mientras la rama no se fusione, la Pi sigue en `main` y su `tools/parar-robot.sh` NO conoce `Orders`.**
+* **Capa de obstáculos con los sensores reales, ruedas sin girar** (`tools/probar-obstaculo.sh`, con la mano del usuario, 25/10/2026):
+  4 de 4. Control sin nada a menos de 30 cm: `tiempo` (3,02 s). Mano a ~20 cm del centro, de la izquierda y de la derecha:
+  `obstaculo` en los tres, con 0 s (el obstáculo ya estaba al empezar). **Sin probar con sensores reales:** un obstáculo
+  que aparece a mitad del movimiento (con el simulador sí, caso 25).
+* **Dos lecciones:** en Windows, `localhost` prueba primero IPv6 y cada petición tarda 2 s de más (falsea las pruebas
+  de tiempo): usar `127.0.0.1`. Y el filtro de los sensores guarda la menor de las dos últimas lecturas, así que las
+  pruebas esperan 0,3 s entre casos.
+* **Límite conocido para el cerebro:** una orden que el portátil dio por perdida puede llegar tarde, cuando vuelve la red,
+  y mover el robot hasta 3 s. Regla: tras un tiempo de espera agotado, mirar `/estado` antes de repetir la orden.
+* **Límites conocidos:** un sensor desenchufado no da eco y se lee como 400 cm ("no hay nada"), como en la lección 09;
+  al retroceder y al girar no hay protección de obstáculo.
+* **Primera prueba con motores (`--real`, ruedas en el aire, confirmación del usuario, 25/10/2026, 19:36 a 19:41).** El
+  usuario arrancó el servicio en su terminal (sin `| tee`) y yo mandé una orden cada vez con `curl`, con cuenta atrás de 8 s;
+  `vigilar-pines.sh` registró los pines. El usuario vio cada rueda. **Los 7 pasos salieron como se esperaba:**
+  1. `avanzar 0.5`: las dos ruedas hacia delante, `tiempo`, 0,51 s.
+  2. `girar derecha 0.5` (dos veces): la rueda derecha hacia atrás y la izquierda hacia delante, 0,5 s.
+  3. `retroceder 0.5`: las dos hacia atrás.
+  4. `retroceder 10`: paró a 1 s, con `ajustes: ["segundos"]`.
+  5. `avanzar 3` y `/parar` a 1 s: `/parar` respondió en 0,18 s, la acción terminó por `parada` a 1,08 s y las ruedas
+     pararon al momento.
+  6. `avanzar 3` con la mano delante de un sensor a mitad: `obstaculo` a 0,7 s, ruedas paradas.
+  7. `avanzar 3` y **Ctrl+C del usuario** a 0,8 s: las ruedas pararon, el servicio imprimió "Parada de emergencia (SIGINT):
+     motores parados" y terminó. En el registro de pines, los pines de los motores estaban en `hi` (PWM) hasta las 19:40:50.1
+     y todos en `lo` con `procs=0` a las 19:40:50.3 (muestras cada ~0,27 s). Al acabar: 8 pines en `lo`,
+     `get_throttled` = `0x0` y ningún programa en marcha.
+* **Prueba de corte de red (`--real`, ruedas en el aire, 25/10/2026, 19:49).** El usuario arrancó el servicio en su terminal; yo
+  mandé `avanzar 3` desde el PC y el usuario **desenchufó el cable de red del portátil** al primer segundo con las ruedas
+  girando (la Pi va por wifi y no se tocó). Mi `curl` no recibió la respuesta (código 28, tiempo agotado a los 12 s), aunque
+  el servicio la había enviado: el enlace estaba cortado. **Resultado: las ruedas pararon solas a los 3 s.** Servicio: orden
+  a las 19:49:24, `terminada` por `tiempo` con 3,01 s a las 19:49:27. Registro de pines (muestras cada ~0,27 s): primera muestra
+  con los motores en `hi` a las 19:49:24.7 y la última a las 19:49:27.4; todos en `lo` desde las 19:49:27.7, con el proceso
+  vivo (`procs=1`). El usuario vio las ruedas parar a los ~3 s. Criterio cumplido: **pines en `lo` a los 3 s de la orden, sin
+  ayuda del portátil.** La sesión de terminal del usuario no se cortó, así que el SIGHUP por pérdida de SSH no intervino.
+  Al acabar: 8 pines en `lo`, `get_throttled` = `0x0`.
+* **El servicio de órdenes queda probado** (sin motores en el simulador y la Pi; con motores en el aire: sentido de las
+  ruedas, recortes, `/parar`, obstáculo, Ctrl+C y corte de red). **Falta:** probarlo en el suelo (no hecho) y el cerebro en
+  el portátil (C#), que reutiliza `tools/medir-llm/herramientas.json` como esquema. **Mientras la rama no se fusione, la
+  Pi sigue en `main` con un `parar-robot.sh` que no conoce `Orders`:** los scripts nuevos están en `~/apps/tools-orders/`.

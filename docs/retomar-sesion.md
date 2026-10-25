@@ -23,7 +23,7 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #62, cuyas descripciones resumen cada fase y cada lección.
+     sobre todo los #4 a #64, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
      actual" de PLAN.md (el 25/10/2026: PR #2625, que espera la nueva revisión de pgrawehr tras
      nuestra respuesta, e incidencias #2614, #2615 y #2617; los PR #2610 y #2616 están fusionados), con sus comprobaciones, comentarios y revisiones
@@ -75,22 +75,25 @@ anota los resultados en PLAN.md en una rama nueva con su PR, y pídeme /usage.
 
 La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. Desde entonces se probó también en el suelo, a 0,45 de velocidad. La probó también una niña de 10 años en el suelo, sin problemas. El checklist del taller se hizo el 25/10/2026 ([`checklist-taller.md`](checklist-taller.md)); la siguiente tarea propuesta es la Fase 7. La lección 10 de siguelíneas se descartó el 17/10/2026 y quedó como idea; las lecciones 11 y 12 pasaron a ser la 10 y la 11. El experimento de modelos está decidido (17/10/2026): se mantiene como está, con el asesor y `buscador` ("Experimento de modelos" en `PLAN.md`).
 
-## Variante: empezar la Fase 7 (robot con IA)
+## Variante: seguir la Fase 7 (robot con IA): decidir el modelo y escribir el cerebro
 
-Esta variante es para la primera sesión de la Fase 7. **No mueve el robot**: el primer paso es medir el modelo de lenguaje en un portátil (ver `PLAN.md`, Fase 7 y "Al retomar", punto 6).
+Esta variante es para la sesión que sigue a la del 25/10/2026. Ese día se midió el modelo de lenguaje (`tools/medir-llm`) y se escribió y probó el servicio de órdenes de la Pi (`src/ExplorerHat.Orders`, con las ruedas en el aire: 7 de 7 y corte de red). Ver `PLAN.md`, Fase 7 y "Al retomar", puntos 6 y 6b.
 
 **Antes de pegarla:**
 
-1. Si quieres usar la tarjeta gráfica del portátil, actualiza antes su controlador NVIDIA: Ollama pide la versión 531 o superior (el equipo candidato tiene la 511.65). Lo haces tú, es una instalación de Windows.
-2. Ten Ollama instalado en el portátil, o dile al asistente que te dé los pasos.
+1. **La rama `fase-7-servicio-ordenes` puede no estar fusionada** (la de la medida, `fase-7-medir-llm`, se fusionó el 25/10/2026 con el PR #63). Mira `git branch -a` y `gh pr list`. Si el servicio no se fusionó, empieza en `fase-7-servicio-ordenes` en vez de `main`: el `PLAN.md` de `main` no tiene el servicio de órdenes.
+2. Si se fusionaron: en la Pi, `git pull --ff-only` y `rm -rf ~/apps/tools-orders`; vuelve a desplegar `~/apps/ExplorerHat.Orders` si hace falta.
+3. Ollama está instalado en el portátil (controlador NVIDIA 621.01) con cinco modelos de Hugging Face, porque la red del 25/10/2026 bloqueaba el servidor de archivos de Ollama. Si la red es otra, puede que `ollama pull qwen2.5:3b` funcione.
+4. Si la sesión va a mover el robot (por ejemplo, probar el servicio en el suelo): la Pi encendida y con wifi, la UPS cargada, el robot **sobre un bote o un libro, con las ruedas en el aire** (salvo la prueba en el suelo, que se pide aparte), y una terminal SSH abierta en la Pi.
 
 Pega el prompt de arriba y **añade esto al final**:
 
 ```text
-Hoy empezamos la Fase 7 (robot con IA). Haz los pasos 1 a 3 (incluido dotnet/iot, que son 5 minutos) y
-después propón el plan del primer paso de la Fase 7: medir el modelo de lenguaje en el portátil, con
-las órdenes de prueba en español que figuran en PLAN.md. Pregúntame qué portátil uso y si el
-controlador de la tarjeta gráfica está actualizado. Antes de fijar el plan, consulta al asesor. No muevas
-el robot ni lances nada que lo mueva en esta sesión. Cuéntame cuánto puede tardar cada comando largo
-(descargar modelos pesa varios GB). Al terminar, anota las medidas en PLAN.md, en una rama nueva con su PR.
+Hoy seguimos la Fase 7 (robot con IA). Haz los pasos 1 a 3 (incluido dotnet/iot, que son 5 minutos), mira
+si las ramas de la Fase 7 están fusionadas (punto 6b de "Al retomar") y después propón el plan de lo que
+sigue: decidir el modelo con los datos de "Medida del 25/10/2026" (hazme una pregunta por cada decisión, con
+su contexto y tu recomendación) y escribir el cerebro en el portátil (C#), con la parada por palabra sin
+pasar por el modelo. El servicio de órdenes ya está probado: no muevas el robot sin mi confirmación de que
+tiene las ruedas en el aire. Antes de fijar el plan, consulta al asesor. Cuéntame cuánto puede tardar cada
+comando largo. Al terminar, anota los resultados en PLAN.md, en una rama nueva con su PR.
 ```
