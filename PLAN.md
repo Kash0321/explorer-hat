@@ -6,7 +6,37 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (19/10/2026)
+## Estado actual (25/10/2026)
+- **Sesión del 25/10/2026** (desde el PC; solo dotnet/iot, sin mover el robot; la Pi, en `main` (`a68e53c`), pines en `lo`, `get_throttled` = `0x0`):
+  - **#2610 fusionado** el 22/10/2026 (`efe9e367` en `upstream/main`). La incidencia #2614 sigue abierta (pgrawehr dijo que
+    la arreglaba el #2610): se puede pedir que la cierren, o comentar que ya está arreglada. Queda el fallo 1 de nuestro
+    comentario (quitar un aviso de otro tipo de evento), que ellos ven poco realista.
+  - **#2617: pgrawehr contestó** (22/10/2026): "implementa lo que mejor encaje con nuestra API, no somos estrictos con el
+    diseño". No hay que contestar a sus preguntas. **Queda posible un PR aparte** con el motor de PWM en las dos entradas
+    (el `HatMotor` de `Common` es el modelo), cuando el #2625 deje de ocupar la cola.
+  - **#2625 (entradas y salidas): revisado el 22/10/2026.** Las comprobaciones pasaban. pgrawehr pidió cambios
+    (`CHANGES_REQUESTED`): devolver `GpioPin` (o una derivada) en vez de `DigitalInput`/`DigitalOutput`, y sin clases de
+    lista artificiales (`IList<T>` o `Get(int)`). Copilot dio dos hallazgos: las entradas y salidas se quedaban con un pin
+    que el programa ya había abierto y lo cerraban al liberarse.
+  - **Decisión del usuario (opción A′):** `DigitalInput` y `DigitalOutput` **derivan de `GpioPin`** (cumple a pgrawehr) y
+    **conservan `On()`, `Off()`, `IsOn` y `One` a `Four`**, porque el código tiene que ser lo más intuitivo posible para
+    niños de 10 a 14 años (`hat.Outputs.One.On()` se lee como `hat.Lights.Blue.On()`; `Write(PinValue.High)` no dice que en
+    una salida de colector abierto significa "encendido"). Las colecciones implementan `IReadOnlyList<T>`. `Pin` pasa a
+    ser `PinNumber`. Si pgrawehr insiste, **nos ajustamos y hacemos una envolvente en este repositorio** (se lo dijimos).
+  - **Commit `c4119033`** en `explorerhat-io` (sin *force push*), con: pin abierto antes = `InvalidOperationException` y
+    `Close`/`Dispose` solo cierran lo que abrieron; una entrada rechaza `Write`, `Toggle` y el modo de salida (su pin lo
+    maneja el búfer); una salida rechaza el modo de entrada. 16 pruebas en `ExplorerHat` y 10 en `DCMotor`; las pruebas del
+    pin abierto fallan sin el arreglo (comprobado con dos fallos metidos a propósito). Respuestas publicadas en los tres
+    hilos, iguales a los borradores: [pgrawehr](https://github.com/dotnet/iot/pull/2625#discussion_r4370528600),
+    [Copilot, entrada](https://github.com/dotnet/iot/pull/2625#discussion_r4370528667) y
+    [Copilot, salida](https://github.com/dotnet/iot/pull/2625#discussion_r4370528783).
+  - **Pendiente del #2625:** que pgrawehr revise otra vez (la aprobación anterior y el `CHANGES_REQUESTED` se mueven con el
+    commit nuevo; no hay que pedir nada). **La rama `explorerhat-analog-v2` NO se ha rehecho a propósito**: `AnalogInputs`
+    usa el mismo patrón de lista (`List<AnalogInput>` + `IEnumerable`); si pgrawehr rechaza `IReadOnlyList` + `One` a `Four`,
+    habría que hacer el trabajo dos veces. Al rehacerla (cherry-pick en una rama nueva desde `explorerhat-io`, porque el
+    #2625 sigue sin fusionar), alinear `AnalogInputs` con `IReadOnlyList<T>`, esperar conflictos en `README.md` y
+    `samples/Program.cs`, y buscar `\.Pin\b` después. Comprobar también que `AnalogInputs` y `TouchPads` de `Common` siguen la
+    forma del binding.
 - **Sesión del 19/10/2026** (desde el PC; solo se trató dotnet/iot, sin mover el robot; la Pi, en `main` y en reposo):
   - **#2616 (`Cap1208`) fusionado** el 18/10/2026 (`5cf07458` en `upstream/main`). Rama `cap1xxx-binding` borrada.
   - **#2625 (entradas y salidas):** sin revisiones ni comentarios; las comprobaciones pasan; "Review required".
@@ -223,12 +253,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | **Fusionado** el 08/10/2026 | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
   | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | **Fusionado** el 15/10/2026 (`1856d767`) | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
   | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | **Fusionado** el 18/10/2026 (`5cf07458`, *squash*), tras aprobarlo pgrawehr. Rama `cap1xxx-binding` borrada (local y en el fork) después de comprobar que sus 15 archivos eran iguales a los del commit fusionado | Nada. Desbloquea los pads táctiles en `ExplorerHat` (PR 4) |
-  | [PR #2625](https://github.com/dotnet/iot/pull/2625): entradas y salidas en `ExplorerHat` (rama `explorerhat-io`, `0078c337`) | Abierto el 16/10/2026 | Que lo revisen. De él depende la rama del analógico |
+  | [PR #2625](https://github.com/dotnet/iot/pull/2625): entradas y salidas en `ExplorerHat` (rama `explorerhat-io`, `0078c337`) | Abierto el 16/10/2026; revisado el 22/10/2026 (cambios pedidos por pgrawehr y Copilot), respondido con `c4119033` el 25/10/2026 | Que pgrawehr lo revise otra vez (ver el "Estado actual"). De él depende la rama del analógico |
   | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta (`untriaged`) | pgrawehr: la arregla el #2610 |
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`), sin respuesta | Solo incidencia |
-  | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`), sin respuesta | Respuesta a sus tres preguntas (forma de la API, variante que frena, si `ExplorerHat` la usa) |
+  | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`); pgrawehr contestó el 22/10/2026: decidimos nosotros la API | Nada que contestar. Posible PR aparte con el motor de PWM en las dos entradas |
   | Rama `explorerhat-analog-v2` del fork (`f39ca85c`, encima de `explorerhat-io`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2625 |
-  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | Aprobado por raffaeler (no es nuestro). Con el recuento de referencias (`0f4e5718`); krwq pidió a Copilot dos arreglos más (15/10/2026). Probado en la Pi el 17/10/2026: arregla la #2614 y tiene dos fallos nuevos, [comentados](https://github.com/dotnet/iot/pull/2610#issuecomment-6232082492) | Que lo fusionen. pgrawehr contestó el 18/10/2026 (ver el "Estado actual"): no pide nada |
+  | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | **Fusionado** el 22/10/2026 (`efe9e367`). Probado en la Pi el 17/10/2026: arregla la #2614 y tiene dos fallos nuevos, [comentados](https://github.com/dotnet/iot/pull/2610#issuecomment-6232082492); pgrawehr no pidió nada | Nada. Llegará en la próxima versión de `System.Device.Gpio` |
 
   `upstream/main` (16/10/2026) tiene 4 commits nuevos desde el 09/10/2026; de ellos, solo el del #2613 toca nuestros
   bindings. Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*).
@@ -250,9 +280,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   elegir entre un checklist del taller y la Fase 7 (el siguelíneas
   ya no es una lección, es una idea guardada).
   **Experimento de modelos: decidido** (17/10/2026, ver "Experimento de modelos"): se mantiene como está.
-  1. Mirar comentarios y revisiones en los PR #2625 y #2610 (el #2616 ya está fusionado) y en las incidencias #2614, #2615 y #2617. Si hay
-     comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones (se abrió
-     el 16/10/2026).
+  1. Mirar comentarios y revisiones en el PR #2625 (los #2610 y #2616 ya están fusionados) y en las incidencias #2614, #2615 y #2617. Si hay
+     comentarios, contárselos al usuario antes de responder. En el #2625, mirar también las comprobaciones y si
+     pgrawehr contestó a nuestra respuesta del 25/10/2026 (ver el "Estado actual"): según lo que pida, ajustar o hacer la
+     envolvente en este repositorio. Con los cambios pedidos, `git fetch origin` y `git merge --ff-only` en `explorerhat-io`.
   2. Las ramas van apiladas: `explorerhat-io` (#2625) → `explorerhat-analog-v2`. Cuando fusionen el #2625 (con
      *squash*, como el #2613), copiar el commit del analógico encima de `upstream/main` en una rama nueva, sin `rebase`
      ni *force push*: `git switch -c explorerhat-analog upstream/main`, `git cherry-pick <commit de
