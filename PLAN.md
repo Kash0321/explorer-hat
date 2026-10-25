@@ -30,8 +30,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     hilos, iguales a los borradores: [pgrawehr](https://github.com/dotnet/iot/pull/2625#discussion_r4370528600),
     [Copilot, entrada](https://github.com/dotnet/iot/pull/2625#discussion_r4370528667) y
     [Copilot, salida](https://github.com/dotnet/iot/pull/2625#discussion_r4370528783).
-  - **Pendiente del #2625:** que pgrawehr revise otra vez (la aprobación anterior y el `CHANGES_REQUESTED` se mueven con el
-    commit nuevo; no hay que pedir nada). **La rama `explorerhat-analog-v2` NO se ha rehecho a propósito**: `AnalogInputs`
+  - **Pendiente del #2625:** que pgrawehr revise otra vez (el PR sigue en `CHANGES_REQUESTED`: un commit
+    nuevo no lo quita; no hay que pedir nada, las respuestas ya les avisan). **La rama `explorerhat-analog-v2` NO se ha rehecho a propósito**: `AnalogInputs`
     usa el mismo patrón de lista (`List<AnalogInput>` + `IEnumerable`); si pgrawehr rechaza `IReadOnlyList` + `One` a `Four`,
     habría que hacer el trabajo dos veces. Al rehacerla (cherry-pick en una rama nueva desde `explorerhat-io`, porque el
     #2625 sigue sin fusionar), alinear `AnalogInputs` con `IReadOnlyList<T>`, esperar conflictos en `README.md` y
@@ -246,22 +246,21 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   placa sí lleva resistencias de subida de 4,7 kΩ y la regla "VCC solo a 3v3" es necesaria.
 - **Cerradas:** fases 0 a 4 y la Fase 5 (catálogo cerrado el 17/10/2026; la lección 07, probada también por una niña de 10 años). De la Fase 3 solo queda la guía de compilación ligera en la Pi (poco urgente).
 - **Fase 7 (robot con IA):** analizada y decidida; la Fase 5 está cerrada (17/10/2026), así que puede empezar.
-- **Fase 6, en dotnet/iot (19/10/2026):**
+- **Fase 6, en dotnet/iot (25/10/2026):**
 
   | Qué | Estado | Pendiente |
   |---|---|---|
   | [PR #2612](https://github.com/dotnet/iot/pull/2612): `Ina219` con signo ("Fixes #1659") | **Fusionado** el 08/10/2026 | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
   | [PR #2613](https://github.com/dotnet/iot/pull/2613): `Dispose` de `DCMotor` y `ExplorerHat` | **Fusionado** el 15/10/2026 (`1856d767`) | Nada. Llegará en la próxima versión de `Iot.Device.Bindings` |
   | [PR #2616](https://github.com/dotnet/iot/pull/2616): binding nuevo `Cap1208` (pads táctiles) | **Fusionado** el 18/10/2026 (`5cf07458`, *squash*), tras aprobarlo pgrawehr. Rama `cap1xxx-binding` borrada (local y en el fork) después de comprobar que sus 15 archivos eran iguales a los del commit fusionado | Nada. Desbloquea los pads táctiles en `ExplorerHat` (PR 4) |
-  | [PR #2625](https://github.com/dotnet/iot/pull/2625): entradas y salidas en `ExplorerHat` (rama `explorerhat-io`, `0078c337`) | Abierto el 16/10/2026; revisado el 22/10/2026 (cambios pedidos por pgrawehr y Copilot), respondido con `c4119033` el 25/10/2026 | Que pgrawehr lo revise otra vez (ver el "Estado actual"). De él depende la rama del analógico |
+  | [PR #2625](https://github.com/dotnet/iot/pull/2625): entradas y salidas en `ExplorerHat` (rama `explorerhat-io`, `c4119033`) | Abierto el 16/10/2026; revisado el 22/10/2026 (cambios pedidos por pgrawehr y Copilot), respondido con `c4119033` el 25/10/2026 | Que pgrawehr lo revise otra vez (ver el "Estado actual"). De él depende la rama del analógico |
   | [Incidencia #2614](https://github.com/dotnet/iot/issues/2614): eventos de GPIO con libgpiod v2 | Abierta (`untriaged`) | pgrawehr: la arregla el #2610 |
   | [Incidencia #2615](https://github.com/dotnet/iot/issues/2615): `QueryComponentInformation` en la Pi 3 | Abierta (`untriaged`), sin respuesta | Solo incidencia |
   | [Incidencia #2617](https://github.com/dotnet/iot/issues/2617): marcha atrás de `DCMotor2PinNoEnable`; propuesta de motor con PWM en las dos entradas | Abierta (`untriaged`); pgrawehr contestó el 22/10/2026: decidimos nosotros la API | Nada que contestar. Posible PR aparte con el motor de PWM en las dos entradas |
   | Rama `explorerhat-analog-v2` del fork (`f39ca85c`, encima de `explorerhat-io`): entradas analógicas en `ExplorerHat` | Lista y probada en la Pi, sin PR | Abrir el PR cuando fusionen el #2625 |
   | [PR #2610](https://github.com/dotnet/iot/pull/2610) de pgrawehr: arreglos de libgpiod v2 | **Fusionado** el 22/10/2026 (`efe9e367`). Probado en la Pi el 17/10/2026: arregla la #2614 y tiene dos fallos nuevos, [comentados](https://github.com/dotnet/iot/pull/2610#issuecomment-6232082492); pgrawehr no pidió nada | Nada. Llegará en la próxima versión de `System.Device.Gpio` |
 
-  `upstream/main` (16/10/2026) tiene 4 commits nuevos desde el 09/10/2026; de ellos, solo el del #2613 toca nuestros
-  bindings. Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*).
+  `upstream/main` (25/10/2026, `41086078`): desde el #2616 solo ha cambiado, en nuestras áreas, el #2610 (libgpiod v2). Si los mantenedores comentan, se responde en el PR y los cambios van en commits nuevos (sin *force push*).
   **Los mantenedores pueden subir commits a nuestras ramas** (pgrawehr lo hizo en el #2616): antes de confirmar nada en
   la rama de un PR, `git fetch origin` y `git merge --ff-only`. Para mirar el
   estado: `gh pr checks <PR> -R dotnet/iot`, los comentarios con `gh api repos/dotnet/iot/issues/<n>/comments` y, en
@@ -293,9 +292,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      el fork). Si piden cambios en el #2625, van en commits nuevos en `explorerhat-io`; después, copiar otra vez el
      commit del analógico encima en otra rama nueva, igual.
   3. ~~Probar en la Pi el #2610 con el recuento de referencias~~ (hecho el 17/10/2026, ver arriba) y ~~comentar sus
-     dos fallos~~ (publicado el 17/10/2026). pgrawehr respondió el 18/10/2026 (ver el "Estado actual"): no pide
-     ningún PR y no se contesta. Solo mirar si hay algo nuevo posterior a esa fecha; si algún día piden un PR
-     de arreglo para el fallo 1, el dato extra de arriba ayuda.
+     dos fallos~~ (publicado el 17/10/2026). El #2610 se fusionó el 22/10/2026 y pgrawehr no pidió ningún PR. Si algún
+     día piden un PR de arreglo para el fallo 1, el dato extra de arriba ayuda. **Ofrecer al usuario** (no hacerlo sin
+     su visto bueno) un comentario en la #2614 diciendo que el #2610 ya la arregla, para que la cierren.
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4). **El `Cap1208` (#2616) ya está
      fusionado (18/10/2026), así que se puede empezar**, pero el #2625 sigue sin revisar.
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
