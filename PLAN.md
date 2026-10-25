@@ -30,6 +30,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     hilos, iguales a los borradores: [pgrawehr](https://github.com/dotnet/iot/pull/2625#discussion_r4370528600),
     [Copilot, entrada](https://github.com/dotnet/iot/pull/2625#discussion_r4370528667) y
     [Copilot, salida](https://github.com/dotnet/iot/pull/2625#discussion_r4370528783).
+  - **Integración continua de `c4119033` (25/10/2026): pasan todas** (las 6 compilaciones de Linux, macOS y Windows, el CLA,
+    `markdownlint` y `markdown-link-check`).
   - **Pendiente del #2625:** que pgrawehr revise otra vez (el PR sigue en `CHANGES_REQUESTED`: un commit
     nuevo no lo quita; no hay que pedir nada, las respuestas ya les avisan). **La rama `explorerhat-analog-v2` NO se ha rehecho a propósito**: `AnalogInputs`
     usa el mismo patrón de lista (`List<AnalogInput>` + `IEnumerable`); si pgrawehr rechaza `IReadOnlyList` + `One` a `Four`,
