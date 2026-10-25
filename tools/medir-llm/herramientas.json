@@ -1,0 +1,79 @@
+{
+  "_comentario": "Lista cerrada de acciones del robot (formato de herramientas de Ollama). Es el contrato que validara el servicio de la Pi: la Pi recorta de todos modos los valores fuera de rango.",
+  "sistema": "Eres el cerebro de un robot con ruedas que usan niños de 10 a 14 años. Solo puedes actuar con las herramientas que tienes. Si una orden pide algo que no se puede hacer con ellas, no llames a ninguna herramienta y contesta en una frase corta por qué. Cada movimiento dura como máximo 3 segundos. La velocidad va de 0.0 (parado) a 1.0 (máxima); si el niño no dice nada, usa 0.45. Una orden con varios pasos se contesta con varias llamadas, en el orden en que se piden.",
+  "limites": {
+    "segundos": { "min": 0.1, "max": 3.0 },
+    "velocidad": { "min": 0.0, "max": 1.0 }
+  },
+  "herramientas": [
+    {
+      "type": "function",
+      "function": {
+        "name": "avanzar",
+        "description": "Mueve el robot hacia delante.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "segundos": { "type": "number", "description": "Duración del movimiento, de 0.1 a 3.0." },
+            "velocidad": { "type": "number", "description": "De 0.0 a 1.0. Por defecto 0.45." }
+          },
+          "required": ["segundos"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "retroceder",
+        "description": "Mueve el robot hacia atrás.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "segundos": { "type": "number", "description": "Duración del movimiento, de 0.1 a 3.0." },
+            "velocidad": { "type": "number", "description": "De 0.0 a 1.0. Por defecto 0.45." }
+          },
+          "required": ["segundos"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "girar",
+        "description": "Gira el robot sobre sí mismo, sin avanzar.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "direccion": { "type": "string", "enum": ["izquierda", "derecha"] },
+            "segundos": { "type": "number", "description": "Duración del giro, de 0.1 a 3.0." },
+            "velocidad": { "type": "number", "description": "De 0.0 a 1.0. Por defecto 0.45." }
+          },
+          "required": ["direccion", "segundos"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "luz",
+        "description": "Enciende o apaga una de las cuatro luces del robot.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "color": { "type": "string", "enum": ["azul", "amarilla", "roja", "verde"] },
+            "encendida": { "type": "boolean", "description": "true enciende la luz, false la apaga." }
+          },
+          "required": ["color", "encendida"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "parar",
+        "description": "Para los dos motores al momento.",
+        "parameters": { "type": "object", "properties": {} }
+      }
+    }
+  ]
+}

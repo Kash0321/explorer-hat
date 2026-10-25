@@ -7,6 +7,15 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (25/10/2026)
+- **Sesión de la tarde del 25/10/2026: Fase 7, primer paso (medir el LLM) hecho** (rama `fase-7-medir-llm`; desde el PC, sin
+  mover el robot; la Pi, actualizada a `main` (`32d1b06`), pines en `lo`, `get_throttled` = `0x0`). Controlador NVIDIA del
+  portátil actualizado por el usuario a la 621.01; Ollama 0.40.11 instalado con `winget`. Resultados, lectura y fallos en la
+  Fase 7 ("Medida del 25/10/2026"); la herramienta está en [`tools/medir-llm/`](tools/medir-llm/README.md). **Resumen:**
+  `qwen2.5:7b` acierta la herramienta en 72/72 pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b` tarda
+  0,7 s pero confunde "Para." con `avanzar`. **Pendiente de decidir con el usuario:** modelo y qué hacer con la parada, y la
+  prueba con la API de reserva (necesita clave y revisar la protección de datos de menores).
+  **La red del trabajo bloquea el servidor de archivos de Ollama** (`*.r2.cloudflarestorage.com`, con y sin VPN): los modelos
+  se bajaron de Hugging Face (ver el README de `tools/medir-llm`).
 - **Sesión del 25/10/2026** (desde el PC; solo dotnet/iot, sin mover el robot; la Pi, en `main` (`a68e53c`), pines en `lo`, `get_throttled` = `0x0`):
   - **#2610 fusionado** el 22/10/2026 (`efe9e367` en `upstream/main`). La incidencia #2614 sigue abierta (pgrawehr dijo que
     la arreglaba el #2610): se puede pedir que la cierren, o comentar que ya está arreglada. Queda el fallo 1 de nuestro
@@ -325,14 +334,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   5. **#2617 (motor con PWM en las dos entradas):** pgrawehr dejó la API a nuestro criterio (22/10/2026). Es un PR
      aparte en `C:\work\iot` (rama nueva desde `upstream/main`); el modelo es `HatMotor` de `Common`. Mejor después de que
      revisen el #2625, para no tener tres ramas abiertas a la vez.
-  6. **Fase 7, primer paso (no mueve el robot):** medir el LLM en el portátil candidato, como dice la lista de pasos de
-     la Fase 7: Ollama con `qwen2.5:3b` y `llama3.2:3b` (y `qwen2.5:7b` para comparar), unas 20 órdenes en español,
-     tiempo de respuesta y aciertos en la herramienta y sus valores. **Antes, el usuario tiene que actualizar el
-     controlador NVIDIA del portátil** (Ollama pide el 531 o superior; tiene el 511.65): lo instala él. Preguntarle qué
-     portátil usa (el candidato es un MSI Prestige 15 A12UD). Después, el protocolo entre el portátil y la Pi y el
-     servicio de órdenes en la Pi. **No se mueve el robot hasta tener el servicio con la lista cerrada de acciones, la
-     validación y la parada por pérdida de conexión**, y la primera prueba será con órdenes escritas a mano, sin LLM,
-     con las ruedas en el aire. Antes de fijar el plan, consultar al asesor (regla de `AGENTS.md`).
+  6. **Fase 7. La medida del LLM está hecha (25/10/2026, ver "Medida del 25/10/2026" en la Fase 7).** Siguiente: decidir con
+     el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s) y
+     si se prueba la API de reserva. Después, el protocolo entre el portátil y la Pi y el servicio de órdenes en la Pi.
+     **No se mueve el robot hasta tener el servicio con la lista cerrada de acciones, la validación y la parada por
+     pérdida de conexión**, y la primera prueba será con órdenes escritas a mano, sin LLM, con las ruedas en el aire.
+     Antes de fijar el plan, consultar al asesor (regla de `AGENTS.md`).
   7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
@@ -1692,9 +1699,9 @@ Decisiones (02/10/2026):
   actualizarlo.
 
 Pasos:
-- [ ] Medir el LLM en el portátil candidato: Ollama con `qwen2.5:3b` y `llama3.2:3b`, y `qwen2.5:7b` para comparar.
+- [~] Medir el LLM en el portátil candidato: Ollama con `qwen2.5:3b` y `llama3.2:3b`, y `qwen2.5:7b` para comparar.
       Unas 20 órdenes de prueba en español: tiempo de respuesta y aciertos en la herramienta y en sus valores.
-      Repetir con la API de reserva.
+      **Hecho el 25/10/2026** (24 órdenes, ver "Medida del 25/10/2026", más abajo). **Falta repetir con la API de reserva.**
 - [ ] Decidir el protocolo entre el portátil y la Pi (HTTP sencillo, WebSocket o MQTT, que necesita un servidor más)
       y cómo detecta la Pi que se ha perdido la conexión.
 - [ ] Servicio de órdenes en la Pi (C#, con `SafeExplorerHat`): lista cerrada de acciones, validación, duración
@@ -1713,3 +1720,36 @@ Pasos:
 - [ ] Lecciones: sentir, pensar y actuar; editar el *system prompt* y la lista de herramientas; capa reactiva frente a
       capa deliberativa; comparar su programa fijo con el agente. La parte compleja (servidor, JSON y validación) es
       código del monitor, no de los niños.
+
+### Medida del 25/10/2026 (MSI Prestige 15 A12UD, RTX 3050 Ti de 4 GB, controlador 621.01, enchufado)
+Herramienta: [`tools/medir-llm/`](tools/medir-llm/README.md). 24 órdenes (simples, con números, en lenguaje de niño, de varios
+pasos, fuera de rango, absurdas o peligrosas, y una urgente) con el resultado esperado escrito **antes** de medir; cada
+orden 3 veces (72 ejecuciones), temperatura 0, `num_ctx` 2048, Ollama 0.40.11. Esquema de cinco herramientas:
+`avanzar`, `retroceder`, `girar`, `luz` y `parar`. Resultados completos en `tools/medir-llm/resultados/`.
+
+| Modelo (GGUF `Q4_K_M`) | Herramienta OK | Valores OK | Válidas | Tiempo (mediana / máximo) | Carga en frío | Tarjeta gráfica |
+| --- | --- | --- | --- | --- | --- | --- |
+| `Qwen2.5-3B-Instruct` (Qwen) | 63/72 | 57/72 | 60/72 | 0,70 s / 4,1 s | 3,0 s | 100 % |
+| `Llama-3.2-3B-Instruct` (bartowski) | 46/72 | 19/72 | 28/72 | 0,53 s / 5,6 s | 14,5 s | 100 % |
+| `Qwen2.5-7B-Instruct` (bartowski) | **72/72** | 66/72 | 66/72 | 3,0 s / 25 s | 4,7 s | 45 % |
+
+* **Los modelos no vienen de la biblioteca de Ollama**, sino de Hugging Face (la red bloquea el servidor de archivos de
+  Ollama). Usan la plantilla de su GGUF: **el resultado de Llama no vale como medida del modelo oficial**. Sus fallos son
+  de formato (números como texto, `"2"` en vez de `2`; la llamada escrita como texto plano), lo que apunta a la plantilla.
+  Repetir con `llama3.2:3b` de la biblioteca de Ollama si se quiere comparar de verdad.
+* **Fuera de rango (órdenes 19 y 20): fallan los tres modelos, siempre** (6 de los 6 fallos de valores de `qwen2.5:7b`).
+  Pasan el valor tal cual (`segundos` = 300 y 10), aunque el esquema y el mensaje de sistema dicen "máximo 3 s". **El
+  recorte de la Pi no es opcional**: no se puede confiar en que el modelo respete los límites.
+* **`qwen2.5:3b` falla en cosas que importan:** ante `Para.` llama a `avanzar` (3 de 3), inventa un color
+  (`luz("morada")`) y en el cuadrado de 8 pasos se deja el último (7 llamadas). Con `¡¡PARA YA!!` acierta. **Decisión de
+  diseño que sale de aquí:** la parada no puede depender del LLM. Las palabras "para", "stop" o "alto" (y un botón o un
+  pad táctil) tienen que parar el robot sin pasar por el modelo; la Pi valida además nombres de herramienta, colores y
+  números.
+* **`qwen2.5:7b` acierta la herramienta en las 72 ejecuciones**, también el cuadrado, pero tarda 3 s de mediana (25 s el
+  cuadrado, con 8 llamadas) porque solo el 45 % del modelo cabe en la tarjeta gráfica (12 tokens/s frente a 53 del de 3B).
+  **La promesa de menos de 1 s solo la cumple el de 3B.**
+* Los resultados son repetibles: la segunda ejecución de `qwen2.5:3b` dio 63/72 otra vez (carga de 3,0 s en frío; en la
+  primera ejecución el modelo ya estaba en memoria y marcó 0 s).
+* **Sin probar:** la API de reserva; un modelo intermedio (por ejemplo, uno de 4B que quepa entero en 4 GB); mejorar el
+  mensaje de sistema; modelos que cuenten mejor los pasos. **Decisión pendiente con el usuario:** elegir entre rapidez
+  (3B, con la parada fuera del modelo) y fiabilidad (7B, con más espera).
