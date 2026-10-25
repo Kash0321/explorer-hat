@@ -342,6 +342,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s) y
      si se prueba la API de reserva; (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
      pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
+  6b. **Al fusionar las ramas de la Fase 7** (`fase-7-medir-llm`, y después `fase-7-servicio-ordenes`): en la Pi, `git pull --ff-only`
+     y `rm -rf ~/apps/tools-orders` (copia provisional de `parar-robot.sh` y `vigilar-pines.sh`, para no dejar dos
+     paradas de emergencia distintas), y volver a desplegar `~/apps/ExplorerHat.Orders` si el código cambió. **Al escribir el
+     cerebro:** `tools/medir-llm/herramientas.json` dice "hasta 3 s" en `retroceder` y el servicio recorta a **1 s**
+     (la medida de los modelos se hizo con 3 s); cambiar la descripción de la herramienta a 1 s y repetir la medida si
+     importa. El README del servicio dice "la misma lista cerrada": es la lista, no los límites.
   7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
@@ -1834,13 +1840,13 @@ Resultados (sin mover las ruedas):
   6. `avanzar 3` con la mano delante de un sensor a mitad: `obstaculo` a 0,7 s, ruedas paradas.
   7. `avanzar 3` y **Ctrl+C del usuario** a 0,8 s: las ruedas pararon, el servicio imprimió "Parada de emergencia (SIGINT):
      motores parados" y terminó. En el registro de pines, los pines de los motores estaban en `hi` (PWM) hasta las 19:40:50.1
-     y todos en `lo` con `procs=0` a las 19:40:50.3 (muestras cada 0,2 s). Al acabar: 8 pines en `lo`,
+     y todos en `lo` con `procs=0` a las 19:40:50.3 (muestras cada ~0,27 s). Al acabar: 8 pines en `lo`,
      `get_throttled` = `0x0` y ningún programa en marcha.
 * **Prueba de corte de red (`--real`, ruedas en el aire, 25/10/2026, 19:49).** El usuario arrancó el servicio en su terminal; yo
   mandé `avanzar 3` desde el PC y el usuario **desenchufó el cable de red del portátil** al primer segundo con las ruedas
   girando (la Pi va por wifi y no se tocó). Mi `curl` no recibió la respuesta (código 28, tiempo agotado a los 12 s), aunque
   el servicio la había enviado: el enlace estaba cortado. **Resultado: las ruedas pararon solas a los 3 s.** Servicio: orden
-  a las 19:49:24, `terminada` por `tiempo` con 3,01 s a las 19:49:27. Registro de pines (muestras cada 0,3 s): primera muestra
+  a las 19:49:24, `terminada` por `tiempo` con 3,01 s a las 19:49:27. Registro de pines (muestras cada ~0,27 s): primera muestra
   con los motores en `hi` a las 19:49:24.7 y la última a las 19:49:27.4; todos en `lo` desde las 19:49:27.7, con el proceso
   vivo (`procs=1`). El usuario vio las ruedas parar a los ~3 s. Criterio cumplido: **pines en `lo` a los 3 s de la orden, sin
   ayuda del portátil.** La sesión de terminal del usuario no se cortó, así que el SIGHUP por pérdida de SSH no intervino.
