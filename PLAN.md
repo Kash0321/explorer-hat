@@ -9,9 +9,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 ## Estado actual (25/10/2026)
 - **Cierre de la sesión de la tarde del 25/10/2026: Fase 7, medida del LLM y servicio de órdenes hechos** (desde el PC; el robot
   solo se movió en las pruebas con las ruedas en el aire, con la confirmación del usuario).
-  * **PR #63 (medida del LLM) fusionado.** **PR #64 (servicio de órdenes, rama `fase-7-servicio-ordenes`) abierto, esperando el
-    merge del usuario.** Si al empezar el #64 no está fusionado, empieza en esa rama y no en `main`: el `PLAN.md` de `main` no
-    tiene el servicio.
+  * **PR #63 (medida del LLM) y #64 (servicio de órdenes) fusionados** (`ed66d71` en `main`, 25/10/2026); las ramas
+    `fase-7-medir-llm` y `fase-7-servicio-ordenes`, borradas (local y remota). `main` ya tiene todo el trabajo de la Fase 7.
   * **Medida del LLM** (ver "Medida del 25/10/2026", Fase 7; herramienta en [`tools/medir-llm/`](tools/medir-llm/README.md)):
     `qwen2.5:7b` acierta la herramienta en 24/24 órdenes pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b`
     tarda 0,7 s pero confunde "Para." con `avanzar`; `Qwen3-4B-Instruct-2507` queda en medio (1,1 s) pero no ejecuta `¡¡PARA
@@ -25,10 +24,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     conectado el portátil, por cable y con o sin VPN, bloquea el servidor de archivos de Ollama**, `*.r2.cloudflarestorage.com`;
     ver el README de `tools/medir-llm`). Quedan ~8 GB de descargas incompletas (`*-partial`) en `~\.ollama\models\blobs`, que
     sirven para reanudar `ollama pull` desde otra red.
-  * **Pi:** en `main` en `32d1b06` (**sin** el #63 ni el #64), en reposo: 8 pines en `lo`, `get_throttled` = `0x0`, ningún
-    programa del robot en marcha. Tiene desplegado `~/apps/ExplorerHat.Orders` (compilación Release del #64), la clave en
-    `~/.explorerhat-clave` y la copia provisional `~/apps/tools-orders/` de los scripts nuevos (su `tools/parar-robot.sh`
-    de `main` NO conoce `Orders`). **Tras fusionar el #64: `git pull --ff-only` en la Pi y `rm -rf ~/apps/tools-orders`.**
+  * **Pi:** actualizada a `main` en `ed66d71` (con el #63 y el #64) con `git pull --ff-only`, y `~/apps/tools-orders` borrada:
+    su `tools/parar-robot.sh` y su `tools/vigilar-pines.sh` ya conocen `Orders`. En reposo: 8 pines en `lo`, `get_throttled` =
+    `0x0`, ningún programa del robot en marcha. Tiene desplegado `~/apps/ExplorerHat.Orders` (compilación Release del
+    código del #64) y la clave en `~/.explorerhat-clave`.
   * **dotnet/iot:** sin cambios mirados por la tarde (al empezar la sesión: #2625 en `CHANGES_REQUESTED` esperando a pgrawehr,
     comprobaciones en verde; clon `C:\work\iot` en `explorerhat-io`, `c4119033`, limpio). La red bloqueada del portátil no
     afectó a GitHub.
@@ -355,10 +354,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s) y
      si se prueba la API de reserva; (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
      pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
-  6b. **Al fusionar las ramas de la Fase 7** (`fase-7-medir-llm`, ya fusionada con el PR #63 el 25/10/2026, y después
-     `fase-7-servicio-ordenes`): en la Pi, `git pull --ff-only`
-     y `rm -rf ~/apps/tools-orders` (copia provisional de `parar-robot.sh` y `vigilar-pines.sh`, para no dejar dos
-     paradas de emergencia distintas), y volver a desplegar `~/apps/ExplorerHat.Orders` si el código cambió. **Al escribir el
+  6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
+     `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
+     `~/apps/ExplorerHat.Orders` en la Pi (cada carpeta lleva su copia de `Common`). **Al escribir el
      cerebro:** `tools/medir-llm/herramientas.json` dice "hasta 3 s" en `retroceder` y el servicio recorta a **1 s**
      (la medida de los modelos se hizo con 3 s); cambiar la descripción de la herramienta a 1 s y repetir la medida si
      importa. El README del servicio dice "la misma lista cerrada": es la lista, no los límites.
@@ -1830,7 +1828,7 @@ Resultados (sin mover las ruedas):
 * **Códigos de salida de las señales** (`timeout --preserve-status`, a mitad de `avanzar 3 s`): SIGTERM 143, SIGINT 130 y
   SIGHUP 129, los mismos que en las lecciones. Los scripts nuevos (`parar-robot.sh`, `vigilar-pines.sh`) se copiaron a
   `~/apps/tools-orders/` de la Pi sin subir la rama: con ellos, la parada encuentra el servicio y `vigilar-pines` cuenta
-  `procs=1`. **Mientras la rama no se fusione, la Pi sigue en `main` y su `tools/parar-robot.sh` NO conoce `Orders`.**
+  `procs=1`. (Tras fusionar el #64, la Pi usa los de `main`, que ya conocen `Orders`, y la copia se borró.)
 * **Capa de obstáculos con los sensores reales, ruedas sin girar** (`tools/probar-obstaculo.sh`, con la mano del usuario, 25/10/2026):
   4 de 4. Control sin nada a menos de 30 cm: `tiempo` (3,02 s). Mano a ~20 cm del centro, de la izquierda y de la derecha:
   `obstaculo` en los tres, con 0 s (el obstáculo ya estaba al empezar). **Sin probar con sensores reales:** un obstáculo
@@ -1867,5 +1865,4 @@ Resultados (sin mover las ruedas):
   Al acabar: 8 pines en `lo`, `get_throttled` = `0x0`.
 * **El servicio de órdenes queda probado** (sin motores en el simulador y la Pi; con motores en el aire: sentido de las
   ruedas, recortes, `/parar`, obstáculo, Ctrl+C y corte de red). **Falta:** probarlo en el suelo (no hecho) y el cerebro en
-  el portátil (C#), que reutiliza `tools/medir-llm/herramientas.json` como esquema. **Mientras la rama no se fusione, la
-  Pi sigue en `main` con un `parar-robot.sh` que no conoce `Orders`:** los scripts nuevos están en `~/apps/tools-orders/`.
+  el portátil (C#), que reutiliza `tools/medir-llm/herramientas.json` como esquema.

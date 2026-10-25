@@ -81,8 +81,8 @@ Esta variante es para la sesión que sigue a la del 25/10/2026. Ese día se midi
 
 **Antes de pegarla:**
 
-1. **La rama `fase-7-servicio-ordenes` puede no estar fusionada** (la de la medida, `fase-7-medir-llm`, se fusionó el 25/10/2026 con el PR #63). Mira `git branch -a` y `gh pr list`. Si el servicio no se fusionó, empieza en `fase-7-servicio-ordenes` en vez de `main`: el `PLAN.md` de `main` no tiene el servicio de órdenes.
-2. Si se fusionaron: en la Pi, `git pull --ff-only` y `rm -rf ~/apps/tools-orders`; vuelve a desplegar `~/apps/ExplorerHat.Orders` si hace falta.
+1. **Las dos ramas de la Fase 7 están fusionadas** (PR #63 y #64, 25/10/2026): empieza en `main` y al día (`git pull`).
+2. La Pi ya está en `main` (con el servicio de órdenes y los scripts de parada que conocen `Orders`). Vuelve a desplegar `~/apps/ExplorerHat.Orders` solo si cambia su código o el de `Common`.
 3. Ollama está instalado en el portátil (controlador NVIDIA 621.01) con cinco modelos de Hugging Face, porque la red del 25/10/2026 bloqueaba el servidor de archivos de Ollama. Si la red es otra, puede que `ollama pull qwen2.5:3b` funcione.
 4. Si la sesión va a mover el robot (por ejemplo, probar el servicio en el suelo): la Pi encendida y con wifi, la UPS cargada, el robot **sobre un bote o un libro, con las ruedas en el aire** (salvo la prueba en el suelo, que se pide aparte), y una terminal SSH abierta en la Pi.
 
