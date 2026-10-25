@@ -112,7 +112,7 @@ Haz esto con cada robot, **con las ruedas en el aire**:
 |---|---|
 | La pantalla da `Error 5 (Input/output error)` | Nadie contesta en 0x27. `i2cdetect -y 1` debe mostrarlo. Mira la alimentación (VCC a 3v3), SDA y SCL (cambiados) o un cable suelto. |
 | Una rueda no gira | Mira que el cable no esté suelto en la borna del motor. Prueba el motor con `probar-cableado.sh` y ve si el sensor de velocidad de esa rueda cuenta. |
-| El robot no para | Ctrl+C. Si no, `bash tools/parar-robot.sh`. Si se cortó la wifi, la Pi cierra la sesión y para los motores en unos 15–30 s. |
+| El robot no para | Ctrl+C. Si no, `bash tools/parar-robot.sh`. Si se cortó la wifi, ninguna de las dos llega a la Pi: **levanta el robot del suelo o apaga la UPS en el momento**. La Pi cierra la sesión y para los motores sola en unos 15–30 s. |
 | El robot va más lento o se reinicia | `vcgencmd get_throttled` (`0x0` está bien). Mira las baterías de la UPS y el cable de alimentación. |
 | El portátil no encuentra la Pi | Mira la red, la IP y `ssh <nombre> true`. Con `harlequin.local`, puede tardar varios segundos. |
 | VS Code no para en los puntos de interrupción | La extensión de C# debe ser la 2.140.9 y C# Dev Kit debe estar deshabilitada. |
