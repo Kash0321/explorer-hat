@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExplorerHat.Common\ExplorerHat.Common.csproj" />
+  </ItemGroup>
+
+</Project>
