@@ -43,6 +43,12 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     #2625 sigue sin fusionar), alinear `AnalogInputs` con `IReadOnlyList<T>`, esperar conflictos en `README.md` y
     `samples/Program.cs`, y buscar `\.Pin\b` después. Comprobar también que `AnalogInputs` y `TouchPads` de `Common` siguen la
     forma del binding.
+- **Cierre de la sesión del 25/10/2026:** PR #60 y #61 fusionados y sus ramas borradas (local y remota). `main` y la Pi
+  en `442ef87` (la Pi, con `git pull --ff-only`; con el PR de este cierre, `main` avanza un commit más y la Pi hay que
+  actualizarla). Pi: en reposo, 8 pines en `lo`, `get_throttled` = `0x0`, ningún programa del robot en marcha; **el robot no
+  se movió en toda la sesión**. Clon del fork (`C:\work\iot`): en la rama `explorerhat-io` (`c4119033`), sin cambios sin
+  confirmar. dotnet/iot: #2625 en `CHANGES_REQUESTED` (espera la nueva revisión de pgrawehr); `upstream/main` en `41086078`.
+  Con esto empieza la **Fase 7**: no mueve el robot hasta tener el servicio de órdenes (ver el punto 6 de "Al retomar").
 - **Sesión del 19/10/2026** (desde el PC; solo se trató dotnet/iot, sin mover el robot; la Pi, en `main` y en reposo):
   - **#2616 (`Cap1208`) fusionado** el 18/10/2026 (`5cf07458` en `upstream/main`). Rama `cap1xxx-binding` borrada.
   - **#2625 (entradas y salidas):** sin revisiones ni comentarios; las comprobaciones pasan; "Review required".
@@ -299,7 +305,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      `ExplorerHat`, comprobar que el contenido es igual (`git diff explorerhat-analog-v2 explorerhat-analog --
      src/devices/ExplorerHat`), subirla, abrir su PR y borrar `explorerhat-io` y `explorerhat-analog-v2` (local y en
      el fork). Si piden cambios en el #2625, van en commits nuevos en `explorerhat-io`; después, copiar otra vez el
-     commit del analógico encima en otra rama nueva, igual.
+     commit del analógico encima en otra rama nueva, igual. **Al rehacerla, alinear `AnalogInputs` con el #2625**
+     (misma forma: `IReadOnlyList<T>` con `One` a `Four`, sin lista propia): hoy usa `List<AnalogInput>` +
+     `IEnumerable`. Esperar conflictos en `README.md` y `samples/Program.cs`, y buscar `\.Pin\b` después. **No se rehizo
+     antes a propósito:** si pgrawehr rechaza el `IReadOnlyList` + `One` a `Four`, habría que hacerlo dos veces.
   3. ~~Probar en la Pi el #2610 con el recuento de referencias~~ (hecho el 17/10/2026, ver arriba) y ~~comentar sus
      dos fallos~~ (publicado el 17/10/2026). El #2610 se fusionó el 22/10/2026 y pgrawehr no pidió ningún PR. Si algún
      día piden un PR de arreglo para el fallo 1, el dato extra de arriba ayuda. ~~Comentar en la #2614 que el #2610 ya la
@@ -313,7 +322,18 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      multímetro (10,35 y 9,83 kΩ en total); falta ver con el programa que tienen el mismo orden de hilos. **La
      lección de siguelíneas se descartó** (decisión del usuario, 17/10/2026; es una idea guardada en la Fase 5).
      Después, la Fase 7 (medir el LLM en el portátil).
-  5. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
+  5. **#2617 (motor con PWM en las dos entradas):** pgrawehr dejó la API a nuestro criterio (22/10/2026). Es un PR
+     aparte en `C:\work\iot` (rama nueva desde `upstream/main`); el modelo es `HatMotor` de `Common`. Mejor después de que
+     revisen el #2625, para no tener tres ramas abiertas a la vez.
+  6. **Fase 7, primer paso (no mueve el robot):** medir el LLM en el portátil candidato, como dice la lista de pasos de
+     la Fase 7: Ollama con `qwen2.5:3b` y `llama3.2:3b` (y `qwen2.5:7b` para comparar), unas 20 órdenes en español,
+     tiempo de respuesta y aciertos en la herramienta y sus valores. **Antes, el usuario tiene que actualizar el
+     controlador NVIDIA del portátil** (Ollama pide el 531 o superior; tiene el 511.65): lo instala él. Preguntarle qué
+     portátil usa (el candidato es un MSI Prestige 15 A12UD). Después, el protocolo entre el portátil y la Pi y el
+     servicio de órdenes en la Pi. **No se mueve el robot hasta tener el servicio con la lista cerrada de acciones, la
+     validación y la parada por pérdida de conexión**, y la primera prueba será con órdenes escritas a mano, sin LLM,
+     con las ruedas en el aire. Antes de fijar el plan, consultar al asesor (regla de `AGENTS.md`).
+  7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
      se quita a menudo (17/10/2026): un conector con llave (por ejemplo, de tipo JST) en vez de cuatro Dupont sueltos, y
