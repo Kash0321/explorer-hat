@@ -106,11 +106,14 @@ def extract_calls(message):
     return calls
 
 
-def chat(url, model, system, tools, text, options, keep_alive):
-    return post(url + "/api/chat", {
+def chat(url, model, system, tools, text, options, keep_alive, think=None):
+    body = {
         "model": model, "stream": False, "keep_alive": keep_alive, "tools": tools, "options": options,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": text}],
-    })
+    }
+    if think is not None:
+        body["think"] = think  # models that think (Qwen3) put their answer in "thinking" unless it is false
+    return post(url + "/api/chat", body)
 
 
 def seconds(nanoseconds):
@@ -128,6 +131,7 @@ def main():
     parser.add_argument("--repeticiones", type=int, default=3)
     parser.add_argument("--url", default="http://localhost:11434")
     parser.add_argument("--num-ctx", type=int, default=2048)
+    parser.add_argument("--sin-pensar", action="store_true", help="send think=false (for models that think)")
     arguments = parser.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -135,9 +139,10 @@ def main():
     orders = json.loads((HERE / "ordenes.json").read_text(encoding="utf-8"))["ordenes"]
     tools, system, limits = config["herramientas"], config["sistema"], config["limites"]
     options = {"temperature": 0, "seed": 1, "num_ctx": arguments.num_ctx}
+    think = False if arguments.sin_pensar else None
 
     print(f"Warm-up de {arguments.modelo} (carga el modelo)...", flush=True)
-    warm = chat(arguments.url, arguments.modelo, system, tools, "Para.", options, "30m")
+    warm = chat(arguments.url, arguments.modelo, system, tools, "Para.", options, "30m", think)
     load_seconds = seconds(warm.get("load_duration", 0))
     processes = [p for p in get(arguments.url + "/api/ps").get("models", []) if p["name"].startswith(arguments.modelo)]
     placement = {}
@@ -149,7 +154,7 @@ def main():
     for order in orders:
         runs = []
         for _ in range(arguments.repeticiones):
-            reply = chat(arguments.url, arguments.modelo, system, tools, order["texto"], options, "30m")
+            reply = chat(arguments.url, arguments.modelo, system, tools, order["texto"], options, "30m", think)
             message = reply["message"]
             calls = extract_calls(message)
             runs.append({
@@ -180,7 +185,7 @@ def main():
         "tokensPorSegundo": summarize([r["evalTokens"] / r["evalSegundos"] for r in all_runs if r["evalSegundos"] > 0]),
     }
     output = {"modelo": arguments.modelo, "equipo": arguments.equipo, "ollama": get(arguments.url + "/api/version").get("version"),
-              "opciones": options, "cargaSegundos": round(load_seconds, 3), "reparto": placement,
+              "opciones": {**options, "think": think}, "cargaSegundos": round(load_seconds, 3), "reparto": placement,
               "resumen": summary, "ordenes": results}
 
     folder = HERE / "resultados"

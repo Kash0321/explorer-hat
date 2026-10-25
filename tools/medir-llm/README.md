@@ -16,6 +16,7 @@ python tools/medir-llm/medir.py --modelo qwen2.5:3b --equipo prestige15
 ```
 
 * Antes, Ollama tiene que estar en marcha y el modelo descargado. Para medir la **carga en frío**, descarga antes el modelo de la memoria (`ollama stop <modelo>`): la primera petición es una de calentamiento y no entra en las estadísticas de tiempo.
+* Con un modelo que piensa (Qwen3), añade `--sin-pensar`: envía `think: false`; si no, la respuesta llega en el campo `thinking`.
 * Cada orden se repite 3 veces (`--repeticiones`). El portátil debe estar **enchufado**: con batería, la tarjeta gráfica baja su rendimiento.
 * Tarda de 2 a 5 minutos con un modelo de 3B y unos 10 con uno de 7B.
 

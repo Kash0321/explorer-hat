@@ -12,7 +12,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   portátil actualizado por el usuario a la 621.01; Ollama 0.40.11 instalado con `winget`. Resultados, lectura y fallos en la
   Fase 7 ("Medida del 25/10/2026"); la herramienta está en [`tools/medir-llm/`](tools/medir-llm/README.md). **Resumen:**
   `qwen2.5:7b` acierta la herramienta en 24/24 órdenes pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b` tarda
-  0,7 s pero confunde "Para." con `avanzar`. **Pendiente de decidir con el usuario:** modelo y qué hacer con la parada, y la
+  0,7 s pero confunde "Para." con `avanzar`; `Qwen3-4B-Instruct-2507` queda en medio (1,1 s) pero no ejecuta `¡¡PARA YA!!`. **Pendiente de decidir con el usuario:** modelo y qué hacer con la parada, y la
   prueba con la API de reserva (necesita clave y revisar la protección de datos de menores).
   **La red a la que estaba conectado el portátil (por cable, con y sin VPN) bloquea el servidor de archivos de Ollama** (`*.r2.cloudflarestorage.com`): los modelos
   se bajaron de Hugging Face (ver el README de `tools/medir-llm`).
@@ -1735,6 +1735,11 @@ repeticiones): la muestra son 24 órdenes, escritas por la misma sesión que esc
 | `Qwen2.5-3B-Instruct` (Qwen) | 21/24 | 19/24 | 20/24 | 0,70 s / 4,1 s | 3,0 s | 100 % |
 | `Llama-3.2-3B-Instruct` (bartowski) | 15/24 | 6/24 | 9/24 | 0,53 s / 5,6 s | 14,5 s | 100 % |
 | `Qwen2.5-7B-Instruct` (bartowski) | **24/24** | 22/24 | 22/24 | 3,0 s / 25 s | 4,7 s | 45 % |
+| `Qwen3-4B-Instruct-2507` (unsloth, con `think: false`) | 21/24 | 20/24 | 23/24 | 1,1 s / 7,6 s | 3,9 s | 72 % |
+
+El Qwen3 4B se midió en una segunda tanda, el mismo día. Con el GGUF de bartowski, Ollama devolvía las llamadas en el campo
+`thinking` o como texto (solo se interpretaba una de dos): el mismo tipo de fallo de plantilla que en Llama. Con el de
+unsloth y `think: false` (opción `--sin-pensar` de `medir.py`) las llamadas llegan bien.
 
 * **Los modelos no vienen de la biblioteca de Ollama**, sino de Hugging Face (la red bloquea el servidor de archivos de
   Ollama). Usan la plantilla de su GGUF: **el resultado de Llama no vale como medida del modelo oficial**. Sus fallos son
@@ -1748,15 +1753,23 @@ repeticiones): la muestra son 24 órdenes, escritas por la misma sesión que esc
   (sin decidir):** la parada no depende del LLM. Es coherente con la decisión de la Fase 7 "seguridad, siempre en la Pi y
   nunca en el LLM": las palabras "para", "stop" o "alto" (y un botón o un pad táctil) paran el robot sin pasar por el
   modelo, y la Pi valida además nombres de herramienta, colores y números.
-* **`qwen2.5:7b` acierta la herramienta en las 72 ejecuciones**, también el cuadrado, pero tarda 3 s de mediana (25 s el
+* **`qwen2.5:7b` acierta la herramienta en las 24 órdenes**, también el cuadrado, pero tarda 3 s de mediana (25 s el
   cuadrado, con 8 llamadas) porque solo el 45 % del modelo cabe en la tarjeta gráfica (12 tokens/s frente a 53 del de 3B).
   **La promesa de menos de 1 s solo la cumple el de 3B.**
+* **`Qwen3-4B-Instruct-2507` queda en medio:** 1,1 s de mediana (el cuadrado, 7,6 s) y la mejor tasa de llamadas válidas
+  (23/24). Sus fallos son otros: no conoce "tira palante" (contesta "reformula tu solicitud"); **ante `¡¡PARA YA!!` escribe
+  el texto `parar` en vez de llamar a la herramienta** (la parada no se ejecutaría); y en "5 minutos" se **niega** a girar en
+  vez de recortar a 3 s (el puntuador lo cuenta como fallo, pero es un comportamiento seguro). En "10 segundos" pasa el
+  valor tal cual. No cabe entero en la tarjeta (72 %) con la pantalla en uso.
+* **Los dos modelos rápidos fallan en una orden de parada** (`qwen2.5:3b` con `Para.` y `qwen3:4b` con `¡¡PARA YA!!`);
+  solo el 7B las acierta, con 2 órdenes de parada de muestra. Refuerza la propuesta de dejar la parada fuera del modelo.
 * `qwen2.5:3b` se midió dos veces: la primera con el modelo ya en memoria (carga de 0 s) y la segunda en frío (3,0 s). Los
   aciertos fueron iguales, como se espera con temperatura 0.
 * **Límite de la medida (tiempos):** el mensaje de sistema y las herramientas son iguales en todas las peticiones
   (~650 tokens de entrada; `prompt_eval_count` marca 652 a 699 en todas las ejecuciones) y `medir.py` no guarda
   `prompt_eval_duration`, así que no sabemos si Ollama reutilizó la caché de ese prefijo. Para el cerebro de la Fase 7: el
   estado de los sensores va **después** del prefijo fijo (en el mensaje del usuario), no en el mensaje de sistema.
-* **Sin probar:** la API de reserva; un modelo intermedio (por ejemplo, uno de 4B que quepa entero en 4 GB); mejorar el
-  mensaje de sistema; modelos que cuenten mejor los pasos. **Decisión pendiente con el usuario:** elegir entre rapidez
+* **Sin probar:** la API de reserva; los modelos de la biblioteca de Ollama (otra red); otros modelos de 4B (por ejemplo,
+  `phi4-mini`, cuya plantilla puede no admitir herramientas); mejorar el mensaje de sistema (por ejemplo, con
+  "`tira palante` = avanzar" y "si piden más de 3 segundos, usa 3"); modelos que cuenten mejor los pasos. **Decisión pendiente con el usuario:** elegir entre rapidez
   (3B, con la parada fuera del modelo) y fiabilidad (7B, con más espera).
