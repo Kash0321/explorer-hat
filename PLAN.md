@@ -342,7 +342,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s) y
      si se prueba la API de reserva; (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
      pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
-  6b. **Al fusionar las ramas de la Fase 7** (`fase-7-medir-llm`, y después `fase-7-servicio-ordenes`): en la Pi, `git pull --ff-only`
+  6b. **Al fusionar las ramas de la Fase 7** (`fase-7-medir-llm`, ya fusionada con el PR #63 el 25/10/2026, y después
+     `fase-7-servicio-ordenes`): en la Pi, `git pull --ff-only`
      y `rm -rf ~/apps/tools-orders` (copia provisional de `parar-robot.sh` y `vigilar-pines.sh`, para no dejar dos
      paradas de emergencia distintas), y volver a desplegar `~/apps/ExplorerHat.Orders` si el código cambió. **Al escribir el
      cerebro:** `tools/medir-llm/herramientas.json` dice "hasta 3 s" en `retroceder` y el servicio recorta a **1 s**
