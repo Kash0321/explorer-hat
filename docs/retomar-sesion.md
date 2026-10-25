@@ -25,8 +25,8 @@ Antes de hacer nada más:
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
      sobre todo los #4 a #59, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
-     actual" de PLAN.md (el 19/10/2026: PR #2625, incidencias #2614, #2615 y #2617,
-     y el PR #2610 de pgrawehr, donde comentamos dos fallos y él ya contestó; el #2616 está fusionado), con sus comprobaciones, comentarios y revisiones
+     actual" de PLAN.md (el 25/10/2026: PR #2625, que espera la nueva revisión de pgrawehr tras
+     nuestra respuesta, e incidencias #2614, #2615 y #2617; los PR #2610 y #2616 están fusionados), con sus comprobaciones, comentarios y revisiones
      nuevos (gh pr checks <n> -R dotnet/iot, gh api repos/dotnet/iot/issues/<n>/comments y, en los
      PR, gh api repos/dotnet/iot/pulls/<n>/reviews y .../pulls/<n>/comments). Si hay
      comentarios, dímelo antes de responder.
