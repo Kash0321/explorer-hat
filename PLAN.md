@@ -15,8 +15,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   0,7 s pero confunde "Para." con `avanzar`; `Qwen3-4B-Instruct-2507` queda en medio (1,1 s) pero no ejecuta `¡¡PARA YA!!`. **Pendiente de decidir con el usuario:** modelo y qué hacer con la parada, y la
   prueba con la API de reserva (necesita clave y revisar la protección de datos de menores).
   **Servicio de órdenes escrito y probado sin mover las ruedas** (rama `fase-7-servicio-ordenes`, apilada sobre la anterior;
-  protocolo HTTP decidido por el usuario): ver "Servicio de órdenes (25/10/2026)" en la Fase 7. Falta la primera prueba con
-  motores (ruedas en el aire) y el corte de wifi. La decisión del modelo sigue pendiente.
+  protocolo HTTP decidido por el usuario): ver "Servicio de órdenes (25/10/2026)" en la Fase 7. Primera prueba con
+  motores hecha (ruedas en el aire, 7 de 7, incluido el Ctrl+C). Falta el corte de wifi. La decisión del modelo sigue pendiente.
   **La red a la que estaba conectado el portátil (por cable, con y sin VPN) bloquea el servidor de archivos de Ollama** (`*.r2.cloudflarestorage.com`): los modelos
   se bajaron de Hugging Face (ver el README de `tools/medir-llm`).
 - **Sesión del 25/10/2026** (desde el PC; solo dotnet/iot, sin mover el robot; la Pi, en `main` (`a68e53c`), pines en `lo`, `get_throttled` = `0x0`):
@@ -338,9 +338,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      aparte en `C:\work\iot` (rama nueva desde `upstream/main`); el modelo es `HatMotor` de `Common`. Mejor después de que
      revisen el #2625, para no tener tres ramas abiertas a la vez.
   6. **Fase 7. La medida del LLM y el servicio de órdenes están hechos (25/10/2026, ver "Medida del 25/10/2026" y "Servicio
-     de órdenes" en la Fase 7).** Siguiente: (a) consultar al asesor y hacer la primera prueba con motores, con órdenes
-     escritas a mano con `curl`, `--real` y **las ruedas en el aire (pedir la confirmación)**, y la prueba de corte de
-     wifi; (b) decidir con el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`,
+     de órdenes" en la Fase 7); la primera prueba con motores también (7 de 7).** Siguiente: (a) la prueba de corte de
+     wifi (con las ruedas en el aire, pedir la confirmación); (b) decidir con el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`,
      fiable pero de 3 s) y si se prueba la API de reserva; (c) el cerebro en el portátil (C#). La parada por palabra
      ("para", "stop") en el portátil, sin pasar por el modelo, está propuesta y sin hacer.
   7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
@@ -1712,7 +1711,7 @@ Pasos:
       máxima, parada al perder la conexión y parada por obstáculo. Probarlo con las ruedas en el aire y con órdenes
       escritas a mano, sin LLM. Repetir la prueba de corte de wifi de la Fase 3.
       **Escrito y probado sin mover las ruedas el 25/10/2026** (`src/ExplorerHat.Orders`, ver "Servicio de órdenes",
-      más abajo). **Falta:** la primera prueba con motores (ruedas en el aire) y la prueba de corte de wifi.
+      más abajo). **Primera prueba con motores hecha el 25/10/2026 (7 de 7).** **Falta:** la prueba de corte de wifi.
 - [ ] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
       el estado de los sensores (distancias y batería).
 - [ ] Voz: Whisper local en el portátil (por ejemplo, whisper.cpp) con *push-to-talk*. Probar con ruido de fondo.
@@ -1823,6 +1822,20 @@ Resultados (sin mover las ruedas):
   y mover el robot hasta 3 s. Regla: tras un tiempo de espera agotado, mirar `/estado` antes de repetir la orden.
 * **Límites conocidos:** un sensor desenchufado no da eco y se lee como 400 cm ("no hay nada"), como en la lección 09;
   al retroceder y al girar no hay protección de obstáculo.
-* **Pendiente:** consultar al asesor y, con la confirmación del usuario de que las ruedas están en el aire, la primera
-  prueba con `--real` y órdenes escritas a mano con `curl`; después, la prueba de corte de wifi (el robot se para en 3 s).
-  Después, el cerebro en el portátil (C#), que reutiliza `tools/medir-llm/herramientas.json` como esquema.
+* **Primera prueba con motores (`--real`, ruedas en el aire, confirmación del usuario, 25/10/2026, 19:36 a 19:41).** El
+  usuario arrancó el servicio en su terminal (sin `| tee`) y yo mandé una orden cada vez con `curl`, con cuenta atrás de 8 s;
+  `vigilar-pines.sh` registró los pines. El usuario vio cada rueda. **Los 7 pasos salieron como se esperaba:**
+  1. `avanzar 0.5`: las dos ruedas hacia delante, `tiempo`, 0,51 s.
+  2. `girar derecha 0.5` (dos veces): la rueda derecha hacia atrás y la izquierda hacia delante, 0,5 s.
+  3. `retroceder 0.5`: las dos hacia atrás.
+  4. `retroceder 10`: paró a 1 s, con `ajustes: ["segundos"]`.
+  5. `avanzar 3` y `/parar` a 1 s: `/parar` respondió en 0,18 s, la acción terminó por `parada` a 1,08 s y las ruedas
+     pararon al momento.
+  6. `avanzar 3` con la mano delante de un sensor a mitad: `obstaculo` a 0,7 s, ruedas paradas.
+  7. `avanzar 3` y **Ctrl+C del usuario** a 0,8 s: las ruedas pararon, el servicio imprimió "Parada de emergencia (SIGINT):
+     motores parados" y terminó. En el registro de pines, los pines de los motores estaban en `hi` (PWM) hasta las 19:40:50.1
+     y todos en `lo` con `procs=0` a las 19:40:50.3 (muestras cada 0,2 s). Al acabar: 8 pines en `lo`,
+     `get_throttled` = `0x0` y ningún programa en marcha.
+* **Pendiente:** la prueba de corte de wifi (lanzar `avanzar 3` y cortar el enlace de la Pi: los pines tienen que quedar en
+  `lo` como mucho 3 s después de la orden). Después, el cerebro en el portátil (C#), que reutiliza
+  `tools/medir-llm/herramientas.json` como esquema. Consultar al asesor antes de dar por cerrado el servicio.
