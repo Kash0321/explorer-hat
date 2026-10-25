@@ -1808,9 +1808,19 @@ Resultados (sin mover las ruedas):
   termina en 0,2 s, imprime "Parada de emergencia", y los 8 pines quedan en `lo`. Los manejadores de Kestrel y los de
   `SafeExplorerHat` conviven bien. `bash tools/parar-robot.sh` desde el PC también lo para. Memoria de la Pi con el
   servicio en marcha: 191 MB usados.
+* **Códigos de salida de las señales** (`timeout --preserve-status`, a mitad de `avanzar 3 s`): SIGTERM 143, SIGINT 130 y
+  SIGHUP 129, los mismos que en las lecciones. Los scripts nuevos (`parar-robot.sh`, `vigilar-pines.sh`) se copiaron a
+  `~/apps/tools-orders/` de la Pi sin subir la rama: con ellos, la parada encuentra el servicio y `vigilar-pines` cuenta
+  `procs=1`. **Mientras la rama no se fusione, la Pi sigue en `main` y su `tools/parar-robot.sh` NO conoce `Orders`.**
+* **Capa de obstáculos con los sensores reales, ruedas sin girar** (`tools/probar-obstaculo.sh`, con la mano del usuario, 25/10/2026):
+  4 de 4. Control sin nada a menos de 30 cm: `tiempo` (3,02 s). Mano a ~20 cm del centro, de la izquierda y de la derecha:
+  `obstaculo` en los tres, con 0 s (el obstáculo ya estaba al empezar). **Sin probar con sensores reales:** un obstáculo
+  que aparece a mitad del movimiento (con el simulador sí, caso 25).
 * **Dos lecciones:** en Windows, `localhost` prueba primero IPv6 y cada petición tarda 2 s de más (falsea las pruebas
   de tiempo): usar `127.0.0.1`. Y el filtro de los sensores guarda la menor de las dos últimas lecturas, así que las
   pruebas esperan 0,3 s entre casos.
+* **Límite conocido para el cerebro:** una orden que el portátil dio por perdida puede llegar tarde, cuando vuelve la red,
+  y mover el robot hasta 3 s. Regla: tras un tiempo de espera agotado, mirar `/estado` antes de repetir la orden.
 * **Límites conocidos:** un sensor desenchufado no da eco y se lee como 400 cm ("no hay nada"), como en la lección 09;
   al retroceder y al girar no hay protección de obstáculo.
 * **Pendiente:** consultar al asesor y, con la confirmación del usuario de que las ruedas están en el aire, la primera
