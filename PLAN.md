@@ -11,6 +11,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   - **#2610 fusionado** el 22/10/2026 (`efe9e367` en `upstream/main`). La incidencia #2614 sigue abierta (pgrawehr dijo que
     la arreglaba el #2610): se puede pedir que la cierren, o comentar que ya está arreglada. Queda el fallo 1 de nuestro
     comentario (quitar un aviso de otro tipo de evento), que ellos ven poco realista.
+  - **#2614: comentario publicado** (25/10/2026, con el visto bueno del usuario y la consulta al asesor):
+    [comentario](https://github.com/dotnet/iot/issues/2614#issuecomment-6396860453), comprobado igual que el borrador.
+    Dice que el #2610 ya la arregla (probado en la Pi con `c6fcf210`) y que se puede cerrar. Solo cita dos pruebas del
+    registro (quitar uno de dos avisos y `WaitForEvent` repetido): la de "registrar otra vez" no salió bien en ese registro.
   - **#2617: pgrawehr contestó** (22/10/2026): "implementa lo que mejor encaje con nuestra API, no somos estrictos con el
     diseño". No hay que contestar a sus preguntas. **Queda posible un PR aparte** con el motor de PWM en las dos entradas
     (el `HatMotor` de `Common` es el modelo), cuando el #2625 deje de ocupar la cola.
@@ -295,8 +299,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      commit del analógico encima en otra rama nueva, igual.
   3. ~~Probar en la Pi el #2610 con el recuento de referencias~~ (hecho el 17/10/2026, ver arriba) y ~~comentar sus
      dos fallos~~ (publicado el 17/10/2026). El #2610 se fusionó el 22/10/2026 y pgrawehr no pidió ningún PR. Si algún
-     día piden un PR de arreglo para el fallo 1, el dato extra de arriba ayuda. **Ofrecer al usuario** (no hacerlo sin
-     su visto bueno) un comentario en la #2614 diciendo que el #2610 ya la arregla, para que la cierren.
+     día piden un PR de arreglo para el fallo 1, el dato extra de arriba ayuda. ~~Comentar en la #2614 que el #2610 ya la
+     arregla~~ (publicado el 25/10/2026, ver el "Estado actual").
   4. Siguiente pieza del binding: los pads táctiles en `ExplorerHat` (PR 4). **El `Cap1208` (#2616) ya está
      fusionado (18/10/2026), así que se puede empezar**, pero el #2625 sigue sin revisar.
      **Recomendación del 04/10/2026:** no alargar la cadena de ramas sin revisar; mientras tanto, trabajar en otra cosa.
