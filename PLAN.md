@@ -11,10 +11,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   mover el robot; la Pi, actualizada a `main` (`32d1b06`), pines en `lo`, `get_throttled` = `0x0`). Controlador NVIDIA del
   portátil actualizado por el usuario a la 621.01; Ollama 0.40.11 instalado con `winget`. Resultados, lectura y fallos en la
   Fase 7 ("Medida del 25/10/2026"); la herramienta está en [`tools/medir-llm/`](tools/medir-llm/README.md). **Resumen:**
-  `qwen2.5:7b` acierta la herramienta en 72/72 pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b` tarda
+  `qwen2.5:7b` acierta la herramienta en 24/24 órdenes pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b` tarda
   0,7 s pero confunde "Para." con `avanzar`. **Pendiente de decidir con el usuario:** modelo y qué hacer con la parada, y la
   prueba con la API de reserva (necesita clave y revisar la protección de datos de menores).
-  **La red del trabajo bloquea el servidor de archivos de Ollama** (`*.r2.cloudflarestorage.com`, con y sin VPN): los modelos
+  **La red a la que estaba conectado el portátil (por cable, con y sin VPN) bloquea el servidor de archivos de Ollama** (`*.r2.cloudflarestorage.com`): los modelos
   se bajaron de Hugging Face (ver el README de `tools/medir-llm`).
 - **Sesión del 25/10/2026** (desde el PC; solo dotnet/iot, sin mover el robot; la Pi, en `main` (`a68e53c`), pines en `lo`, `get_throttled` = `0x0`):
   - **#2610 fusionado** el 22/10/2026 (`efe9e367` en `upstream/main`). La incidencia #2614 sigue abierta (pgrawehr dijo que
@@ -1724,32 +1724,39 @@ Pasos:
 ### Medida del 25/10/2026 (MSI Prestige 15 A12UD, RTX 3050 Ti de 4 GB, controlador 621.01, enchufado)
 Herramienta: [`tools/medir-llm/`](tools/medir-llm/README.md). 24 órdenes (simples, con números, en lenguaje de niño, de varios
 pasos, fuera de rango, absurdas o peligrosas, y una urgente) con el resultado esperado escrito **antes** de medir; cada
-orden 3 veces (72 ejecuciones), temperatura 0, `num_ctx` 2048, Ollama 0.40.11. Esquema de cinco herramientas:
+orden 3 veces, temperatura 0, semilla 1, `num_ctx` 2048, Ollama 0.40.11. Esquema de cinco herramientas:
 `avanzar`, `retroceder`, `girar`, `luz` y `parar`. Resultados completos en `tools/medir-llm/resultados/`.
+**Con temperatura 0 las 3 repeticiones dan casi siempre la misma respuesta** (solo difiere la orden 23 de Llama): sirven
+para el tiempo, no para medir la variación. Los aciertos se cuentan **por orden** (una orden cuenta si acierta en las 3
+repeticiones): la muestra son 24 órdenes, escritas por la misma sesión que escribió los resultados esperados.
 
 | Modelo (GGUF `Q4_K_M`) | Herramienta OK | Valores OK | Válidas | Tiempo (mediana / máximo) | Carga en frío | Tarjeta gráfica |
 | --- | --- | --- | --- | --- | --- | --- |
-| `Qwen2.5-3B-Instruct` (Qwen) | 63/72 | 57/72 | 60/72 | 0,70 s / 4,1 s | 3,0 s | 100 % |
-| `Llama-3.2-3B-Instruct` (bartowski) | 46/72 | 19/72 | 28/72 | 0,53 s / 5,6 s | 14,5 s | 100 % |
-| `Qwen2.5-7B-Instruct` (bartowski) | **72/72** | 66/72 | 66/72 | 3,0 s / 25 s | 4,7 s | 45 % |
+| `Qwen2.5-3B-Instruct` (Qwen) | 21/24 | 19/24 | 20/24 | 0,70 s / 4,1 s | 3,0 s | 100 % |
+| `Llama-3.2-3B-Instruct` (bartowski) | 15/24 | 6/24 | 9/24 | 0,53 s / 5,6 s | 14,5 s | 100 % |
+| `Qwen2.5-7B-Instruct` (bartowski) | **24/24** | 22/24 | 22/24 | 3,0 s / 25 s | 4,7 s | 45 % |
 
 * **Los modelos no vienen de la biblioteca de Ollama**, sino de Hugging Face (la red bloquea el servidor de archivos de
   Ollama). Usan la plantilla de su GGUF: **el resultado de Llama no vale como medida del modelo oficial**. Sus fallos son
   de formato (números como texto, `"2"` en vez de `2`; la llamada escrita como texto plano), lo que apunta a la plantilla.
   Repetir con `llama3.2:3b` de la biblioteca de Ollama si se quiere comparar de verdad.
-* **Fuera de rango (órdenes 19 y 20): fallan los tres modelos, siempre** (6 de los 6 fallos de valores de `qwen2.5:7b`).
+* **Fuera de rango (órdenes 19 y 20): fallan los tres modelos, siempre** (son los 2 fallos de valores de `qwen2.5:7b`).
   Pasan el valor tal cual (`segundos` = 300 y 10), aunque el esquema y el mensaje de sistema dicen "máximo 3 s". **El
   recorte de la Pi no es opcional**: no se puede confiar en que el modelo respete los límites.
 * **`qwen2.5:3b` falla en cosas que importan:** ante `Para.` llama a `avanzar` (3 de 3), inventa un color
-  (`luz("morada")`) y en el cuadrado de 8 pasos se deja el último (7 llamadas). Con `¡¡PARA YA!!` acierta. **Decisión de
-  diseño que sale de aquí:** la parada no puede depender del LLM. Las palabras "para", "stop" o "alto" (y un botón o un
-  pad táctil) tienen que parar el robot sin pasar por el modelo; la Pi valida además nombres de herramienta, colores y
-  números.
+  (`luz("morada")`) y en el cuadrado de 8 pasos se deja el último (7 llamadas). Con `¡¡PARA YA!!` acierta. **Propuesta
+  (sin decidir):** la parada no depende del LLM. Es coherente con la decisión de la Fase 7 "seguridad, siempre en la Pi y
+  nunca en el LLM": las palabras "para", "stop" o "alto" (y un botón o un pad táctil) paran el robot sin pasar por el
+  modelo, y la Pi valida además nombres de herramienta, colores y números.
 * **`qwen2.5:7b` acierta la herramienta en las 72 ejecuciones**, también el cuadrado, pero tarda 3 s de mediana (25 s el
   cuadrado, con 8 llamadas) porque solo el 45 % del modelo cabe en la tarjeta gráfica (12 tokens/s frente a 53 del de 3B).
   **La promesa de menos de 1 s solo la cumple el de 3B.**
-* Los resultados son repetibles: la segunda ejecución de `qwen2.5:3b` dio 63/72 otra vez (carga de 3,0 s en frío; en la
-  primera ejecución el modelo ya estaba en memoria y marcó 0 s).
+* `qwen2.5:3b` se midió dos veces: la primera con el modelo ya en memoria (carga de 0 s) y la segunda en frío (3,0 s). Los
+  aciertos fueron iguales, como se espera con temperatura 0.
+* **Límite de la medida (tiempos):** el mensaje de sistema y las herramientas son iguales en todas las peticiones
+  (~650 tokens de entrada; `prompt_eval_count` marca 652 a 699 en todas las ejecuciones) y `medir.py` no guarda
+  `prompt_eval_duration`, así que no sabemos si Ollama reutilizó la caché de ese prefijo. Para el cerebro de la Fase 7: el
+  estado de los sensores va **después** del prefijo fijo (en el mensaje del usuario), no en el mensaje de sistema.
 * **Sin probar:** la API de reserva; un modelo intermedio (por ejemplo, uno de 4B que quepa entero en 4 GB); mejorar el
   mensaje de sistema; modelos que cuenten mejor los pasos. **Decisión pendiente con el usuario:** elegir entre rapidez
   (3B, con la parada fuera del modelo) y fiabilidad (7B, con más espera).
