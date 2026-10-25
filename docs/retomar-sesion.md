@@ -23,7 +23,7 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #59, cuyas descripciones resumen cada fase y cada lección.
+     sobre todo los #4 a #62, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
      actual" de PLAN.md (el 25/10/2026: PR #2625, que espera la nueva revisión de pgrawehr tras
      nuestra respuesta, e incidencias #2614, #2615 y #2617; los PR #2610 y #2616 están fusionados), con sus comprobaciones, comentarios y revisiones
@@ -37,7 +37,8 @@ Antes de hacer nada más:
    indica AGENTS.md. Comprueba también que el autor de los commits es el correcto:
    git var GIT_AUTHOR_IDENT
    En el PC, revisa también el clon del fork de dotnet/iot (C:\work\iot, ver AGENTS.md): sus
-   ramas (la del analógico va apilada sobre la del #2625, la de entradas y salidas), que no
+   ramas (la del analógico va apilada sobre la del #2625, la de entradas y salidas; el clon
+   debería estar en `explorerhat-io`, en `c4119033` o más si los mantenedores subieron algo), que no
    haya cambios sin confirmar y lo que ha cambiado en upstream/main.
 
 3. Ya en la Pi, sin mover nada, revisa su estado: rama y estado de git en ~/work/explorer-hat
@@ -72,4 +73,24 @@ mirar. Si algo no cuadra, no sigas con la lección siguiente: para el robot y cu
 anota los resultados en PLAN.md en una rama nueva con su PR, y pídeme /usage.
 ```
 
-La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. Desde entonces se probó también en el suelo, a 0,45 de velocidad. La probó también una niña de 10 años en el suelo, sin problemas. La siguiente tarea propuesta es el checklist del taller o la Fase 7. La lección 10 de siguelíneas se descartó el 17/10/2026 y quedó como idea; las lecciones 11 y 12 pasaron a ser la 10 y la 11. El experimento de modelos está decidido (17/10/2026): se mantiene como está, con el asesor y `buscador` ("Experimento de modelos" en `PLAN.md`).
+La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. Desde entonces se probó también en el suelo, a 0,45 de velocidad. La probó también una niña de 10 años en el suelo, sin problemas. El checklist del taller se hizo el 25/10/2026 ([`checklist-taller.md`](checklist-taller.md)); la siguiente tarea propuesta es la Fase 7. La lección 10 de siguelíneas se descartó el 17/10/2026 y quedó como idea; las lecciones 11 y 12 pasaron a ser la 10 y la 11. El experimento de modelos está decidido (17/10/2026): se mantiene como está, con el asesor y `buscador` ("Experimento de modelos" en `PLAN.md`).
+
+## Variante: empezar la Fase 7 (robot con IA)
+
+Esta variante es para la primera sesión de la Fase 7. **No mueve el robot**: el primer paso es medir el modelo de lenguaje en un portátil (ver `PLAN.md`, Fase 7 y "Al retomar", punto 6).
+
+**Antes de pegarla:**
+
+1. Si quieres usar la tarjeta gráfica del portátil, actualiza antes su controlador NVIDIA: Ollama pide la versión 531 o superior (el equipo candidato tiene la 511.65). Lo haces tú, es una instalación de Windows.
+2. Ten Ollama instalado en el portátil, o dile al asistente que te dé los pasos.
+
+Pega el prompt de arriba y **añade esto al final**:
+
+```text
+Hoy empezamos la Fase 7 (robot con IA). Haz los pasos 1 a 3 (incluido dotnet/iot, que son 5 minutos) y
+después propón el plan del primer paso de la Fase 7: medir el modelo de lenguaje en el portátil, con
+las órdenes de prueba en español que figuran en PLAN.md. Pregúntame qué portátil uso y si el
+controlador de la tarjeta gráfica está actualizado. Antes de fijar el plan, consulta al asesor. No muevas
+el robot ni lances nada que lo mueva en esta sesión. Cuéntame cuánto puede tardar cada comando largo
+(descargar modelos pesa varios GB). Al terminar, anota las medidas en PLAN.md, en una rama nueva con su PR.
+```
