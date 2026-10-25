@@ -7,18 +7,31 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (25/10/2026)
-- **Sesión de la tarde del 25/10/2026: Fase 7, primer paso (medir el LLM) hecho** (rama `fase-7-medir-llm`; desde el PC, sin
-  mover el robot; la Pi, actualizada a `main` (`32d1b06`), pines en `lo`, `get_throttled` = `0x0`). Controlador NVIDIA del
-  portátil actualizado por el usuario a la 621.01; Ollama 0.40.11 instalado con `winget`. Resultados, lectura y fallos en la
-  Fase 7 ("Medida del 25/10/2026"); la herramienta está en [`tools/medir-llm/`](tools/medir-llm/README.md). **Resumen:**
-  `qwen2.5:7b` acierta la herramienta en 24/24 órdenes pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b` tarda
-  0,7 s pero confunde "Para." con `avanzar`; `Qwen3-4B-Instruct-2507` queda en medio (1,1 s) pero no ejecuta `¡¡PARA YA!!`. **Pendiente de decidir con el usuario:** modelo y qué hacer con la parada, y la
-  prueba con la API de reserva (necesita clave y revisar la protección de datos de menores).
-  **Servicio de órdenes escrito y probado sin mover las ruedas** (rama `fase-7-servicio-ordenes`, apilada sobre la anterior;
-  protocolo HTTP decidido por el usuario): ver "Servicio de órdenes (25/10/2026)" en la Fase 7. Primera prueba con
-  motores hecha (ruedas en el aire, 7 de 7, incluido el Ctrl+C). Corte de red también hecho (el robot se para solo a los 3 s). La decisión del modelo sigue pendiente.
-  **La red a la que estaba conectado el portátil (por cable, con y sin VPN) bloquea el servidor de archivos de Ollama** (`*.r2.cloudflarestorage.com`): los modelos
-  se bajaron de Hugging Face (ver el README de `tools/medir-llm`).
+- **Cierre de la sesión de la tarde del 25/10/2026: Fase 7, medida del LLM y servicio de órdenes hechos** (desde el PC; el robot
+  solo se movió en las pruebas con las ruedas en el aire, con la confirmación del usuario).
+  * **PR #63 (medida del LLM) fusionado.** **PR #64 (servicio de órdenes, rama `fase-7-servicio-ordenes`) abierto, esperando el
+    merge del usuario.** Si al empezar el #64 no está fusionado, empieza en esa rama y no en `main`: el `PLAN.md` de `main` no
+    tiene el servicio.
+  * **Medida del LLM** (ver "Medida del 25/10/2026", Fase 7; herramienta en [`tools/medir-llm/`](tools/medir-llm/README.md)):
+    `qwen2.5:7b` acierta la herramienta en 24/24 órdenes pero tarda 3 s de mediana (45 % en la tarjeta gráfica); `qwen2.5:3b`
+    tarda 0,7 s pero confunde "Para." con `avanzar`; `Qwen3-4B-Instruct-2507` queda en medio (1,1 s) pero no ejecuta `¡¡PARA
+    YA!!`. **Decisión del modelo: el usuario la dejó para más tarde** (nada depende de ella hasta escribir el cerebro). Tampoco
+    se probó la API de reserva (necesita clave y revisar la protección de datos de menores).
+  * **Servicio de órdenes** (`src/ExplorerHat.Orders`; ver "Servicio de órdenes (25/10/2026)", Fase 7): protocolo HTTP,
+    decidido por el usuario. Probado sin mover las ruedas (29 casos en el PC, 23 en la Pi, 4 de 4 en obstáculos con los sensores
+    reales, señales y códigos de salida) y con las ruedas en el aire (7 de 7, incluido el Ctrl+C, y el corte de red: el robot se
+    para solo a los 3 s). **No se probó en el suelo.**
+  * **Portátil:** controlador NVIDIA 621.01; Ollama 0.40.11 con cinco modelos (los de Hugging Face; **la red a la que estaba
+    conectado el portátil, por cable y con o sin VPN, bloquea el servidor de archivos de Ollama**, `*.r2.cloudflarestorage.com`;
+    ver el README de `tools/medir-llm`). Quedan ~8 GB de descargas incompletas (`*-partial`) en `~\.ollama\models\blobs`, que
+    sirven para reanudar `ollama pull` desde otra red.
+  * **Pi:** en `main` en `32d1b06` (**sin** el #63 ni el #64), en reposo: 8 pines en `lo`, `get_throttled` = `0x0`, ningún
+    programa del robot en marcha. Tiene desplegado `~/apps/ExplorerHat.Orders` (compilación Release del #64), la clave en
+    `~/.explorerhat-clave` y la copia provisional `~/apps/tools-orders/` de los scripts nuevos (su `tools/parar-robot.sh`
+    de `main` NO conoce `Orders`). **Tras fusionar el #64: `git pull --ff-only` en la Pi y `rm -rf ~/apps/tools-orders`.**
+  * **dotnet/iot:** sin cambios mirados por la tarde (al empezar la sesión: #2625 en `CHANGES_REQUESTED` esperando a pgrawehr,
+    comprobaciones en verde; clon `C:\work\iot` en `explorerhat-io`, `c4119033`, limpio). La red bloqueada del portátil no
+    afectó a GitHub.
 - **Sesión del 25/10/2026** (desde el PC; solo dotnet/iot, sin mover el robot; la Pi, en `main` (`a68e53c`), pines en `lo`, `get_throttled` = `0x0`):
   - **#2610 fusionado** el 22/10/2026 (`efe9e367` en `upstream/main`). La incidencia #2614 sigue abierta (pgrawehr dijo que
     la arreglaba el #2610): se puede pedir que la cierren, o comentar que ya está arreglada. Queda el fallo 1 de nuestro
