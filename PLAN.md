@@ -1884,14 +1884,15 @@ taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-
   la URL base. **Respaldo propuesto:** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio
   portátil; decidir al escribir el cerebro.
 * **Verificado el 26/10/2026:** el puerto 11434 responde desde otro equipo de la red (`OLLAMA_HOST` vale), el modelo se
-  queda cargado (`UNTIL` = `Forever`) y `ollama ps` marca `100% GPU`. **Cortafuegos, revisado el mismo día: no estaba
-  limitado.** Había una regla propia bien hecha (`Liliput`: `Private`, TCP, 11434, solo la red 192.168.0.0/24), pero **además**
-  las dos reglas automáticas de Windows para `ollama.exe` (`Private`, `Remota` = `Any`, `Puerto` = `Any`), que dejan pasar a
-  cualquier equipo de la red. La primera revisión (por nombre) no vio `Liliput`; el comando del documento ya busca por puerto. **Pendiente (lo hace el usuario, con
-  administrador):** desactivarlas y crear la regla con `-RemoteAddress LocalSubnet` (paso 4 del documento), y repetir la
-  revisión; Windows puede recrear las automáticas al actualizar Ollama. **Sin comprobar:** el identificador de `winget` y los
-  tamaños de `qwen3:8b` y `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por red local es
-  obligatorio. **La IP del PC no está fijada** (era 192.168.0.241 el 26/10/2026 y
+  queda cargado (`UNTIL` = `Forever`) y `ollama ps` marca `100% GPU`. **Cortafuegos, revisado y corregido el mismo día.**
+  Al principio **no estaba limitado**: había una regla propia bien hecha (`Liliput`: `Private`, TCP, 11434, solo la red
+  192.168.0.0/24), pero **además** las dos reglas automáticas de Windows para `ollama.exe` (`Private`, `Remota` = `Any`,
+  `Puerto` = `Any`), que dejaban pasar a cualquier equipo de la red. La primera revisión (por nombre) no vio `Liliput`; el
+  comando del documento ya busca por puerto. **Corregido por el usuario:** `Liliput` renombrada a `Ollama taller` con
+  `Remota` = `LocalSubnet`, y las dos `ollama.exe` desactivadas. **Revisión final:** sale solo `Ollama taller` (`Private`,
+  TCP, 11434, `LocalSubnet`), y el servidor sigue respondiendo desde el portátil. **Repetir la revisión después de actualizar
+  Ollama:** Windows puede recrear las reglas automáticas. **Sin comprobar:** el identificador de `winget` y los tamaños de
+  `qwen3:8b` y `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por red local es obligatorio. **La IP del PC no está fijada** (era 192.168.0.241 el 26/10/2026 y
   puede cambiar: el cerebro la lleva como ajuste, no escrita en el código).
 * **Estado:** **montado y medido el 26/10/2026** (lo montó el usuario; las medidas las hizo el asistente desde el portátil).
   Registro en `docs/servidor-modelos-pc-gaming.md`.

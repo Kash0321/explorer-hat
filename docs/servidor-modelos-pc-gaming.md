@@ -2,9 +2,9 @@
 
 Cómo montar un PC de gaming con una **RTX 3060 Ti (8 GB de VRAM)** como servidor de Ollama para los portátiles del taller.
 Estado: **montado y medido el 26/10/2026** (ver "Registro del montaje" y los resultados en `PLAN.md`, Fase 7). Las variables
-de Ollama y el acceso desde otro equipo funcionaron. **Sin comprobar:** que el cortafuegos esté limitado a la red del taller
-(ver "Revisar el cortafuegos", más abajo), el identificador de `winget` y los tamaños de `qwen3:8b` y `qwen2.5:14b`. Si algo falla, anota el error en el apartado "Registro del montaje" y se corrige este
-documento.
+de Ollama y el acceso desde otro equipo funcionaron, y el cortafuegos quedó limitado a la red local tras corregirlo (ver
+"Revisar el cortafuegos" y el registro). **Sin comprobar:** el identificador de `winget` y los tamaños de `qwen3:8b` y
+`qwen2.5:14b`. Si algo falla, anota el error en el apartado "Registro del montaje" y se corrige este documento.
 
 Decisiones del usuario (26/10/2026): el PC **va al taller**, en la misma red local que los portátiles y las Pi; usa
 **Windows**; trabajan **entre 4 y 6 portátiles y robots a la vez**.
@@ -214,4 +214,5 @@ Anota aquí lo que pase al montarlo (fecha, comando, resultado, errores) y copia
 | 26/10/2026 | `medir.py` con 1 y con 6 clientes (`--paralelo 6`), 7B y 3B | Sin errores. Resultados en `PLAN.md` (Fase 7) y en `tools/medir-llm/resultados/gaming3060ti_*.json`. 7B: 0,44 s de mediana con 1 cliente y 0,97 s con 6 |
 | 26/10/2026 | Revisión de las reglas del cortafuegos, primero por nombre (`*ollama*`) | Salieron solo dos reglas automáticas `ollama.exe`: `Perfil` = `Private`, `Remota` = `Any`, `Puerto` = `Any`. Dejan pasar a **cualquier equipo** de una red marcada como Privada. La búsqueda por nombre no encontró la regla propia, porque el usuario la había llamado `Liliput` |
 | 26/10/2026 | Revisión por puerto (11434) | Existe la regla propia, **bien hecha**, llamada `Liliput`: `Private`, TCP, puerto 11434, `Remota` = `192.168.0.0/255.255.255.0`. Pendiente: renombrarla a `Ollama taller` (`Set-NetFirewallRule -DisplayName "Liliput" -NewDisplayName "Ollama taller"`), desactivar las dos `ollama.exe` y, si se quiere que valga en cualquier red, cambiar su rango a `LocalSubnet` |
+| 26/10/2026 | El usuario renombra `Liliput` a `Ollama taller`, le pone `Remota` = `LocalSubnet` y desactiva las dos reglas `ollama.exe` (con administrador) | Revisión por puerto y por programa: sale **solo** `Ollama taller` (`Private`, TCP, 11434, `LocalSubnet`). Desde el portátil, el puerto responde (`TcpTestSucceeded` = `True`) y `/api/version` da 0.40.11 |
 | | | |
