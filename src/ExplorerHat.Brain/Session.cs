@@ -40,7 +40,10 @@ namespace ExplorerHat.Brain
         /// <summary>Called on Ctrl+C: the action in progress would run to its end otherwise</summary>
         public void EmergencyStop()
         {
+            // Twice, like a stop word: an action that was already on its way would start after the first stop
             Interlocked.Increment(ref _stopCount);
+            _robot?.StopAsync().Wait(3000);
+            Thread.Sleep(300);
             _robot?.StopAsync().Wait(3000);
         }
 
