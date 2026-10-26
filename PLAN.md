@@ -1885,8 +1885,9 @@ taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-
   portátil; decidir al escribir el cerebro.
 * **Verificado el 26/10/2026:** el puerto 11434 responde desde otro equipo de la red (`OLLAMA_HOST` vale), el modelo se
   queda cargado (`UNTIL` = `Forever`) y `ollama ps` marca `100% GPU`. **Cortafuegos, revisado el mismo día: no estaba
-  limitado.** No existía la regla propia: solo las dos reglas automáticas de Windows para `ollama.exe` (`Private`, `Remota` =
-  `Any`, `Puerto` = `Any`), que dejan pasar a cualquier equipo de la red. **Pendiente (lo hace el usuario, con
+  limitado.** Había una regla propia bien hecha (`Liliput`: `Private`, TCP, 11434, solo la red 192.168.0.0/24), pero **además**
+  las dos reglas automáticas de Windows para `ollama.exe` (`Private`, `Remota` = `Any`, `Puerto` = `Any`), que dejan pasar a
+  cualquier equipo de la red. La primera revisión (por nombre) no vio `Liliput`; el comando del documento ya busca por puerto. **Pendiente (lo hace el usuario, con
   administrador):** desactivarlas y crear la regla con `-RemoteAddress LocalSubnet` (paso 4 del documento), y repetir la
   revisión; Windows puede recrear las automáticas al actualizar Ollama. **Sin comprobar:** el identificador de `winget` y los
   tamaños de `qwen3:8b` y `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por red local es

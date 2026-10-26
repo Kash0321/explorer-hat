@@ -101,15 +101,17 @@ New-NetFirewallRule -DisplayName "Ollama taller" -Direction Inbound -Protocol TC
 
 Un puerto abierto no prueba que la regla esté limitada a la red del taller (el 26/10/2026 no lo estaba: ver el paso 4).
 Repite esta revisión **después de actualizar Ollama**, porque Windows puede crear otra vez las reglas automáticas.
-Ejecuta esto y revisa el resultado:
+**Busca por puerto y por programa, no por el nombre de la regla** (el 26/10/2026, una búsqueda por nombre no encontró una
+regla propia que se llamaba `Liliput`). Ejecuta esto y revisa el resultado. **Recorre todas las reglas: tarda de unos
+segundos a varios minutos**, según cuántas haya (en un portátil de empresa, más de 2 minutos):
 
 ```powershell
-Get-NetFirewallRule | Where-Object { $_.DisplayName -like '*ollama*' -and $_.Enabled -eq 'True' -and $_.Direction -eq 'Inbound' } | ForEach-Object { [pscustomobject]@{ Nombre=$_.DisplayName; Perfil=$_.Profile; Remota=($_ | Get-NetFirewallAddressFilter).RemoteAddress; Puerto=($_ | Get-NetFirewallPortFilter).LocalPort; Programa=($_ | Get-NetFirewallApplicationFilter).Program } }
+Get-NetFirewallRule -Direction Inbound -Enabled True -Action Allow | ForEach-Object { $p = $_ | Get-NetFirewallPortFilter; $a = $_ | Get-NetFirewallApplicationFilter; if (@($p.LocalPort) -contains '11434' -or $a.Program -like '*ollama*') { [pscustomobject]@{ Nombre=$_.DisplayName; Perfil=$_.Profile; Remota=($_ | Get-NetFirewallAddressFilter).RemoteAddress; Protocolo=$p.Protocol; Puerto=$p.LocalPort; Programa=$a.Program } } }
 ```
 
-Lo esperado es **solo** la regla `Ollama taller`, con `Perfil` = `Private`, `Puerto` = `11434` y `Remota` = `LocalSubnet` (o el
-rango del taller). Cualquier otra regla de Ollama con `Remota` = `Any` o `Perfil` = `Public` o `Any` hay que desactivarla (con
-administrador: `Disable-NetFirewallRule -DisplayName "<nombre>"`).
+Lo esperado es **solo** la regla `Ollama taller`, con `Perfil` = `Private`, `Protocolo` = `TCP`, `Puerto` = `11434` y `Remota` =
+`LocalSubnet` (o el rango del taller). Cualquier otra regla con `Remota` = `Any` o `Perfil` = `Public` o `Any` hay que
+desactivarla (con administrador: `Disable-NetFirewallRule -DisplayName "<nombre>"`).
 
 ### 5. Fijar la IP del PC
 
@@ -210,5 +212,6 @@ Anota aquí lo que pase al montarlo (fecha, comando, resultado, errores) y copia
 | 26/10/2026 | El usuario configura Ollama en el PC (según su mensaje: Ollama configurado; **no dijo si creó la regla del cortafuegos: sin comprobar**) y descarga `qwen2.5:3b` y `qwen2.5:7b` | `ollama list` muestra los dos. `ollama ps`: `qwen2.5:7b`, 5,9 GB, `100% GPU`, contexto 4096, `UNTIL` = `Forever`, ejecutor `llamacpp` |
 | 26/10/2026 | Comprobación desde el portátil (IP del día: 192.168.0.241, **sin reservar**) | `Test-NetConnection` al puerto 11434: `True`. `/api/version`: 0.40.11. `/api/tags` y `/api/ps` correctos. El ping no responde (Windows bloquea el ICMP: es normal) |
 | 26/10/2026 | `medir.py` con 1 y con 6 clientes (`--paralelo 6`), 7B y 3B | Sin errores. Resultados en `PLAN.md` (Fase 7) y en `tools/medir-llm/resultados/gaming3060ti_*.json`. 7B: 0,44 s de mediana con 1 cliente y 0,97 s con 6 |
-| 26/10/2026 | Revisión de las reglas del cortafuegos (el usuario ejecuta el comando de "Revisar el cortafuegos") | **No existía la regla `Ollama taller`.** Solo había dos reglas automáticas `ollama.exe`: `Perfil` = `Private`, `Remota` = `Any`, `Puerto` = `Any`. Es decir, el puerto estaba abierto a cualquier equipo de una red marcada como Privada. Pendiente: desactivarlas y crear la regla con `LocalSubnet` (paso 4) |
+| 26/10/2026 | Revisión de las reglas del cortafuegos, primero por nombre (`*ollama*`) | Salieron solo dos reglas automáticas `ollama.exe`: `Perfil` = `Private`, `Remota` = `Any`, `Puerto` = `Any`. Dejan pasar a **cualquier equipo** de una red marcada como Privada. La búsqueda por nombre no encontró la regla propia, porque el usuario la había llamado `Liliput` |
+| 26/10/2026 | Revisión por puerto (11434) | Existe la regla propia, **bien hecha**, llamada `Liliput`: `Private`, TCP, puerto 11434, `Remota` = `192.168.0.0/255.255.255.0`. Pendiente: renombrarla a `Ollama taller` (`Set-NetFirewallRule -DisplayName "Liliput" -NewDisplayName "Ollama taller"`), desactivar las dos `ollama.exe` y, si se quiere que valga en cualquier red, cambiar su rango a `LocalSubnet` |
 | | | |
