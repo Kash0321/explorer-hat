@@ -23,7 +23,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
   * **Decisión del modelo: sigue pendiente** (entre `qwen2.5:3b` y `qwen2.5:7b`; Qwen3 no gana en nada y Llama es el peor). El
     3B oficial acierta las dos órdenes de parada, pero omite `segundos` (obligatorio) en varias órdenes. **Idea
     nueva del usuario:** un PC de gaming con una RTX 3060 Ti (8 GB de VRAM) como servidor de Ollama para los portátiles del
-    taller, para usar un modelo mejor sin esperar. Sin montar ni medir (ver el punto 6 de "Al retomar").
+    taller, para usar un modelo mejor sin esperar. Sin montar ni medir: pasos en
+    [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md) (el usuario lo montará cuando pueda; ver el
+    punto 6 de "Al retomar"). `medir.py` tiene ya `--paralelo N` para medir con 4 a 6 portátiles a la vez.
 - **Cierre de la sesión de la tarde del 25/10/2026: Fase 7, medida del LLM y servicio de órdenes hechos** (desde el PC; el robot
   solo se movió en las pruebas con las ruedas en el aire, con la confirmación del usuario).
   * **PR #63 (medida del LLM) y #64 (servicio de órdenes) fusionados** (`ed66d71` en `main`, 25/10/2026); las ramas
@@ -369,8 +371,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      de órdenes" en la Fase 7), con las pruebas con motores en el aire (7 de 7 y corte de red).** Siguiente: (a) decidir con
      el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s; datos
      de los modelos oficiales en "Medida con los modelos de la biblioteca de Ollama (26/10/2026)"), si se prueba la API de
-     reserva y **si se monta el PC de gaming con la RTX 3060 Ti como servidor** (pasos en "Servidor de modelos en un PC de
-     gaming"; con él, `qwen2.5:7b` cabría entero en la tarjeta y se mediría otra vez con `--url`); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
+     reserva y **cómo va el PC de gaming con la RTX 3060 Ti como servidor** (el usuario lo monta con
+     [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md): revisar su "Registro del montaje" y medir con
+     `--url` y `--paralelo 6`; con él, `qwen2.5:7b` cabría entero en la tarjeta); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
      pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
   6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
      `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
@@ -1864,45 +1867,26 @@ Mismo equipo, misma herramienta y mismas 24 órdenes que la tanda del 25/10/2026
 
 ### Servidor de modelos en un PC de gaming (propuesta del 26/10/2026, sin montar)
 Idea del usuario: usar un PC de gaming con una **RTX 3060 Ti (8 GB de VRAM)** como servidor de Ollama para los portátiles del
-taller. El Prestige tiene 4 GB. **Previsión, sin medir:** `qwen2.5:7b` (~4,7 GB) cabe entero y debería bajar de los 3 s de
-mediana a menos de 1 s; un modelo de 14B (~9 GB) no cabe entero y parte va por la CPU. Un modelo mayor no arregla los
-valores fuera de rango (los tres modelos pasan 300 y 10 segundos): el recorte de la Pi sigue siendo obligatorio.
+taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md).**
+* **Decidido el 26/10/2026:** el PC va al taller, en la misma red local (opción A); Windows; **entre 4 y 6 portátiles y
+  robots a la vez** (`OLLAMA_NUM_PARALLEL` = 6). Descartado el PC en casa con VPN (cruzaría internet: la regla de privacidad
+  de esta fase, "el LLM, en local", pide revisarlo con la organización del taller). **El puerto 11434 no se abre nunca a
+  internet.**
+* **Previsión, sin medir:** `qwen2.5:7b` (~4,7 GB) cabe entero en 8 GB y debería bajar de los 3 s de mediana a menos de 1 s;
+  un modelo de 14B (~9 GB) no cabe entero. Un modelo mayor no arregla los valores fuera de rango (los tres modelos pasan 300
+  y 10 segundos): el recorte de la Pi sigue siendo obligatorio.
 * **Arquitectura:** Pi (cuerpo) ← cerebro en cada portátil (C#) → HTTP → Ollama en el PC de gaming. En el cerebro solo cambia
-  la URL base (`medir.py` ya la admite con `--url`). La Pi y el servicio de órdenes no cambian.
-* **Opciones de ubicación (decide el usuario):** (A) el PC va al taller, en la misma red local: es lo que describen los pasos
-  de abajo. (B) el PC se queda en casa y los portátiles llegan por una VPN: el tráfico cruza internet, así que la regla de
-  privacidad de esta fase ("el LLM, en local") se aplica en espíritu y hay que revisarla con la organización del taller;
-  depende además de la red del taller. (C) **Nunca se abre el puerto 11434 a internet.**
-* **Respaldo en el cerebro (propuesta):** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio
-  portátil. Si el PC o la red caen, el taller sigue. Cambia el diseño del cerebro: decidir al escribirlo.
+  la URL base. **Respaldo propuesto:** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio
+  portátil; decidir al escribir el cerebro.
 * **Sin verificar:** los nombres y valores de las variables de entorno de Ollama, el identificador de `winget` y los tamaños
-  de `qwen3:8b` y `qwen2.5:14b`. Lo que vale es que `ollama ps` muestre `100% GPU`.
-* **En el PC de gaming** (Windows, sin confirmar; PowerShell; el cortafuegos pide administrador):
-  1. `winget install Ollama.Ollama` y el controlador de NVIDIA al día.
-  2. Variables de usuario: `setx OLLAMA_HOST "0.0.0.0:11434"` (escucha en la red, no solo en `localhost`), `setx
-     OLLAMA_KEEP_ALIVE "-1"` (el modelo se queda en la tarjeta), `setx OLLAMA_NUM_PARALLEL "6"` (seis peticiones a la vez,
-     para 4 a 6 portátiles; el contexto de cada una ocupa VRAM) y `setx OLLAMA_MAX_LOADED_MODELS "1"`. Salir de Ollama (icono de la bandeja) y abrirlo.
-  3. Cortafuegos, solo para la red del taller: `New-NetFirewallRule -DisplayName "Ollama taller" -Direction Inbound -Protocol TCP
-     -LocalPort 11434 -Action Allow -Profile Private -RemoteAddress 192.168.0.0/24` (cambiar el rango al de la red del
-     taller; la red tiene que estar en perfil "Privada").
-  4. Reservar la IP del PC en el router (por su MAC), para que el cerebro use siempre la misma.
-  5. `ollama pull qwen2.5:7b`. Candidatos para medir después (tamaños aproximados, sin comprobar): `qwen3:8b` (~5 GB, con
-     `--sin-pensar`) y `qwen2.5:14b` (~9 GB, parte por la CPU).
-  6. En el PC: `ollama ps` debe mostrar `100% GPU`. Sin suspensión de energía, y sin jugar durante el taller (comparten VRAM).
-  7. Desde un portátil: `Invoke-RestMethod http://<ip>:11434/api/version` y `python tools/medir-llm/medir.py --modelo
-     qwen2.5:7b --equipo gaming3060ti --url http://<ip>:11434`.
-* **Seguridad y privacidad:** Ollama no tiene autenticación: quien llegue al puerto puede usar el modelo y también bajar o
-  borrar modelos (`/api/pull`, `/api/delete`). Por eso el cortafuegos por rango de IP y, mejor, una red de taller aislada.
-  Opción más estricta, **sin probar:** Ollama solo en `127.0.0.1` y delante un proxy inverso con clave (por ejemplo, Caddy, que
-  comprueba la cabecera `Authorization`). El tráfico va en HTTP sin cifrar dentro de la red local: las órdenes de los niños no
-  salen de ella. Si el PC estuviera fuera del taller (en casa), haría falta una VPN (por ejemplo, Tailscale), con latencia y
-  dependencia de la red del taller: sin probar.
-* **Decidido el 26/10/2026:** opción A (el PC va al taller), Windows, y **entre 4 y 6 portátiles y robots a la vez**.
-* **Medir con varios portátiles a la vez:** `medir.py --paralelo N` (hecho el 26/10/2026; probado con el 3B del portátil
-  con 3 clientes). Con el servidor montado: una medida con 1 cliente y otra con `--paralelo 6`, del mismo modelo, y comparar
-  la mediana y el máximo de tiempo. Si con 6 clientes el 7B tarda demasiado, probar `qwen2.5:3b` o `OLLAMA_NUM_PARALLEL`
-  más bajo. Con un Ollama local en Windows, usar `--url http://127.0.0.1:11434` (con `localhost`, 2 s de retraso por
-  petición).
+  de `qwen3:8b` y `qwen2.5:14b`. Lo que vale es que `ollama ps` muestre `100% GPU`. **Seguridad:** Ollama no tiene
+  autenticación; el cortafuegos por rango de IP es obligatorio.
+* **Medir con varios portátiles a la vez:** `medir.py --paralelo N` (hecho el 26/10/2026; probado con el 3B del portátil con
+  3 clientes). Con el servidor montado: una medida con 1 cliente y otra con `--paralelo 6`, del mismo modelo, y comparar la
+  mediana y el máximo de tiempo. Con un Ollama local en Windows, `--url http://127.0.0.1:11434` (con `localhost`, 2 s de
+  retraso por petición).
+* **Estado:** el usuario lo montará cuando pueda y se revisa el registro del documento (`docs/servidor-modelos-pc-gaming.md`,
+  "Registro del montaje") en la sesión siguiente.
 
 ### Servicio de órdenes (25/10/2026)
 Código en [`src/ExplorerHat.Orders`](src/ExplorerHat.Orders/README.md) y pruebas en
