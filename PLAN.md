@@ -2055,4 +2055,11 @@ diseño (con la consulta al asesor, que pidió las tres primeras correcciones an
   `¡Tira palante!`, `Retrocede.`, `Gira a la derecha un segundo.`, la orden de tres pasos (luz, avanzar, luz) y `¿Cuánto es dos
   más dos?` (contesta "El resultado es 4." y no hace nada) salieron bien, con tildes y signos `¡¿`; `Avanza 10 segundos.` termina
   a los 3,0 s con el aviso `el robot ajustó: segundos`; con un obstáculo simulado a 20 cm para a los 0,0 s y cancela el plan; en
-  el cuadrado, `PARA` a los 4,5 s corta la acción en curso y cancela el resto. **Falta probarlo con la Pi.**
+  el cuadrado, `PARA` a los 4,5 s corta la acción en curso y cancela el resto.
+* **Con la Pi en `--velocidad-cero` (pines reales, ruedas quietas), 26/10/2026:** el portátil, el 7B del PC de gaming y el
+  servicio de la Pi encajan de punta a punta. `Enciende la luz roja.` (GPIO 27 en `hi` a mitad, los pines de los motores en
+  `lo`), `Retrocede medio segundo.` (terminó a los 0,5 s), `Gira a la derecha un segundo.` (1,0 s), `Avanza 2 segundos.`
+  (con los sensores reales marcando 5 cm en el centro: **parada por obstáculo a los 0,0 s** y plan cancelado) y `Apaga la luz
+  roja.` Al final, los 8 pines en `lo`. La clave se copió con `scp` a `~/.explorerhat-clave` del portátil. Servicio parado
+  después con `tools/parar-robot.sh`; la Pi en reposo, `get_throttled` = `0x0`. **Falta:** `--real` con las ruedas en el aire
+  (pide la confirmación del usuario y una consulta al asesor) y el suelo.
