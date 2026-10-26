@@ -374,14 +374,16 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      de los modelos oficiales en "Medida con los modelos de la biblioteca de Ollama (26/10/2026)"), si se prueba la API de
      reserva. **El PC de gaming con la RTX 3060 Ti ya funciona como servidor** (26/10/2026,
      [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md)): el 7B va a 0,44 s de mediana (0,97 s con 6
-     clientes), así que la decisión pasa a ser **`qwen2.5:7b` en el servidor, con el 3B local de respaldo**; queda por
-     decidir con el usuario y por medir `qwen3:8b` y `qwen2.5:14b` en esa tarjeta (hay que bajarlos con `ollama pull` en el PC);
-     la IP del PC no está fijada; (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
+     clientes). **Recomendación (sin decidir con el usuario): `qwen2.5:7b` en el servidor, con el 3B local de respaldo**
+     (con 6 clientes el 7B no varía; el 3B sí). Queda por medir `qwen3:8b` y `qwen2.5:14b` en esa tarjeta (hay que bajarlos
+     con `ollama pull` en el PC); la IP del PC no está fijada; y **revisar las reglas del cortafuegos del PC** (comando en
+     el documento); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
      pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
   6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
      `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
      `~/apps/ExplorerHat.Orders` en la Pi (cada carpeta lleva su copia de `Common`). **Al escribir el
-     cerebro:** `tools/medir-llm/herramientas.json` dice "hasta 3 s" en `retroceder` y el servicio recorta a **1 s**
+     cerebro:** enviar el mismo `num_ctx` que la medida (2048) y **no** enviar `keep_alive` (`medir.py` envía `30m` en cada
+     petición, que pisa el `-1` del servidor); `tools/medir-llm/herramientas.json` dice "hasta 3 s" en `retroceder` y el servicio recorta a **1 s**
      (la medida de los modelos se hizo con 3 s); cambiar la descripción de la herramienta a 1 s y repetir la medida si
      importa. El README del servicio dice "la misma lista cerrada": es la lista, no los límites.
   7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
@@ -1881,11 +1883,13 @@ taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-
 * **Arquitectura:** Pi (cuerpo) ← cerebro en cada portátil (C#) → HTTP → Ollama en el PC de gaming. En el cerebro solo cambia
   la URL base. **Respaldo propuesto:** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio
   portátil; decidir al escribir el cerebro.
-* **Verificado el 26/10/2026:** con las variables puestas, el puerto 11434 responde desde otro equipo de la red (el
-  cortafuegos y `OLLAMA_HOST` valen), el modelo se queda cargado (`UNTIL` = `Forever`) y `ollama ps` marca `100% GPU`.
-  **Sin verificar:** el identificador de `winget` y los tamaños de `qwen3:8b` y `qwen2.5:14b`. **Seguridad:** Ollama no
-  tiene autenticación; el cortafuegos por rango de IP es obligatorio. **La IP del PC no está fijada** (era 192.168.0.241
-  el 26/10/2026 y puede cambiar: el cerebro la lleva como ajuste, no escrita en el código).
+* **Verificado el 26/10/2026:** el puerto 11434 responde desde otro equipo de la red (`OLLAMA_HOST` vale), el modelo se
+  queda cargado (`UNTIL` = `Forever`) y `ollama ps` marca `100% GPU`. **Sin comprobar:** que el cortafuegos esté limitado
+  a la red del taller y al perfil Privado (un puerto abierto no lo prueba; si se aceptó el aviso de Windows para
+  `ollama.exe`, puede haber otra regla que abra a todos), el identificador de `winget` y los tamaños de `qwen3:8b` y
+  `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por rango de IP es obligatorio (comando de
+  revisión en `docs/servidor-modelos-pc-gaming.md`). **La IP del PC no está fijada** (era 192.168.0.241 el 26/10/2026 y
+  puede cambiar: el cerebro la lleva como ajuste, no escrita en el código).
 * **Estado:** **montado y medido el 26/10/2026** (lo montó el usuario; las medidas las hizo el asistente desde el portátil).
   Registro en `docs/servidor-modelos-pc-gaming.md`.
 
@@ -1906,14 +1910,19 @@ orden cuentan solo si acierta en todas. El `p95` es el tiempo que no pasa el 95 
   (segundos fuera de rango) que en el portátil.
 * **Con 6 clientes a la vez, el 7B sigue por debajo de 1 s de mediana** (0,97 s). Sin el cuadrado (8 llamadas seguidas, el
   más lento: 7,4 s), el `p95` es 2,1 s y el máximo 5,4 s. Hay cola, pero el robot ya espera 1 a 3 s por acción.
-* **La precisión no cambia con la carga.** Por ejecución, los porcentajes son iguales con 1 y con 6 clientes (7B: 100 % de
-  herramienta y 91,7 % de valores y de válidas; 3B: 91,7 %, 79 % y 81 a 83 %). Las diferencias de la tabla del 3B son un
-  efecto de contar por orden con 18 repeticiones en vez de 3. **No se detectó variación entre clientes** (ninguna orden
-  tiene resultados mezclados en la herramienta). Con otra tarjeta, el mismo modelo da algo distinto en una orden (3B con 1
-  cliente: 20 válidas, frente a 19 en el portátil): son diferencias de cálculo de la tarjeta.
-* **Límites:** 6 clientes sin pausa es la peor carga (los niños escriben una orden cada pocos segundos); la medida incluye la
-  red local pero no el cerebro; la IP no estaba fijada; y solo se midieron los dos modelos de Qwen2.5 (ver los siguientes
-  pasos en "Al retomar").
+* **El 7B es estable con la carga; el 3B no.** Con 6 clientes a la vez, **el 7B da la misma respuesta en todas las
+  repeticiones** de las 24 órdenes (herramienta, valores y válidas, igual que con 1 cliente). **El 3B cambia sus
+  argumentos entre repeticiones en 9 de las 24 órdenes** (2, 6, 9, 11, 12, 14, 16, 18 y 20; en 4 de ellas cambia si los
+  valores son correctos, y en 5, si son válidas), **aunque la herramienta sigue siendo la misma** (22/24 con 1 y con 6
+  clientes). Los porcentajes por ejecución casi no cambian (valores 79,2 % con 1 cliente y 79,4 % con 6; válidas 83,3 % y
+  81,2 %). Por eso la tabla del 3B baja a 17/24 y 16/24 con 6 clientes: una orden cuenta solo si acierta en las 18 ejecuciones.
+  **La nota de la tanda del 25/10/2026 ("con temperatura 0 las repeticiones dan casi siempre la misma respuesta") vale solo
+  para un cliente.** Con otra tarjeta, el mismo modelo también dio algo distinto en una orden (3B con 1 cliente: 20 válidas,
+  frente a 19 en el portátil); la causa no se comprobó (el servidor también corría con `OLLAMA_NUM_PARALLEL` = 6).
+* **Límites:** 6 clientes sin pausa es la peor carga (los niños escriben una orden cada pocos segundos); la **mediana, el
+  `p95` y el máximo son los de Ollama (`total_duration`, en el servidor): no incluyen la red local ni el cerebro** (solo los
+  segundos de pared y las peticiones por segundo incluyen la red); la IP no estaba fijada; y solo se midieron los dos
+  modelos de Qwen2.5 (ver los siguientes pasos en "Al retomar").
 
 ### Servicio de órdenes (25/10/2026)
 Código en [`src/ExplorerHat.Orders`](src/ExplorerHat.Orders/README.md) y pruebas en

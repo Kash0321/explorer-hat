@@ -2,8 +2,8 @@
 
 Cómo montar un PC de gaming con una **RTX 3060 Ti (8 GB de VRAM)** como servidor de Ollama para los portátiles del taller.
 Estado: **montado y medido el 26/10/2026** (ver "Registro del montaje" y los resultados en `PLAN.md`, Fase 7). Las variables
-de Ollama, el cortafuegos y el acceso desde otro equipo funcionaron. **Sin verificar:** el identificador de `winget` y los
-tamaños de `qwen3:8b` y `qwen2.5:14b`. Si algo falla, anota el error en el apartado "Registro del montaje" y se corrige este
+de Ollama y el acceso desde otro equipo funcionaron. **Sin comprobar:** que el cortafuegos esté limitado a la red del taller
+(ver "Revisar el cortafuegos", más abajo), el identificador de `winget` y los tamaños de `qwen3:8b` y `qwen2.5:14b`. Si algo falla, anota el error en el apartado "Registro del montaje" y se corrige este
 documento.
 
 Decisiones del usuario (26/10/2026): el PC **va al taller**, en la misma red local que los portátiles y las Pi; usa
@@ -84,6 +84,19 @@ Debe aparecer `0.0.0.0:11434` en estado `LISTENING`. Si aparece `127.0.0.1:11434
 ```powershell
 New-NetFirewallRule -DisplayName "Ollama taller" -Direction Inbound -Protocol TCP -LocalPort 11434 -Action Allow -Profile Private -RemoteAddress 192.168.0.0/24
 ```
+
+#### Revisar el cortafuegos (sin administrador)
+
+Un puerto abierto no prueba que la regla esté limitada a la red del taller. Si al instalar Ollama aceptaste el aviso de
+Windows, puede haber **otra regla que abra el puerto a todos**. Ejecuta esto y revisa el resultado:
+
+```powershell
+Get-NetFirewallRule | Where-Object { $_.DisplayName -like '*ollama*' -and $_.Enabled -eq 'True' -and $_.Direction -eq 'Inbound' } | ForEach-Object { [pscustomobject]@{ Nombre=$_.DisplayName; Perfil=$_.Profile; Remota=($_ | Get-NetFirewallAddressFilter).RemoteAddress; Puerto=($_ | Get-NetFirewallPortFilter).LocalPort; Programa=($_ | Get-NetFirewallApplicationFilter).Program } }
+```
+
+Lo esperado es **solo** la regla `Ollama taller`, con `Perfil` = `Private` y `Remota` = la red del taller. Cualquier otra
+regla de Ollama con `Remota` = `Any` o `Perfil` = `Public` o `Any` hay que desactivarla (con administrador:
+`Disable-NetFirewallRule -DisplayName "<nombre>"`).
 
 ### 5. Fijar la IP del PC
 
@@ -181,7 +194,7 @@ Anota aquí lo que pase al montarlo (fecha, comando, resultado, errores) y copia
 
 | Fecha | Paso | Resultado |
 |---|---|---|
-| 26/10/2026 | El usuario configura Ollama en el PC (variables, reinicio, cortafuegos) y descarga `qwen2.5:3b` y `qwen2.5:7b` | `ollama list` muestra los dos. `ollama ps`: `qwen2.5:7b`, 5,9 GB, `100% GPU`, contexto 4096, `UNTIL` = `Forever`, ejecutor `llamacpp` |
+| 26/10/2026 | El usuario configura Ollama en el PC (según su mensaje: Ollama configurado; **no dijo si creó la regla del cortafuegos: sin comprobar**) y descarga `qwen2.5:3b` y `qwen2.5:7b` | `ollama list` muestra los dos. `ollama ps`: `qwen2.5:7b`, 5,9 GB, `100% GPU`, contexto 4096, `UNTIL` = `Forever`, ejecutor `llamacpp` |
 | 26/10/2026 | Comprobación desde el portátil (IP del día: 192.168.0.241, **sin reservar**) | `Test-NetConnection` al puerto 11434: `True`. `/api/version`: 0.40.11. `/api/tags` y `/api/ps` correctos. El ping no responde (Windows bloquea el ICMP: es normal) |
 | 26/10/2026 | `medir.py` con 1 y con 6 clientes (`--paralelo 6`), 7B y 3B | Sin errores. Resultados en `PLAN.md` (Fase 7) y en `tools/medir-llm/resultados/gaming3060ti_*.json`. 7B: 0,44 s de mediana con 1 cliente y 0,97 s con 6 |
 | | | |
