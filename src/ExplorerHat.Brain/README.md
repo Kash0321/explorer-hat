@@ -62,3 +62,13 @@ python tools/probar-cerebro/probar.py
 Contra el servicio de la Pi en `--velocidad-cero` (pines reales, ruedas quietas) y en `--real` (ruedas en el aire), el 26/10/2026, con la parada por palabra y con Ctrl+C, y con el robot en el suelo. Resultados en `PLAN.md`, Fase 7.
 
 En la consola de Windows, lo que tecleas se puede mezclar con los mensajes del cerebro. Es solo de aspecto: la orden llega entera.
+
+## Arrancar una sesión con el robot
+
+1. **En la Pi**, en una terminal SSH y en primer plano (Ctrl+C la para): `cd ~/apps/ExplorerHat.Orders && dotnet ExplorerHat.Orders.dll --real`. Debe decir `modo real`.
+2. **En el portátil**, compila y ejecuta la DLL (es lo que se probó, también Ctrl+C): `dotnet build src/ExplorerHat.Brain/ExplorerHat.Brain.csproj -o $HOME/explorerhat-cerebro` y después `dotnet $HOME\explorerhat-cerebro\ExplorerHat.Brain.dll --llm ... --robot ...`, con las IP del día. **Compila otra vez después de cualquier cambio de código.** `dotnet run` (el comando de "Uso") sirve para `--solo-mostrar`, pero no para mover el robot: Ctrl+C llega también a `dotnet run` y no se comprobó que el cerebro mande su doble parada antes de cerrarse. En el servidor de modelos, ningún otro modelo cargado.
+3. **Con las ruedas en el aire primero.** Para el suelo, antes de empezar: espacio libre de 1,5 m por delante y por los lados, sin cables sueltos, el cargador de la UPS quitado y la mano cerca de `para`. Empieza con órdenes cortas (`Avanza medio segundo`) y sube poco a poco.
+4. **Retroceder y girar van a ciegas:** los sensores miran hacia delante. La Pi recorta `retroceder` a 1 s y el resto a 3 s.
+5. **Al terminar:** Ctrl+C en el cerebro y en el servicio, y `pinctrl get 19,20,21,26,4,17,27,5` con todos los pines en `lo`.
+
+Si una rueda no gira, toca primero los cables de su borna y repite `tools/probar-cableado.sh`.

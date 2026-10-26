@@ -23,7 +23,7 @@ Antes de hacer nada más:
      Empieza por su sección "Estado actual".
    - README.md y los scripts de tools/ (cada uno explica su uso al principio).
    - El historial reciente: git log --oneline -30 y los PR fusionados (gh pr list --state merged),
-     sobre todo los #4 a #64, cuyas descripciones resumen cada fase y cada lección.
+     sobre todo los #4 a #68, cuyas descripciones resumen cada fase y cada lección.
    - Lo que tenemos abierto en dotnet/iot (Fase 6): los PR e incidencias de la tabla del "Estado
      actual" de PLAN.md (el 25/10/2026: PR #2625, que espera la nueva revisión de pgrawehr tras
      nuestra respuesta, e incidencias #2614, #2615 y #2617; los PR #2610 y #2616 están fusionados), con sus comprobaciones, comentarios y revisiones
@@ -75,25 +75,27 @@ anota los resultados en PLAN.md en una rama nueva con su PR, y pídeme /usage.
 
 La lección 07 (pads táctiles) se hizo la noche del 17/10/2026. Desde entonces se probó también en el suelo, a 0,45 de velocidad. La probó también una niña de 10 años en el suelo, sin problemas. El checklist del taller se hizo el 25/10/2026 ([`checklist-taller.md`](checklist-taller.md)); la siguiente tarea propuesta es la Fase 7. La lección 10 de siguelíneas se descartó el 17/10/2026 y quedó como idea; las lecciones 11 y 12 pasaron a ser la 10 y la 11. El experimento de modelos está decidido (17/10/2026): se mantiene como está, con el asesor y `buscador` ("Experimento de modelos" en `PLAN.md`).
 
-## Variante: seguir la Fase 7 (robot con IA): decidir el modelo y escribir el cerebro
+## Variante: seguir la Fase 7 (robot con IA), después del cerebro
 
-Esta variante es para la sesión que sigue a la del 25/10/2026. Ese día se midió el modelo de lenguaje (`tools/medir-llm`) y se escribió y probó el servicio de órdenes de la Pi (`src/ExplorerHat.Orders`, con las ruedas en el aire: 7 de 7 y corte de red). Ver `PLAN.md`, Fase 7 y "Al retomar", puntos 6 y 6b.
+Esta variante es para la sesión que sigue a la del 26/10/2026. Ese día se montó el PC de gaming como servidor de modelos (#67), se decidió el modelo de forma provisional y se escribió y probó el cerebro (`src/ExplorerHat.Brain`, #68): sin robot, con la Pi en `--velocidad-cero`, con las ruedas en el aire y en el suelo. Ver `PLAN.md`: "Cierre de la sesión del 26/10/2026" (en el "Estado actual"), "Al retomar", punto 6c, y "Cerebro (26/10/2026)" en la Fase 7.
 
 **Antes de pegarla:**
 
-1. **Las dos ramas de la Fase 7 están fusionadas** (PR #63 y #64, 25/10/2026): empieza en `main` y al día (`git pull`).
-2. La Pi ya está en `main` (con el servicio de órdenes y los scripts de parada que conocen `Orders`). Vuelve a desplegar `~/apps/ExplorerHat.Orders` solo si cambia su código o el de `Common`.
-3. Ollama está instalado en el portátil (controlador NVIDIA 621.01) con cuatro modelos de la biblioteca de Ollama (`qwen2.5:3b`, `qwen2.5:7b`, `llama3.2:latest` y `qwen3:4b-instruct-2507-q4_K_M`), medidos el 26/10/2026 (`PLAN.md`, Fase 7). El 25/10/2026 la red bloqueaba el servidor de archivos de Ollama; si vuelve a pasar, ver `tools/medir-llm/README.md`. El modelo está decidido **de forma provisional** (26/10/2026): `qwen2.5:7b` en el servidor, con el `qwen2.5:3b` local de respaldo; se revisa si aparece un modelo mejor (`PLAN.md`, "Decisión del modelo: provisional y revisable"). Desde el 26/10/2026 hay un PC de gaming con una RTX 3060 Ti como servidor de Ollama para los portátiles del taller (`qwen2.5:7b` a 0,44 s de mediana, 0,97 s con 6 clientes): pasos, registro y resultados en [`servidor-modelos-pc-gaming.md`](servidor-modelos-pc-gaming.md) y en `PLAN.md` (Fase 7). Su IP no está fijada y no se anota en el repositorio: pregunta cuál es el día que se use (`--url http://<ip>:11434`).
-4. Si la sesión va a mover el robot (por ejemplo, probar el servicio en el suelo): la Pi encendida y con wifi, la UPS cargada, el robot **sobre un bote o un libro, con las ruedas en el aire** (salvo la prueba en el suelo, que se pide aparte), y una terminal SSH abierta en la Pi.
+1. **Todo está fusionado** (PR #63 a #68): empieza en `main` y al día (`git pull`), en el PC y en la Pi.
+2. Redespliega `~/apps/ExplorerHat.Orders` solo si cambia su código o el de `Common`. El cerebro corre en el portátil y no se despliega: se compila con `dotnet build src/ExplorerHat.Brain/ExplorerHat.Brain.csproj -o $HOME/explorerhat-cerebro` y se ejecuta la DLL (receta en el README del cerebro). Compílalo otra vez si el código cambió.
+3. **El servidor de modelos** es un PC de gaming con una RTX 3060 Ti (pasos y registro en [`servidor-modelos-pc-gaming.md`](servidor-modelos-pc-gaming.md)). Su IP no está fijada y no se anota en el repositorio: pregunta cuál es el día que se use. Con `OLLAMA_MAX_LOADED_MODELS` = 1, no cargues otro modelo en él durante las pruebas. El modelo es provisional: `qwen2.5:7b` en el servidor, con el `qwen2.5:3b` local de respaldo (`PLAN.md`, "Decisión del modelo: provisional y revisable").
+4. **La clave del robot** está en `~/.explorerhat-clave` del portátil (copiada con `scp` desde la Pi). Si falta, vuelve a copiarla; no la subas ni la escribas en pantalla.
+5. Si la sesión va a mover el robot: la Pi encendida y con wifi, la UPS cargada y una terminal SSH abierta en la Pi. **Primero, con las ruedas en el aire**, y comprueba que giran las dos (la derecha falló el 26/10/2026). El suelo se pide aparte, con confirmación: robot en el suelo, espacio libre, cargador de la UPS quitado y terminal abierta.
 
 Pega el prompt de arriba y **añade esto al final**:
 
 ```text
-Hoy seguimos la Fase 7 (robot con IA). Haz los pasos 1 a 3 (incluido dotnet/iot, que son 5 minutos), mira
-si las ramas de la Fase 7 están fusionadas (punto 6b de "Al retomar") y después propón el plan de lo que
-sigue: decidir el modelo con los datos de "Medida del 25/10/2026" (hazme una pregunta por cada decisión, con
-su contexto y tu recomendación) y escribir el cerebro en el portátil (C#), con la parada por palabra sin
-pasar por el modelo. El servicio de órdenes ya está probado: no muevas el robot sin mi confirmación de que
-tiene las ruedas en el aire. Antes de fijar el plan, consulta al asesor. Cuéntame cuánto puede tardar cada
-comando largo. Al terminar, anota los resultados en PLAN.md, en una rama nueva con su PR.
+Hoy seguimos la Fase 7 (robot con IA). Haz los pasos 1 a 3 (incluido dotnet/iot, que son 5 minutos) y
+después lee "Cierre de la sesión del 26/10/2026" en el "Estado actual" de PLAN.md: el cerebro ya funciona
+de punta a punta y ahí está el orden recomendado de lo siguiente. Propón el plan de hoy y hazme una
+pregunta por cada decisión, con su contexto y tu recomendación. Antes de fijar el plan, consulta al asesor.
+No muevas el robot sin mi confirmación explícita (ruedas en el aire, o las palabras del suelo). Si cambias
+herramientas.json o el mensaje de sistema, hay que volver a medir con medir.py: la medida de 24 de 24 deja
+de valer. Cuéntame cuánto puede tardar cada comando largo. Al terminar, anota los resultados en PLAN.md,
+en una rama nueva con su PR.
 ```
