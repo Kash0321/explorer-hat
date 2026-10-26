@@ -380,7 +380,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      de respaldo** (con 6 clientes el 7B no varía; el 3B sí); ver "Decisión del modelo: provisional y revisable". Queda por
      medir `qwen3:8b` y `qwen2.5:14b` en esa tarjeta (hay que bajarlos con `ollama pull` en el PC); la IP del PC no está
      fijada (se pregunta cada día); el cortafuegos del PC ya está revisado y corregido (se repite tras actualizar Ollama); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
-     pasar por el modelo (**hecho el 26/10/2026**, `src/ExplorerHat.Brain`; probado con la Pi, también `--real` con las ruedas en el aire: ver "Cerebro (26/10/2026)"); (c) más adelante, el servicio en el suelo (pedir la confirmación).
+     pasar por el modelo (**hecho el 26/10/2026**, `src/ExplorerHat.Brain`; probado con la Pi, también `--real` con las ruedas en el aire: ver "Cerebro (26/10/2026)"); (c) el servicio en el suelo (**hecho el 26/10/2026** con el cerebro: ver "Cerebro (26/10/2026)").
   6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
      `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
      `~/apps/ExplorerHat.Orders` en la Pi (cada carpeta lleva su copia de `Common`). **Al escribir el
@@ -1757,11 +1757,11 @@ Pasos:
       máxima, parada al perder la conexión y parada por obstáculo. Probarlo con las ruedas en el aire y con órdenes
       escritas a mano, sin LLM. Repetir la prueba de corte de wifi de la Fase 3.
       **Escrito y probado sin mover las ruedas el 25/10/2026** (`src/ExplorerHat.Orders`, ver "Servicio de órdenes",
-      más abajo). **Pruebas con motores hechas el 25/10/2026 (7 de 7 y corte de red).** **Falta:** probarlo en el suelo y el cerebro.
+      más abajo). **Pruebas con motores hechas el 25/10/2026 (7 de 7 y corte de red).** **Probado también en el suelo, con el cerebro, el 26/10/2026** (ver "Cerebro (26/10/2026)").
 - [~] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
       el estado de los sensores (distancias y batería). **Escrito y probado sin robot el 26/10/2026**
       (`src/ExplorerHat.Brain`, ver "Cerebro (26/10/2026)", más abajo). **Probado con la Pi en `--velocidad-cero` y en `--real` con las ruedas en el aire (26/10/2026).**
-      **Falta:** el suelo (pedir la confirmación) y el estado de los sensores como texto (sin medir, no incluido).
+      **Probado también en el suelo (26/10/2026).** **Falta:** el estado de los sensores como texto (sin medir, no incluido).
 - [ ] Voz: Whisper local en el portátil (por ejemplo, whisper.cpp) con *push-to-talk*. Probar con ruido de fondo.
 - [ ] Opcional: respuesta hablada (un altavoz con amplificador propio en el conector de 3,5 mm de la Pi, o el portátil).
 - [ ] Opcional: cámara en el conector CSI de la Pi y un modelo de visión en el portátil, para que el robot "vea".
@@ -2083,5 +2083,15 @@ diseño (con la consulta al asesor, que pidió las tres primeras correcciones an
   * **Defecto de aspecto, sin consecuencias:** en la consola real, lo que el usuario teclea se mezcla con los mensajes del
     cerebro (`PARADA: paraelocidad=0.45...`). No se ha decidido arreglarlo.
   * **Observado:** `Avanza` sin tiempo dio `segundos=1.5` y `velocidad=0.45`; `a toda marcha` dio `velocidad=1`.
-  * Al final: servicio parado con `tools/parar-robot.sh`, los 8 pines en `lo` y `get_throttled` = `0x0`. **Falta:** el suelo
-    (pide la confirmación del usuario), más órdenes y el estado de los sensores como texto.
+  * Al final: servicio parado con `tools/parar-robot.sh`, los 8 pines en `lo` y `get_throttled` = `0x0`. **Falta:** más órdenes y el estado de los sensores como texto.
+* **En el suelo, 26/10/2026 (17:39 a 17:43; confirmación del usuario: robot en el suelo, espacio libre, cargador quitado; servicio
+  arrancado por el usuario en su terminal SSH, en primer plano, con `--real`; 7B del PC de gaming).** Diez órdenes escritas a mano.
+  El usuario: "Creo que ha ido muy bien". Según el registro de la Pi:
+  * `avanzar` 2 s a 0,45 (2,01 s) y 3 s a 0,2 (3,0 s). `avanzar` 3 s a 0,5: **parada por obstáculo a los 2,85 s** y plan cancelado.
+  * `retroceder` 2 s y 3 s: **la Pi recortó a 1 s** y lo dijo (`ajustes: segundos`). La herramienta sigue diciendo "hasta 3 s" (pendiente
+    conocido: cambiarla invalida la medida de los modelos). `girar` 0,5 s, 1 s y 3 s bien; `girar` 10 s se recortó a 3,0 s.
+  * Al terminar, Ctrl+C en el servicio: "Parada de emergencia (SIGINT): motores parados".
+  * **Lo que hace el 7B con la velocidad y los ángulos:** `adelante toda 2 segundos` dio `velocidad=0.45` (la de por defecto; con
+    `a toda velocidad` sí dio 1); `a media velocidad` dio 0,45 y no 0,5; `a poca velocidad`, 0,2. `gira a la izquierda 20 grados` dio
+    `girar(segundos=0.5)`: **el robot no mide ángulos** y el modelo adivina un tiempo. Idea para más adelante, sin medir: giros por
+    ángulo con los sensores de velocidad LM393 (cuentan los pasos de rueda) o una equivalencia de segundos a grados medida.

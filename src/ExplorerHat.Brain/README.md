@@ -59,6 +59,6 @@ python tools/probar-cerebro/probar.py
 
 ## Probado con la Pi
 
-Contra el servicio de la Pi en `--velocidad-cero` (pines reales, ruedas quietas) y en `--real` (ruedas en el aire), el 26/10/2026, con la parada por palabra y con Ctrl+C. **Falta el suelo.** Resultados en `PLAN.md`, Fase 7.
+Contra el servicio de la Pi en `--velocidad-cero` (pines reales, ruedas quietas) y en `--real` (ruedas en el aire), el 26/10/2026, con la parada por palabra y con Ctrl+C, y con el robot en el suelo. Resultados en `PLAN.md`, Fase 7.
 
 En la consola de Windows, lo que tecleas se puede mezclar con los mensajes del cerebro. Es solo de aspecto: la orden llega entera.
