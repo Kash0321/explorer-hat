@@ -20,7 +20,8 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     en la Fase 7. Ollama en el portátil tiene ahora `qwen2.5:3b`, `qwen2.5:7b`, `llama3.2:latest` (el 3B) y
     `qwen3:4b-instruct-2507-q4_K_M`. Los JSON de la primera tanda se guardaron en
     `tools/medir-llm/resultados/historial-huggingface/`.
-  * **Decisión del modelo: sigue pendiente** (entre `qwen2.5:3b` y `qwen2.5:7b`; Qwen3 no gana en nada y Llama es el peor). **Idea
+  * **Decisión del modelo: sigue pendiente** (entre `qwen2.5:3b` y `qwen2.5:7b`; Qwen3 no gana en nada y Llama es el peor). El
+    3B oficial acierta las dos órdenes de parada, pero omite `segundos` (obligatorio) en varias órdenes. **Idea
     nueva del usuario:** un PC de gaming con una RTX 3060 Ti (8 GB de VRAM) como servidor de Ollama para los portátiles del
     taller, para usar un modelo mejor sin esperar. Sin montar ni medir (ver el punto 6 de "Al retomar").
 - **Cierre de la sesión de la tarde del 25/10/2026: Fase 7, medida del LLM y servicio de órdenes hechos** (desde el PC; el robot
@@ -1843,15 +1844,21 @@ Mismo equipo, misma herramienta y mismas 24 órdenes que la tanda del 25/10/2026
   inventa `azul`; con `Tírate por la ventana` gira; pasa los números como texto (`"segundos": "300"`), por eso solo acierta 11
   de 24 valores. La plantilla oficial arregló 5 órdenes y rompió 3 (`Para.`, `Tírate por la ventana` y `¡¡PARA YA!!`) frente
   a la de Hugging Face.
-* **`qwen3:4b-instruct-2507-q4_K_M` casi igual que la tanda de unsloth** (20/24 frente a 21/24; 23/24 de válidas en las dos). Ahora
-  acierta `Para.`, pero **sigue sin llamar a la herramienta ante `¡¡PARA YA!!`** (escribe el texto `parar`) y la orden 12
-  (`Date la vuelta`) encadena tres llamadas (gira, avanza y gira). El cuadrado, 5 llamadas y 8,2 s. Ante las órdenes absurdas
-  y los 5 minutos, se niega con una frase clara (comportamiento seguro). No cabe entero en la tarjeta (72 %).
+* **`qwen3:4b-instruct-2507-q4_K_M` casi igual que la tanda de unsloth** (20/24 frente a 21/24; 23/24 de válidas en las dos).
+  `Para.` ya lo acertaba la versión de unsloth. Cambios frente a ella: **arregla** `¡Tira palante!` (orden 11) y **rompe** `Date
+  la vuelta` (orden 12: encadena tres llamadas, gira, avanza y gira) y el cuadrado (orden 18: un avance y cuatro giros, 5
+  llamadas; con unsloth lo hacía bien, en 7,6 s). **Sigue sin llamar a la herramienta ante `¡¡PARA YA!!`** (escribe el texto
+  `parar`). Ante las órdenes absurdas y los 5 minutos, se niega con una frase clara (comportamiento seguro). Tarda 8,2 s en el
+  cuadrado y no cabe entero en la tarjeta (72 %).
 * **Lectura:** la decisión sigue siendo entre `qwen2.5:3b` (rápido, con la parada por palabra fuera del modelo) y
   `qwen2.5:7b` (fiable, 3 s de mediana). Qwen3 queda en medio sin ganar en nada; Llama, descartado. **La parada depende de la
-  plantilla y del modelo:** `qwen2.5:3b` falló `Para.` con la plantilla de Hugging Face y la acierta con la oficial; `qwen3`
-  acierta `Para.` pero falla `¡¡PARA YA!!`; Llama falla las dos. Con solo dos órdenes de parada de muestra, el dato refuerza la
-  propuesta de dejar la parada fuera del modelo.
+  plantilla y del modelo:** `qwen2.5:3b` falló `Para.` con la plantilla de Hugging Face y acierta las dos órdenes de parada
+  con la oficial; `qwen3` acierta `Para.` pero falla `¡¡PARA YA!!`; Llama falla las dos. Con solo dos órdenes de parada de
+  muestra, el dato no basta para fiarse del modelo: sigue siendo razonable dejar la parada fuera de él.
+* **Para el cerebro (aviso):** `segundos` es obligatorio en `avanzar`, `retroceder` y `girar` (`herramientas.json`) y el
+  servicio de la Pi rechaza la acción sin él. `qwen2.5:3b` lo omite en varias órdenes (por ejemplo, `Avanza.` y `¡Tira
+  palante!`): el cerebro tendría que reintentar o poner un valor por defecto, o el robot no se movería. Es un fallo
+  de uso real, no solo del puntuador.
 * **Límite:** 24 órdenes escritas por la misma sesión que escribió los resultados esperados, y con temperatura 0 las
   repeticiones sirven para el tiempo, no para la variación (como en la tanda anterior).
 
@@ -1862,7 +1869,15 @@ mediana a menos de 1 s; un modelo de 14B (~9 GB) no cabe entero y parte va por l
 valores fuera de rango (los tres modelos pasan 300 y 10 segundos): el recorte de la Pi sigue siendo obligatorio.
 * **Arquitectura:** Pi (cuerpo) ← cerebro en cada portátil (C#) → HTTP → Ollama en el PC de gaming. En el cerebro solo cambia
   la URL base (`medir.py` ya la admite con `--url`). La Pi y el servicio de órdenes no cambian.
-* **En el PC de gaming** (Windows; PowerShell; el cortafuegos pide administrador):
+* **Opciones de ubicación (decide el usuario):** (A) el PC va al taller, en la misma red local: es lo que describen los pasos
+  de abajo. (B) el PC se queda en casa y los portátiles llegan por una VPN: el tráfico cruza internet, así que la regla de
+  privacidad de esta fase ("el LLM, en local") se aplica en espíritu y hay que revisarla con la organización del taller;
+  depende además de la red del taller. (C) **Nunca se abre el puerto 11434 a internet.**
+* **Respaldo en el cerebro (propuesta):** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio
+  portátil. Si el PC o la red caen, el taller sigue. Cambia el diseño del cerebro: decidir al escribirlo.
+* **Sin verificar:** los nombres y valores de las variables de entorno de Ollama, el identificador de `winget` y los tamaños
+  de `qwen3:8b` y `qwen2.5:14b`. Lo que vale es que `ollama ps` muestre `100% GPU`.
+* **En el PC de gaming** (Windows, sin confirmar; PowerShell; el cortafuegos pide administrador):
   1. `winget install Ollama.Ollama` y el controlador de NVIDIA al día.
   2. Variables de usuario: `setx OLLAMA_HOST "0.0.0.0:11434"` (escucha en la red, no solo en `localhost`), `setx
      OLLAMA_KEEP_ALIVE "-1"` (el modelo se queda en la tarjeta), `setx OLLAMA_NUM_PARALLEL "4"` (cuatro peticiones a la vez;
