@@ -16,6 +16,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ExplorerHat.BasicSample/ExplorerHat.BasicSample.csproj" />
+    <Project Path="src/ExplorerHat.Brain/ExplorerHat.Brain.csproj" />
     <Project Path="src/ExplorerHat.Common/ExplorerHat.Common.csproj" />
     <Project Path="src/ExplorerHat.LdrCheck/ExplorerHat.LdrCheck.csproj" />
     <Project Path="src/ExplorerHat.ObstacleAvoidance/ExplorerHat.ObstacleAvoidance.csproj" />

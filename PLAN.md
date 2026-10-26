@@ -380,7 +380,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      de respaldo** (con 6 clientes el 7B no varía; el 3B sí); ver "Decisión del modelo: provisional y revisable". Queda por
      medir `qwen3:8b` y `qwen2.5:14b` en esa tarjeta (hay que bajarlos con `ollama pull` en el PC); la IP del PC no está
      fijada (se pregunta cada día); el cortafuegos del PC ya está revisado y corregido (se repite tras actualizar Ollama); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
-     pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
+     pasar por el modelo (**hecho el 26/10/2026**, `src/ExplorerHat.Brain`; queda probarlo con la Pi: ver "Cerebro (26/10/2026)"); (c) más adelante, el servicio en el suelo (pedir la confirmación).
   6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
      `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
      `~/apps/ExplorerHat.Orders` en la Pi (cada carpeta lleva su copia de `Common`). **Al escribir el
@@ -1758,8 +1758,10 @@ Pasos:
       escritas a mano, sin LLM. Repetir la prueba de corte de wifi de la Fase 3.
       **Escrito y probado sin mover las ruedas el 25/10/2026** (`src/ExplorerHat.Orders`, ver "Servicio de órdenes",
       más abajo). **Pruebas con motores hechas el 25/10/2026 (7 de 7 y corte de red).** **Falta:** probarlo en el suelo y el cerebro.
-- [ ] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
-      el estado de los sensores (distancias y batería).
+- [~] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
+      el estado de los sensores (distancias y batería). **Escrito y probado sin robot el 26/10/2026**
+      (`src/ExplorerHat.Brain`, ver "Cerebro (26/10/2026)", más abajo). **Falta:** probarlo con la Pi (`--velocidad-cero` y
+      `--real` con las ruedas en el aire) y el estado de los sensores como texto (sin medir, no incluido).
 - [ ] Voz: Whisper local en el portátil (por ejemplo, whisper.cpp) con *push-to-talk*. Probar con ruido de fondo.
 - [ ] Opcional: respuesta hablada (un altavoz con amplificador propio en el conector de 3,5 mm de la Pi, o el portátil).
 - [ ] Opcional: cámara en el conector CSI de la Pi y un modelo de visión en el portátil, para que el robot "vea".
@@ -2015,3 +2017,42 @@ Resultados (sin mover las ruedas):
 * **El servicio de órdenes queda probado** (sin motores en el simulador y la Pi; con motores en el aire: sentido de las
   ruedas, recortes, `/parar`, obstáculo, Ctrl+C y corte de red). **Falta:** probarlo en el suelo (no hecho) y el cerebro en
   el portátil (C#), que reutiliza `tools/medir-llm/herramientas.json` como esquema.
+
+### Cerebro (26/10/2026)
+Código en [`src/ExplorerHat.Brain`](src/ExplorerHat.Brain/README.md) (README con el uso) y pruebas en
+[`tools/probar-cerebro`](tools/probar-cerebro/probar.py). Consola para el portátil; no se despliega en la Pi. Decisiones de
+diseño (con la consulta al asesor, que pidió las tres primeras correcciones antes de escribir código):
+* **Sin paquetes:** `HttpClient` y `System.Text.Json`, con la misma petición a `/api/chat` que midió `medir.py` (mismo mensaje de
+  sistema y mismas herramientas, leídos del mismo `tools/medir-llm/herramientas.json`, que se copia al compilar; solo la orden
+  como mensaje del usuario; temperatura 0, semilla 1, `num_ctx` 2048, **sin `keep_alive` ni `think`**). Si la petición
+  cambia, la medida de 24/24 deja de valer. (El plan hablaba de `Microsoft.Extensions.AI`: no hizo falta.)
+* **Parada por palabra, fuera del modelo.** Un hilo lee el teclado siempre. **La regla mira solo la primera palabra** (sin
+  tildes ni signos): `para`, `parar`, `stop`, `alto`, `detente`, `quieto`, `frena`, `basta`. Una regla de "mensaje corto" habría
+  dejado pasar `¡¡PARA YA!! ¡Que se cae por las escaleras!` (la orden 24, que fallan los modelos rápidos). Una parada falsa
+  (`Para la luz roja`) es segura; una que no llega, no. Orden de los hechos: se anota la parada, se manda `/parar` y se repite
+  300 ms después (una acción ya en camino empezaría después de la primera parada); el plan mira la parada antes de cada
+  acción y después de cada respuesta; las órdenes escritas antes de la parada que aún no empezaron se descartan. Ctrl+C manda
+  `/parar` antes de salir. **UTF-8 en la consola** (si no, `¡¡PARA YA!!` llega estropeado y la regla falla).
+* **Lista de servidores `--llm <url>=<modelo>`:** el primero es el principal y los demás, el respaldo. Conexión con 3 s de
+  límite y respuesta con 20 s (lo más lento medido, 8,5 s). Un servidor que falla se salta 30 s. Si ninguno responde, el robot
+  no se mueve. Un servidor inaccesible cuesta unos 3 s en la primera orden. **Dato del 26/10/2026:** con
+  `OLLAMA_MAX_LOADED_MODELS` = 1, si alguien carga otro modelo en el servidor (había un `qwen2.5-coder:14b` de otra prueba),
+  la primera petición del nuestro espera y cambia de modelo: la carga en frío del 7B tardó 10,6 s y una petición del cerebro superó los
+  20 s (no había otro servidor que la atendiera). El servidor del taller **no debe usarse para otra cosa**.
+* **Ningún dato de red en el repositorio:** URL y modelos se pasan al arrancar. La clave va en un archivo o en la variable
+  `EXPLORERHAT_CLAVE`, **nunca en la línea de comandos**, y no se escribe en pantalla.
+* **Falta `segundos`:** el servicio lo exige y `qwen2.5:3b` lo omite a veces; el cerebro pone 1 s y lo dice. Máximo 12 acciones
+  por orden. Para el plan al primer fallo (400, 401, 409, 503, sin respuesta) o si una acción termina por obstáculo, parada o
+  sensores.
+* **No incluido (a propósito):** el estado de los sensores como texto para el modelo (sin medir: cambiaría la petición medida),
+  el cambio de la descripción de `retroceder` a "hasta 1 s" (la Pi ya recorta a 1 s y lo avisa en `ajustes`; cambiar el JSON
+  invalida la medida) y `think: false` (solo hace falta con modelos que piensan, como Qwen3).
+* **Pruebas sin robot ni modelo real (`tools/probar-cerebro/probar.py`): 23 comprobaciones, todas bien.** Un Ollama falso, el
+  servicio de órdenes en `--simulado` y el cerebro real. Con dos fallos metidos a propósito (una parada que ignora los
+  mensajes largos y un plan que no mira la parada antes de cada acción) fallan 3 comprobaciones. Dos fallos de la primera
+  versión eran de la prueba, no del cerebro (una orden descartada por la parada, como se diseñó).
+* **Con el modelo real (7B del PC de gaming) contra el servicio en `--simulado`, sin pines ni ruedas:** `Avanza 2 segundos.`,
+  `¡Tira palante!`, `Retrocede.`, `Gira a la derecha un segundo.`, la orden de tres pasos (luz, avanzar, luz) y `¿Cuánto es dos
+  más dos?` (contesta "El resultado es 4." y no hace nada) salieron bien, con tildes y signos `¡¿`; `Avanza 10 segundos.` termina
+  a los 3,0 s con el aviso `el robot ajustó: segundos`; con un obstáculo simulado a 20 cm para a los 0,0 s y cancela el plan; en
+  el cuadrado, `PARA` a los 4,5 s corta la acción en curso y cancela el resto. **Falta probarlo con la Pi.**
