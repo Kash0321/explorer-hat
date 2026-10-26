@@ -79,24 +79,37 @@ Debe aparecer `0.0.0.0:11434` en estado `LISTENING`. Si aparece `127.0.0.1:11434
 
 1. Mira el nombre y la categoría de tu red: `Get-NetConnectionProfile`. Debe ser **Private**. Si dice `Public`, la regla de
    abajo no vale (`-Profile Private`): cámbiala con `Set-NetConnectionProfile -InterfaceAlias "<nombre>" -NetworkCategory Private`.
-2. Crea la regla. **Cambia el rango `192.168.0.0/24` por el de la red del taller** (por ejemplo, `192.168.1.0/24`):
+2. **Desactiva las reglas automáticas de Windows.** Al arrancar Ollama por primera vez, Windows pregunta si lo deja pasar y,
+   si aceptas, crea **dos reglas `ollama.exe`** (el 26/10/2026 existían: `Perfil` = `Private`, `Remota` = `Any`, `Puerto` =
+   `Any`). Dejan pasar a **cualquier equipo** de la red. Desactívalas (no las borres: así se pueden volver a activar):
 
 ```powershell
-New-NetFirewallRule -DisplayName "Ollama taller" -Direction Inbound -Protocol TCP -LocalPort 11434 -Action Allow -Profile Private -RemoteAddress 192.168.0.0/24
+Disable-NetFirewallRule -DisplayName "ollama.exe"
 ```
+
+3. Crea la regla propia. **`LocalSubnet`** quiere decir "la red local a la que está conectado el PC", así que vale en cualquier
+   taller sin cambiar nada. (Con un rango fijo, como `-RemoteAddress 192.168.0.0/24`, hay que cambiarlo en cada red.)
+
+```powershell
+New-NetFirewallRule -DisplayName "Ollama taller" -Direction Inbound -Protocol TCP -LocalPort 11434 -Action Allow -Profile Private -RemoteAddress LocalSubnet
+```
+
+4. Comprueba desde otro equipo de la red que sigue respondiendo (`Invoke-RestMethod http://<ip>:11434/api/version`). Si no,
+   reactiva las reglas con `Enable-NetFirewallRule -DisplayName "ollama.exe"` y revisa la categoría de la red (punto 1).
 
 #### Revisar el cortafuegos (sin administrador)
 
-Un puerto abierto no prueba que la regla esté limitada a la red del taller. Si al instalar Ollama aceptaste el aviso de
-Windows, puede haber **otra regla que abra el puerto a todos**. Ejecuta esto y revisa el resultado:
+Un puerto abierto no prueba que la regla esté limitada a la red del taller (el 26/10/2026 no lo estaba: ver el paso 4).
+Repite esta revisión **después de actualizar Ollama**, porque Windows puede crear otra vez las reglas automáticas.
+Ejecuta esto y revisa el resultado:
 
 ```powershell
 Get-NetFirewallRule | Where-Object { $_.DisplayName -like '*ollama*' -and $_.Enabled -eq 'True' -and $_.Direction -eq 'Inbound' } | ForEach-Object { [pscustomobject]@{ Nombre=$_.DisplayName; Perfil=$_.Profile; Remota=($_ | Get-NetFirewallAddressFilter).RemoteAddress; Puerto=($_ | Get-NetFirewallPortFilter).LocalPort; Programa=($_ | Get-NetFirewallApplicationFilter).Program } }
 ```
 
-Lo esperado es **solo** la regla `Ollama taller`, con `Perfil` = `Private` y `Remota` = la red del taller. Cualquier otra
-regla de Ollama con `Remota` = `Any` o `Perfil` = `Public` o `Any` hay que desactivarla (con administrador:
-`Disable-NetFirewallRule -DisplayName "<nombre>"`).
+Lo esperado es **solo** la regla `Ollama taller`, con `Perfil` = `Private`, `Puerto` = `11434` y `Remota` = `LocalSubnet` (o el
+rango del taller). Cualquier otra regla de Ollama con `Remota` = `Any` o `Perfil` = `Public` o `Any` hay que desactivarla (con
+administrador: `Disable-NetFirewallRule -DisplayName "<nombre>"`).
 
 ### 5. Fijar la IP del PC
 
@@ -197,4 +210,5 @@ Anota aquí lo que pase al montarlo (fecha, comando, resultado, errores) y copia
 | 26/10/2026 | El usuario configura Ollama en el PC (según su mensaje: Ollama configurado; **no dijo si creó la regla del cortafuegos: sin comprobar**) y descarga `qwen2.5:3b` y `qwen2.5:7b` | `ollama list` muestra los dos. `ollama ps`: `qwen2.5:7b`, 5,9 GB, `100% GPU`, contexto 4096, `UNTIL` = `Forever`, ejecutor `llamacpp` |
 | 26/10/2026 | Comprobación desde el portátil (IP del día: 192.168.0.241, **sin reservar**) | `Test-NetConnection` al puerto 11434: `True`. `/api/version`: 0.40.11. `/api/tags` y `/api/ps` correctos. El ping no responde (Windows bloquea el ICMP: es normal) |
 | 26/10/2026 | `medir.py` con 1 y con 6 clientes (`--paralelo 6`), 7B y 3B | Sin errores. Resultados en `PLAN.md` (Fase 7) y en `tools/medir-llm/resultados/gaming3060ti_*.json`. 7B: 0,44 s de mediana con 1 cliente y 0,97 s con 6 |
+| 26/10/2026 | Revisión de las reglas del cortafuegos (el usuario ejecuta el comando de "Revisar el cortafuegos") | **No existía la regla `Ollama taller`.** Solo había dos reglas automáticas `ollama.exe`: `Perfil` = `Private`, `Remota` = `Any`, `Puerto` = `Any`. Es decir, el puerto estaba abierto a cualquier equipo de una red marcada como Privada. Pendiente: desactivarlas y crear la regla con `LocalSubnet` (paso 4) |
 | | | |

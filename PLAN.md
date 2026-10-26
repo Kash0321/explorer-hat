@@ -1884,11 +1884,13 @@ taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-
   la URL base. **Respaldo propuesto:** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio
   portátil; decidir al escribir el cerebro.
 * **Verificado el 26/10/2026:** el puerto 11434 responde desde otro equipo de la red (`OLLAMA_HOST` vale), el modelo se
-  queda cargado (`UNTIL` = `Forever`) y `ollama ps` marca `100% GPU`. **Sin comprobar:** que el cortafuegos esté limitado
-  a la red del taller y al perfil Privado (un puerto abierto no lo prueba; si se aceptó el aviso de Windows para
-  `ollama.exe`, puede haber otra regla que abra a todos), el identificador de `winget` y los tamaños de `qwen3:8b` y
-  `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por rango de IP es obligatorio (comando de
-  revisión en `docs/servidor-modelos-pc-gaming.md`). **La IP del PC no está fijada** (era 192.168.0.241 el 26/10/2026 y
+  queda cargado (`UNTIL` = `Forever`) y `ollama ps` marca `100% GPU`. **Cortafuegos, revisado el mismo día: no estaba
+  limitado.** No existía la regla propia: solo las dos reglas automáticas de Windows para `ollama.exe` (`Private`, `Remota` =
+  `Any`, `Puerto` = `Any`), que dejan pasar a cualquier equipo de la red. **Pendiente (lo hace el usuario, con
+  administrador):** desactivarlas y crear la regla con `-RemoteAddress LocalSubnet` (paso 4 del documento), y repetir la
+  revisión; Windows puede recrear las automáticas al actualizar Ollama. **Sin comprobar:** el identificador de `winget` y los
+  tamaños de `qwen3:8b` y `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por red local es
+  obligatorio. **La IP del PC no está fijada** (era 192.168.0.241 el 26/10/2026 y
   puede cambiar: el cerebro la lleva como ajuste, no escrita en el código).
 * **Estado:** **montado y medido el 26/10/2026** (lo montó el usuario; las medidas las hizo el asistente desde el portátil).
   Registro en `docs/servidor-modelos-pc-gaming.md`.
