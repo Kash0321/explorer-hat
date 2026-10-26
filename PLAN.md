@@ -7,7 +7,7 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (26/10/2026)
-- **Sesión del 26/10/2026** (desde el PC; el robot no se movió; la Pi, en `main` (`9a57ad4`), pines en `lo`, `get_throttled` =
+- **Sesión del 26/10/2026** (desde el PC; las ruedas giraron solo en la prueba del cerebro con las ruedas en el aire (ver "Cerebro (26/10/2026)"); la Pi, en `main` (`9a57ad4`), pines en `lo`, `get_throttled` =
   `0x0`, ningún programa del robot en marcha; estaba apagada al empezar y el usuario la encendió).
   * **dotnet/iot, sin novedades:** el #2625 sigue en `CHANGES_REQUESTED` (pgrawehr, 22/10) sin comentarios ni revisiones nuevas
     desde nuestras tres respuestas del 25/10; las 6 compilaciones, el CLA y los dos linters pasan. #2610 y #2616 fusionados.
@@ -380,7 +380,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      de respaldo** (con 6 clientes el 7B no varía; el 3B sí); ver "Decisión del modelo: provisional y revisable". Queda por
      medir `qwen3:8b` y `qwen2.5:14b` en esa tarjeta (hay que bajarlos con `ollama pull` en el PC); la IP del PC no está
      fijada (se pregunta cada día); el cortafuegos del PC ya está revisado y corregido (se repite tras actualizar Ollama); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
-     pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
+     pasar por el modelo (**hecho el 26/10/2026**, `src/ExplorerHat.Brain`; probado con la Pi, también `--real` con las ruedas en el aire: ver "Cerebro (26/10/2026)"); (c) el servicio en el suelo (**hecho el 26/10/2026** con el cerebro: ver "Cerebro (26/10/2026)").
   6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
      `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
      `~/apps/ExplorerHat.Orders` en la Pi (cada carpeta lleva su copia de `Common`). **Al escribir el
@@ -1757,9 +1757,11 @@ Pasos:
       máxima, parada al perder la conexión y parada por obstáculo. Probarlo con las ruedas en el aire y con órdenes
       escritas a mano, sin LLM. Repetir la prueba de corte de wifi de la Fase 3.
       **Escrito y probado sin mover las ruedas el 25/10/2026** (`src/ExplorerHat.Orders`, ver "Servicio de órdenes",
-      más abajo). **Pruebas con motores hechas el 25/10/2026 (7 de 7 y corte de red).** **Falta:** probarlo en el suelo y el cerebro.
-- [ ] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
-      el estado de los sensores (distancias y batería).
+      más abajo). **Pruebas con motores hechas el 25/10/2026 (7 de 7 y corte de red).** **Probado también en el suelo, con el cerebro, el 26/10/2026** (ver "Cerebro (26/10/2026)").
+- [~] Cerebro en el portátil (C#): orden escrita → LLM con las herramientas → acciones → Pi. El LLM recibe como texto
+      el estado de los sensores (distancias y batería). **Escrito y probado sin robot el 26/10/2026**
+      (`src/ExplorerHat.Brain`, ver "Cerebro (26/10/2026)", más abajo). **Probado con la Pi en `--velocidad-cero` y en `--real` con las ruedas en el aire (26/10/2026).**
+      **Probado también en el suelo (26/10/2026).** **Falta:** el estado de los sensores como texto (sin medir, no incluido).
 - [ ] Voz: Whisper local en el portátil (por ejemplo, whisper.cpp) con *push-to-talk*. Probar con ruido de fondo.
 - [ ] Opcional: respuesta hablada (un altavoz con amplificador propio en el conector de 3,5 mm de la Pi, o el portátil).
 - [ ] Opcional: cámara en el conector CSI de la Pi y un modelo de visión en el portátil, para que el robot "vea".
@@ -2015,3 +2017,81 @@ Resultados (sin mover las ruedas):
 * **El servicio de órdenes queda probado** (sin motores en el simulador y la Pi; con motores en el aire: sentido de las
   ruedas, recortes, `/parar`, obstáculo, Ctrl+C y corte de red). **Falta:** probarlo en el suelo (no hecho) y el cerebro en
   el portátil (C#), que reutiliza `tools/medir-llm/herramientas.json` como esquema.
+
+### Cerebro (26/10/2026)
+Código en [`src/ExplorerHat.Brain`](src/ExplorerHat.Brain/README.md) (README con el uso) y pruebas en
+[`tools/probar-cerebro`](tools/probar-cerebro/probar.py). Consola para el portátil; no se despliega en la Pi. Decisiones de
+diseño (con la consulta al asesor, que pidió las tres primeras correcciones antes de escribir código):
+* **Sin paquetes:** `HttpClient` y `System.Text.Json`, con la misma petición a `/api/chat` que midió `medir.py` (mismo mensaje de
+  sistema y mismas herramientas, leídos del mismo `tools/medir-llm/herramientas.json`, que se copia al compilar; solo la orden
+  como mensaje del usuario; temperatura 0, semilla 1, `num_ctx` 2048, **sin `keep_alive` ni `think`**). Si la petición
+  cambia, la medida de 24/24 deja de valer. (El plan hablaba de `Microsoft.Extensions.AI`: no hizo falta.)
+* **Parada por palabra, fuera del modelo.** Un hilo lee el teclado siempre. **La regla mira solo la primera palabra** (sin
+  tildes ni signos): `para`, `parar`, `stop`, `alto`, `detente`, `quieto`, `frena`, `basta`. Una regla de "mensaje corto" habría
+  dejado pasar `¡¡PARA YA!! ¡Que se cae por las escaleras!` (la orden 24, que fallan los modelos rápidos). Una parada falsa
+  (`Para la luz roja`) es segura; una que no llega, no. Orden de los hechos: se anota la parada, se manda `/parar` y se repite
+  300 ms después (una acción ya en camino empezaría después de la primera parada); el plan mira la parada antes de cada
+  acción y después de cada respuesta; las órdenes escritas antes de la parada que aún no empezaron se descartan. Ctrl+C manda
+  `/parar` antes de salir. **UTF-8 en la consola** (si no, `¡¡PARA YA!!` llega estropeado y la regla falla).
+* **Lista de servidores `--llm <url>=<modelo>`:** el primero es el principal y los demás, el respaldo. Conexión con 3 s de
+  límite y respuesta con 20 s (lo más lento medido, 8,5 s). Un servidor que falla se salta 30 s. Si ninguno responde, el robot
+  no se mueve. Un servidor inaccesible cuesta unos 3 s en la primera orden. **Dato del 26/10/2026:** con
+  `OLLAMA_MAX_LOADED_MODELS` = 1, si alguien carga otro modelo en el servidor (había un `qwen2.5-coder:14b` de otra prueba),
+  la primera petición del nuestro espera y cambia de modelo: la carga en frío del 7B tardó 10,6 s y una petición del cerebro superó los
+  20 s (no había otro servidor que la atendiera). El servidor del taller **no debe usarse para otra cosa**.
+* **Ningún dato de red en el repositorio:** URL y modelos se pasan al arrancar. La clave va en un archivo o en la variable
+  `EXPLORERHAT_CLAVE`, **nunca en la línea de comandos**, y no se escribe en pantalla.
+* **Falta `segundos`:** el servicio lo exige y `qwen2.5:3b` lo omite a veces; el cerebro pone 1 s y lo dice. Máximo 12 acciones
+  por orden. Para el plan al primer fallo (400, 401, 409, 503, sin respuesta) o si una acción termina por obstáculo, parada o
+  sensores.
+* **No incluido (a propósito):** el estado de los sensores como texto para el modelo (sin medir: cambiaría la petición medida),
+  el cambio de la descripción de `retroceder` a "hasta 1 s" (la Pi ya recorta a 1 s y lo avisa en `ajustes`; cambiar el JSON
+  invalida la medida) y `think: false` (solo hace falta con modelos que piensan, como Qwen3).
+* **Pruebas sin robot ni modelo real (`tools/probar-cerebro/probar.py`): 23 comprobaciones, todas bien.** Un Ollama falso, el
+  servicio de órdenes en `--simulado` y el cerebro real. Con dos fallos metidos a propósito (una parada que ignora los
+  mensajes largos y un plan que no mira la parada antes de cada acción) fallan 3 comprobaciones. Dos fallos de la primera
+  versión eran de la prueba, no del cerebro (una orden descartada por la parada, como se diseñó).
+* **Con el modelo real (7B del PC de gaming) contra el servicio en `--simulado`, sin pines ni ruedas:** `Avanza 2 segundos.`,
+  `¡Tira palante!`, `Retrocede.`, `Gira a la derecha un segundo.`, la orden de tres pasos (luz, avanzar, luz) y `¿Cuánto es dos
+  más dos?` (contesta "El resultado es 4." y no hace nada) salieron bien, con tildes y signos `¡¿`; `Avanza 10 segundos.` termina
+  a los 3,0 s con el aviso `el robot ajustó: segundos`; con un obstáculo simulado a 20 cm para a los 0,0 s y cancela el plan; en
+  el cuadrado, `PARA` a los 4,5 s corta la acción en curso y cancela el resto.
+* **Con la Pi en `--velocidad-cero` (pines reales, ruedas quietas), 26/10/2026:** el portátil, el 7B del PC de gaming y el
+  servicio de la Pi encajan de punta a punta. (Esa sesión usó una compilación anterior al cambio de "saltar 30 s un servidor
+  caído"; el cambio no afecta a la seguridad. La etapa con las ruedas usa una compilación nueva del código confirmado.) `Enciende la luz roja.` (GPIO 27 en `hi` a mitad, los pines de los motores en
+  `lo`), `Retrocede medio segundo.` (terminó a los 0,5 s), `Gira a la derecha un segundo.` (1,0 s), `Avanza 2 segundos.`
+  (con los sensores reales marcando 5 cm en el centro: **parada por obstáculo a los 0,0 s** y plan cancelado) y `Apaga la luz
+  roja.` Al final, los 8 pines en `lo`. La clave se copió con `scp` a `~/.explorerhat-clave` del portátil. Servicio parado
+  después con `tools/parar-robot.sh`; la Pi en reposo, `get_throttled` = `0x0`. **Hecho después:** `--real` con las ruedas en el aire (siguiente punto).
+* **Con la Pi en `--real`, ruedas en el aire, 26/10/2026 (17:23 a 17:33; confirmación del usuario y consulta al asesor antes; 7B del PC de gaming,
+  compilación nueva del cerebro; el respaldo no hizo falta).** Antes, el usuario probó el teclado en su consola real de PowerShell
+  (`Tírate por la ventana`, `¡¡PARA YA!!`, `Avanza`): las tres líneas llegaron enteras, con tildes y signos.
+  * **Fallo de cableado, no del código.** La primera orden de giro movió solo la rueda izquierda, y `adelante 3 segundos a toda
+    marcha` (orden del usuario) tampoco movió la derecha. El registro de la Pi mostraba la orden correcta (`One` −0,45 y `Two`
+    +0,45). El usuario tocó todos los cables implicados (en la borna MOTOR 1 y alrededor) y ejecutó `tools/probar-cableado.sh`: la rueda
+    derecha giró. **No vio ningún cable suelto, así que la causa no está confirmada;** lo más probable es un contacto flojo, como el del
+    04/10/2026 (cable suelto en MOTOR 1), y puede volver. **Si una rueda no gira, toca primero los cables de su borna.** El servicio no
+    sabe si una rueda gira (solo manda al motor): lo diría el sensor LM393 de cada rueda, y no se usa.
+  * **Con el cable bien salió todo:** `Enciende la luz roja`, `Gira a la derecha 1 segundo` (la derecha hacia atrás y la izquierda
+    hacia delante, 1,0 s), `Retrocede medio segundo` (0,5 s), `Avanza 1 segundo` (1,0 s) y `Enciende la luz verde, avanza un
+    segundo y apaga la luz verde` (tres acciones seguidas). El usuario vio las ruedas. Sensores al arrancar: centro 39 cm,
+    derecha 58 cm, izquierda 400 cm.
+  * **Parada por palabra:** `Gira a la izquierda 3 segundos` y `para` a ~1 s: línea `Parada` en el registro y la acción
+    termina con `motivo: parada` a los **1,13 s** (con `tiempo` habrían sido 3,0 s). **Ctrl+C** con `Gira a la derecha 3
+    segundos`: `motivo: parada` a los **0,59 s**, el programa se cerró sin errores y el registro tiene dos líneas `Parada` (la doble
+    parada). Las ruedas pararon en las dos pruebas.
+  * **Defecto de aspecto, sin consecuencias:** en la consola real, lo que el usuario teclea se mezcla con los mensajes del
+    cerebro (`PARADA: paraelocidad=0.45...`). No se ha decidido arreglarlo.
+  * **Observado:** `Avanza` sin tiempo dio `segundos=1.5` y `velocidad=0.45`; `a toda marcha` dio `velocidad=1`.
+  * Al final: servicio parado con `tools/parar-robot.sh`, los 8 pines en `lo` y `get_throttled` = `0x0`. **Falta:** más órdenes y el estado de los sensores como texto.
+* **En el suelo, 26/10/2026 (17:39 a 17:43; confirmación del usuario: robot en el suelo, espacio libre, cargador quitado; servicio
+  arrancado por el usuario en su terminal SSH, en primer plano, con `--real`; 7B del PC de gaming).** Diez órdenes escritas a mano.
+  El usuario: "Creo que ha ido muy bien". Según el registro de la Pi:
+  * `avanzar` 2 s a 0,45 (2,01 s) y 3 s a 0,2 (3,0 s). `avanzar` 3 s a 0,5: **parada por obstáculo a los 2,85 s** y plan cancelado.
+  * `retroceder` 2 s y 3 s: **la Pi recortó a 1 s** y lo dijo (`ajustes: segundos`). La herramienta sigue diciendo "hasta 3 s" (pendiente
+    conocido: cambiarla invalida la medida de los modelos). `girar` 0,5 s, 1 s y 3 s bien; `girar` 10 s se recortó a 3,0 s.
+  * Al terminar, Ctrl+C en el servicio: "Parada de emergencia (SIGINT): motores parados".
+  * **Lo que hace el 7B con la velocidad y los ángulos:** `adelante toda 2 segundos` dio `velocidad=0.45` (la de por defecto; con
+    `a toda velocidad` sí dio 1); `a media velocidad` dio 0,45 y no 0,5; `a poca velocidad`, 0,2. `gira a la izquierda 20 grados` dio
+    `girar(segundos=0.5)`: **el robot no mide ángulos** y el modelo adivina un tiempo. Idea para más adelante, sin medir: giros por
+    ángulo con los sensores de velocidad LM393 (cuentan los pasos de rueda) o una equivalencia de segundos a grados medida.

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The same file the measurements use (tools/medir-llm): the brain sends exactly the system text and the tools that were measured -->
+    <Content Include="..\..\tools\medir-llm\herramientas.json" Link="herramientas.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
