@@ -1,9 +1,10 @@
 # Servidor de modelos en un PC de gaming (Fase 7)
 
 Cómo montar un PC de gaming con una **RTX 3060 Ti (8 GB de VRAM)** como servidor de Ollama para los portátiles del taller.
-Estado: **propuesta del 26/10/2026, sin montar**. Los nombres de las variables de Ollama, el identificador de `winget` y los
-tamaños de los modelos **no se han verificado**: si algo falla, anota el error en el apartado "Registro del montaje" y se
-corrige este documento.
+Estado: **montado y medido el 26/10/2026** (ver "Registro del montaje" y los resultados en `PLAN.md`, Fase 7). Las variables
+de Ollama, el cortafuegos y el acceso desde otro equipo funcionaron. **Sin verificar:** el identificador de `winget` y los
+tamaños de `qwen3:8b` y `qwen2.5:14b`. Si algo falla, anota el error en el apartado "Registro del montaje" y se corrige este
+documento.
 
 Decisiones del usuario (26/10/2026): el PC **va al taller**, en la misma red local que los portátiles y las Pi; usa
 **Windows**; trabajan **entre 4 y 6 portátiles y robots a la vez**.
@@ -11,7 +12,8 @@ Decisiones del usuario (26/10/2026): el PC **va al taller**, en la misma red loc
 ## Para qué sirve
 
 * El portátil de pruebas (RTX 3050 Ti, 4 GB) no deja `qwen2.5:7b` entero en la tarjeta: va un 45 % en la tarjeta y tarda 3 s
-  de mediana. Con 8 GB, el 7B (unos 4,7 GB) **debería caber entero** y bajar de 1 s. **Es una previsión, sin medir.**
+  de mediana. Con 8 GB, el 7B (unos 4,7 GB) **cabe entero**: **medido el 26/10/2026, 0,44 s de mediana con un cliente y 0,97 s
+  con seis a la vez** (tabla en `PLAN.md`, Fase 7).
 * Un modelo de 14B (unos 9 GB) no cabe entero: parte va por la CPU y será más lento.
 * Un modelo mayor **no arregla** los valores fuera de rango (todos los modelos pasan 300 y 10 segundos): el recorte de la Pi
   sigue siendo obligatorio.
@@ -179,4 +181,7 @@ Anota aquí lo que pase al montarlo (fecha, comando, resultado, errores) y copia
 
 | Fecha | Paso | Resultado |
 |---|---|---|
+| 26/10/2026 | El usuario configura Ollama en el PC (variables, reinicio, cortafuegos) y descarga `qwen2.5:3b` y `qwen2.5:7b` | `ollama list` muestra los dos. `ollama ps`: `qwen2.5:7b`, 5,9 GB, `100% GPU`, contexto 4096, `UNTIL` = `Forever`, ejecutor `llamacpp` |
+| 26/10/2026 | Comprobación desde el portátil (IP del día: 192.168.0.241, **sin reservar**) | `Test-NetConnection` al puerto 11434: `True`. `/api/version`: 0.40.11. `/api/tags` y `/api/ps` correctos. El ping no responde (Windows bloquea el ICMP: es normal) |
+| 26/10/2026 | `medir.py` con 1 y con 6 clientes (`--paralelo 6`), 7B y 3B | Sin errores. Resultados en `PLAN.md` (Fase 7) y en `tools/medir-llm/resultados/gaming3060ti_*.json`. 7B: 0,44 s de mediana con 1 cliente y 0,97 s con 6 |
 | | | |
