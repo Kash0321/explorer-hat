@@ -15,9 +15,13 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     `--velocidad-cero`, `--real` con las ruedas en el aire (parada por palabra a 1,13 s y Ctrl+C a 0,59 s) y el suelo (diez órdenes,
     parada por obstáculo a 2,85 s). Detalle en "Cerebro (26/10/2026)", Fase 7.
   * **Cómo arrancarlo (receta; el README del cerebro la explica):** en la Pi, en una terminal SSH y en primer plano,
-    `cd ~/apps/ExplorerHat.Orders && dotnet ExplorerHat.Orders.dll --real` (Ctrl+C la para). En el portátil, `dotnet run --project
-    src/ExplorerHat.Brain -- --llm http://<ip del PC de gaming>:11434=qwen2.5:7b --robot http://<ip de la Pi>:5000`. Las IP
-    cambian: se preguntan cada día y no se anotan. La clave está en `~/.explorerhat-clave` del portátil (copiada con `scp`; no se
+    `cd ~/apps/ExplorerHat.Orders && dotnet ExplorerHat.Orders.dll --real` (Ctrl+C la para). En el portátil, **compila y ejecuta la
+    DLL** (es lo que se probó, incluidos el UTF-8, la parada por palabra y Ctrl+C): `dotnet build
+    src/ExplorerHat.Brain/ExplorerHat.Brain.csproj -o $HOME/explorerhat-cerebro` y después `dotnet
+    $HOME\explorerhat-cerebro\ExplorerHat.Brain.dll --llm http://<ip del PC de gaming>:11434=qwen2.5:7b --robot http://<ip de la
+    Pi>:5000`. **Vuelve a compilar después de cualquier cambio de código.** No uses `dotnet run` para mover el robot: Ctrl+C llega
+    también al proceso de `dotnet run` y no se comprobó que el cerebro mande su doble parada antes de que lo cierre; sirve para
+    `--solo-mostrar`. Las IP cambian: se preguntan cada día y no se anotan. La clave está en `~/.explorerhat-clave` del portátil (copiada con `scp`; no se
     sube). En el servidor, ningún otro modelo cargado (`OLLAMA_MAX_LOADED_MODELS` = 1). **Antes de poner el robot en el suelo:** el
     usuario confirma con palabras (robot en el suelo, espacio libre, cargador de la UPS quitado, terminal abierta).
   * **Siguiente, en el orden recomendado:**

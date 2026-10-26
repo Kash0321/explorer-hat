@@ -82,7 +82,7 @@ Esta variante es para la sesión que sigue a la del 26/10/2026. Ese día se mont
 **Antes de pegarla:**
 
 1. **Todo está fusionado** (PR #63 a #68): empieza en `main` y al día (`git pull`), en el PC y en la Pi.
-2. Redespliega `~/apps/ExplorerHat.Orders` solo si cambia su código o el de `Common`. El cerebro corre en el portátil y no se despliega.
+2. Redespliega `~/apps/ExplorerHat.Orders` solo si cambia su código o el de `Common`. El cerebro corre en el portátil y no se despliega: se compila con `dotnet build src/ExplorerHat.Brain/ExplorerHat.Brain.csproj -o $HOME/explorerhat-cerebro` y se ejecuta la DLL (receta en el README del cerebro). Compílalo otra vez si el código cambió.
 3. **El servidor de modelos** es un PC de gaming con una RTX 3060 Ti (pasos y registro en [`servidor-modelos-pc-gaming.md`](servidor-modelos-pc-gaming.md)). Su IP no está fijada y no se anota en el repositorio: pregunta cuál es el día que se use. Con `OLLAMA_MAX_LOADED_MODELS` = 1, no cargues otro modelo en él durante las pruebas. El modelo es provisional: `qwen2.5:7b` en el servidor, con el `qwen2.5:3b` local de respaldo (`PLAN.md`, "Decisión del modelo: provisional y revisable").
 4. **La clave del robot** está en `~/.explorerhat-clave` del portátil (copiada con `scp` desde la Pi). Si falta, vuelve a copiarla; no la subas ni la escribas en pantalla.
 5. Si la sesión va a mover el robot: la Pi encendida y con wifi, la UPS cargada y una terminal SSH abierta en la Pi. **Primero, con las ruedas en el aire**, y comprueba que giran las dos (la derecha falló el 26/10/2026). El suelo se pide aparte, con confirmación: robot en el suelo, espacio libre, cargador de la UPS quitado y terminal abierta.
