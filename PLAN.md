@@ -6,7 +6,26 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (25/10/2026)
+## Estado actual (26/10/2026)
+- **Sesión del 26/10/2026** (desde el PC; el robot no se movió; la Pi, en `main` (`9a57ad4`), pines en `lo`, `get_throttled` =
+  `0x0`, ningún programa del robot en marcha; estaba apagada al empezar y el usuario la encendió).
+  * **dotnet/iot, sin novedades:** el #2625 sigue en `CHANGES_REQUESTED` (pgrawehr, 22/10) sin comentarios ni revisiones nuevas
+    desde nuestras tres respuestas del 25/10; las 6 compilaciones, el CLA y los dos linters pasan. #2610 y #2616 fusionados.
+    Incidencias #2614, #2615 y #2617 sin comentarios nuevos. `upstream/main` en `41086078` (solo añade el binding Bmp3xx,
+    #2627). Clon `C:\work\iot` en `explorerhat-io` (`c4119033`), limpio.
+  * **Modelos de la biblioteca de Ollama.** El usuario pudo hacer `ollama pull` de los modelos oficiales (no sabemos si
+    cambió la red o si el bloqueo era otro). Las descargas incompletas de la víspera (~8 GB) se reanudaron y terminaron:
+    **no queda ningún `*-partial`**. Se **borraron los cinco modelos de Hugging Face** (`ollama rm`) y se midieron los
+    cuatro modelos oficiales con la misma herramienta: ver "Medida con los modelos de la biblioteca de Ollama (26/10/2026)",
+    en la Fase 7. Ollama en el portátil tiene ahora `qwen2.5:3b`, `qwen2.5:7b`, `llama3.2:latest` (el 3B) y
+    `qwen3:4b-instruct-2507-q4_K_M`. Los JSON de la primera tanda se guardaron en
+    `tools/medir-llm/resultados/historial-huggingface/`.
+  * **Decisión del modelo: sigue pendiente** (entre `qwen2.5:3b` y `qwen2.5:7b`; Qwen3 no gana en nada y Llama es el peor). El
+    3B oficial acierta las dos órdenes de parada, pero omite `segundos` (obligatorio) en varias órdenes. **Idea
+    nueva del usuario:** un PC de gaming con una RTX 3060 Ti (8 GB de VRAM) como servidor de Ollama para los portátiles del
+    taller, para usar un modelo mejor sin esperar. Sin montar ni medir: pasos en
+    [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md) (el usuario lo montará cuando pueda; ver el
+    punto 6 de "Al retomar"). `medir.py` tiene ya `--paralelo N` para medir con 4 a 6 portátiles a la vez.
 - **Cierre de la sesión de la tarde del 25/10/2026: Fase 7, medida del LLM y servicio de órdenes hechos** (desde el PC; el robot
   solo se movió en las pruebas con las ruedas en el aire, con la confirmación del usuario).
   * **PR #63 (medida del LLM) y #64 (servicio de órdenes) fusionados** (`ed66d71` en `main`, 25/10/2026); las ramas
@@ -20,10 +39,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     decidido por el usuario. Probado sin mover las ruedas (29 casos en el PC, 23 en la Pi, 4 de 4 en obstáculos con los sensores
     reales, señales y códigos de salida) y con las ruedas en el aire (7 de 7, incluido el Ctrl+C, y el corte de red: el robot se
     para solo a los 3 s). **No se probó en el suelo.**
-  * **Portátil:** controlador NVIDIA 621.01; Ollama 0.40.11 con cinco modelos (los de Hugging Face; **la red a la que estaba
-    conectado el portátil, por cable y con o sin VPN, bloquea el servidor de archivos de Ollama**, `*.r2.cloudflarestorage.com`;
-    ver el README de `tools/medir-llm`). Quedan ~8 GB de descargas incompletas (`*-partial`) en `~\.ollama\models\blobs`, que
-    sirven para reanudar `ollama pull` desde otra red.
+  * **Portátil (25/10/2026, ya superado: ver la sesión del 26/10/2026, arriba):** controlador NVIDIA 621.01; Ollama 0.40.11 con
+    cinco modelos de Hugging Face, porque la red a la que estaba conectado el portátil (por cable y con o sin VPN) bloqueaba el
+    servidor de archivos de Ollama (`*.r2.cloudflarestorage.com`).
   * **Pi:** actualizada a `main` en `ed66d71` (con el #63 y el #64) con `git pull --ff-only`, y `~/apps/tools-orders` borrada:
     su `tools/parar-robot.sh` y su `tools/vigilar-pines.sh` ya conocen `Orders`. En reposo: 8 pines en `lo`, `get_throttled` =
     `0x0`, ningún programa del robot en marcha. Tiene desplegado `~/apps/ExplorerHat.Orders` (compilación Release del
@@ -351,8 +369,11 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      revisen el #2625, para no tener tres ramas abiertas a la vez.
   6. **Fase 7. La medida del LLM y el servicio de órdenes están hechos (25/10/2026, ver "Medida del 25/10/2026" y "Servicio
      de órdenes" en la Fase 7), con las pruebas con motores en el aire (7 de 7 y corte de red).** Siguiente: (a) decidir con
-     el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s) y
-     si se prueba la API de reserva; (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
+     el usuario el modelo (`qwen2.5:3b`, rápido pero con la parada fuera del modelo, o `qwen2.5:7b`, fiable pero de 3 s; datos
+     de los modelos oficiales en "Medida con los modelos de la biblioteca de Ollama (26/10/2026)"), si se prueba la API de
+     reserva y **cómo va el PC de gaming con la RTX 3060 Ti como servidor** (el usuario lo monta con
+     [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md): revisar su "Registro del montaje" y medir con
+     `--url` y `--paralelo 6`; con él, `qwen2.5:7b` cabría entero en la tarjeta); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
      pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
   6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
      `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
@@ -1745,6 +1766,11 @@ Pasos:
       código del monitor, no de los niños.
 
 ### Medida del 25/10/2026 (MSI Prestige 15 A12UD, RTX 3050 Ti de 4 GB, controlador 621.01, enchufado)
+**Historial: primera tanda, con modelos de Hugging Face.** Los modelos oficiales de la biblioteca de Ollama se midieron el
+26/10/2026 (apartado siguiente) y **sus datos son los que valen**: la plantilla del GGUF de Hugging Face cambia los
+resultados (por ejemplo, `qwen2.5:3b` acierta `Para.` con la plantilla oficial y no con la de Hugging Face). Los JSON de esta
+tanda están en `tools/medir-llm/resultados/historial-huggingface/`.
+
 Herramienta: [`tools/medir-llm/`](tools/medir-llm/README.md). 24 órdenes (simples, con números, en lenguaje de niño, de varios
 pasos, fuera de rango, absurdas o peligrosas, y una urgente) con el resultado esperado escrito **antes** de medir; cada
 orden 3 veces, temperatura 0, semilla 1, `num_ctx` 2048, Ollama 0.40.11. Esquema de cinco herramientas:
@@ -1764,10 +1790,10 @@ El Qwen3 4B se midió en una segunda tanda, el mismo día. Con el GGUF de bartow
 `thinking` o como texto (solo se interpretaba una de dos): el mismo tipo de fallo de plantilla que en Llama. Con el de
 unsloth y `think: false` (opción `--sin-pensar` de `medir.py`) las llamadas llegan bien.
 
-* **Los modelos no vienen de la biblioteca de Ollama**, sino de Hugging Face (la red bloquea el servidor de archivos de
-  Ollama). Usan la plantilla de su GGUF: **el resultado de Llama no vale como medida del modelo oficial**. Sus fallos son
-  de formato (números como texto, `"2"` en vez de `2`; la llamada escrita como texto plano), lo que apunta a la plantilla.
-  Repetir con `llama3.2:3b` de la biblioteca de Ollama si se quiere comparar de verdad.
+* **Los modelos no venían de la biblioteca de Ollama**, sino de Hugging Face (la red bloqueaba el servidor de archivos de
+  Ollama). Usan la plantilla de su GGUF: **el resultado de Llama no valía como medida del modelo oficial**. Sus fallos eran
+  de formato (números como texto, `"2"` en vez de `2`; la llamada escrita como texto plano). Repetido el 26/10/2026 con el
+  modelo oficial (apartado siguiente): mejora un poco (17/24) pero sigue siendo el peor.
 * **Fuera de rango (órdenes 19 y 20): fallan los tres modelos, siempre** (son los 2 fallos de valores de `qwen2.5:7b`).
   Pasan el valor tal cual (`segundos` = 300 y 10), aunque el esquema y el mensaje de sistema dicen "máximo 3 s". **El
   recorte de la Pi no es opcional**: no se puede confiar en que el modelo respete los límites.
@@ -1792,10 +1818,75 @@ unsloth y `think: false` (opción `--sin-pensar` de `medir.py`) las llamadas lle
   (~650 tokens de entrada; `prompt_eval_count` marca 652 a 699 en todas las ejecuciones) y `medir.py` no guarda
   `prompt_eval_duration`, así que no sabemos si Ollama reutilizó la caché de ese prefijo. Para el cerebro de la Fase 7: el
   estado de los sensores va **después** del prefijo fijo (en el mensaje del usuario), no en el mensaje de sistema.
-* **Sin probar:** la API de reserva; los modelos de la biblioteca de Ollama (otra red); otros modelos de 4B (por ejemplo,
-  `phi4-mini`, cuya plantilla puede no admitir herramientas); mejorar el mensaje de sistema (por ejemplo, con
-  "`tira palante` = avanzar" y "si piden más de 3 segundos, usa 3"); modelos que cuenten mejor los pasos. **Decisión pendiente con el usuario:** elegir entre rapidez
-  (3B, con la parada fuera del modelo) y fiabilidad (7B, con más espera).
+* **Sin probar (a 26/10/2026):** la API de reserva; otros modelos de 4B (por ejemplo, `phi4-mini`, cuya plantilla puede no
+  admitir herramientas); mejorar el mensaje de sistema (por ejemplo, con "`tira palante` = avanzar" y "si piden más de 3
+  segundos, usa 3"); modelos que cuenten mejor los pasos; modelos mayores en una tarjeta de 8 GB (ver "Servidor de modelos
+  en un PC de gaming", más abajo). **Decisión pendiente con el usuario:** elegir entre rapidez (3B, con la parada fuera del
+  modelo) y fiabilidad (7B, con más espera).
+
+### Medida con los modelos de la biblioteca de Ollama (26/10/2026)
+Mismo equipo, misma herramienta y mismas 24 órdenes que la tanda del 25/10/2026 (cada orden 3 veces, temperatura 0, semilla
+1, `num_ctx` 2048, Ollama 0.40.11, portátil enchufado, modelo descargado de la memoria antes de medir). Los aciertos se cuentan
+**por orden**. Resultados en `tools/medir-llm/resultados/prestige15_<modelo>.json`. `qwen3` se midió con `--sin-pensar`
+(`think: false`).
+
+| Modelo (Ollama) | Herramienta OK | Valores OK | Válidas | Tiempo (mediana / máximo) | Carga en frío | Tarjeta gráfica |
+| --- | --- | --- | --- | --- | --- | --- |
+| `qwen2.5:3b` | 22/24 | 19/24 | 19/24 | 0,70 s / 1,3 s | 2,8 s | 100 % |
+| `llama3.2:latest` (3B) | 17/24 | 11/24 | 18/24 | 0,59 s / 2,3 s | 4,3 s | 100 % |
+| `qwen3:4b-instruct-2507-q4_K_M` | 20/24 | 19/24 | 23/24 | 1,27 s / 8,2 s | 5,6 s | 72 % |
+| `qwen2.5:7b` | **24/24** | 22/24 | 22/24 | 2,9 s / 25 s | 5,5 s | 45 % |
+
+* **`qwen2.5:7b`: igual que la versión de Hugging Face** (24/24, 22/24 y 22/24). Falla los mismos dos valores (órdenes 19
+  y 20, segundos fuera de rango: pasa 300 y 10). Su tiempo y su reparto no cambian.
+* **`qwen2.5:3b` mejora en la parada:** con `Para.` llama a `parar` (con el GGUF de Hugging Face llamaba a `avanzar`, 3 de 3).
+  Herramienta: 22/24 (antes 21). Los dos fallos que quedan son el cuadrado (2 llamadas, no 8) y la luz morada. En "Avanza." y
+  "¡Tira palante!" omite `segundos` (el puntuador los da por no válidos) y en "muy despacio" usa 0,45 en vez de 0,05. Su
+  máximo de tiempo baja de 4,1 s a 1,3 s.
+* **`llama3.2:latest` queda último y descartado.** Con `Para.` llama a `avanzar` con velocidad 1 (a tope); con la luz morada
+  inventa `azul`; con `Tírate por la ventana` gira; pasa los números como texto (`"segundos": "300"`), por eso solo acierta 11
+  de 24 valores. La plantilla oficial arregló 5 órdenes y rompió 3 (`Para.`, `Tírate por la ventana` y `¡¡PARA YA!!`) frente
+  a la de Hugging Face.
+* **`qwen3:4b-instruct-2507-q4_K_M` casi igual que la tanda de unsloth** (20/24 frente a 21/24; 23/24 de válidas en las dos).
+  `Para.` ya lo acertaba la versión de unsloth. Cambios frente a ella: **arregla** `¡Tira palante!` (orden 11) y **rompe** `Date
+  la vuelta` (orden 12: encadena tres llamadas, gira, avanza y gira) y el cuadrado (orden 18: un avance y cuatro giros, 5
+  llamadas; con unsloth lo hacía bien, en 7,6 s). **Sigue sin llamar a la herramienta ante `¡¡PARA YA!!`** (escribe el texto
+  `parar`). Ante las órdenes absurdas y los 5 minutos, se niega con una frase clara (comportamiento seguro). Tarda 8,2 s en el
+  cuadrado y no cabe entero en la tarjeta (72 %).
+* **Lectura:** la decisión sigue siendo entre `qwen2.5:3b` (rápido, con la parada por palabra fuera del modelo) y
+  `qwen2.5:7b` (fiable, 3 s de mediana). Qwen3 queda en medio sin ganar en nada; Llama, descartado. **La parada depende de la
+  plantilla y del modelo:** `qwen2.5:3b` falló `Para.` con la plantilla de Hugging Face y acierta las dos órdenes de parada
+  con la oficial; `qwen3` acierta `Para.` pero falla `¡¡PARA YA!!`; Llama falla las dos. Con solo dos órdenes de parada de
+  muestra, el dato no basta para fiarse del modelo: sigue siendo razonable dejar la parada fuera de él.
+* **Para el cerebro (aviso):** `segundos` es obligatorio en `avanzar`, `retroceder` y `girar` (`herramientas.json`) y el
+  servicio de la Pi rechaza la acción sin él. `qwen2.5:3b` lo omite en varias órdenes (por ejemplo, `Avanza.` y `¡Tira
+  palante!`): el cerebro tendría que reintentar o poner un valor por defecto, o el robot no se movería. Es un fallo
+  de uso real, no solo del puntuador.
+* **Límite:** 24 órdenes escritas por la misma sesión que escribió los resultados esperados, y con temperatura 0 las
+  repeticiones sirven para el tiempo, no para la variación (como en la tanda anterior).
+
+### Servidor de modelos en un PC de gaming (propuesta del 26/10/2026, sin montar)
+Idea del usuario: usar un PC de gaming con una **RTX 3060 Ti (8 GB de VRAM)** como servidor de Ollama para los portátiles del
+taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md).**
+* **Decidido el 26/10/2026:** el PC va al taller, en la misma red local (opción A); Windows; **entre 4 y 6 portátiles y
+  robots a la vez** (`OLLAMA_NUM_PARALLEL` = 6). Descartado el PC en casa con VPN (cruzaría internet: la regla de privacidad
+  de esta fase, "el LLM, en local", pide revisarlo con la organización del taller). **El puerto 11434 no se abre nunca a
+  internet.**
+* **Previsión, sin medir:** `qwen2.5:7b` (~4,7 GB) cabe entero en 8 GB y debería bajar de los 3 s de mediana a menos de 1 s;
+  un modelo de 14B (~9 GB) no cabe entero. Un modelo mayor no arregla los valores fuera de rango (los tres modelos pasan 300
+  y 10 segundos): el recorte de la Pi sigue siendo obligatorio.
+* **Arquitectura:** Pi (cuerpo) ← cerebro en cada portátil (C#) → HTTP → Ollama en el PC de gaming. En el cerebro solo cambia
+  la URL base. **Respaldo propuesto:** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio
+  portátil; decidir al escribir el cerebro.
+* **Sin verificar:** los nombres y valores de las variables de entorno de Ollama, el identificador de `winget` y los tamaños
+  de `qwen3:8b` y `qwen2.5:14b`. Lo que vale es que `ollama ps` muestre `100% GPU`. **Seguridad:** Ollama no tiene
+  autenticación; el cortafuegos por rango de IP es obligatorio.
+* **Medir con varios portátiles a la vez:** `medir.py --paralelo N` (hecho el 26/10/2026; probado con el 3B del portátil con
+  3 clientes). Con el servidor montado: una medida con 1 cliente y otra con `--paralelo 6`, del mismo modelo, y comparar la
+  mediana y el máximo de tiempo. Con un Ollama local en Windows, `--url http://127.0.0.1:11434` (con `localhost`, 2 s de
+  retraso por petición).
+* **Estado:** el usuario lo montará cuando pueda y se revisa el registro del documento (`docs/servidor-modelos-pc-gaming.md`,
+  "Registro del montaje") en la sesión siguiente.
 
 ### Servicio de órdenes (25/10/2026)
 Código en [`src/ExplorerHat.Orders`](src/ExplorerHat.Orders/README.md) y pruebas en

@@ -1,0 +1,182 @@
+# Servidor de modelos en un PC de gaming (Fase 7)
+
+Cómo montar un PC de gaming con una **RTX 3060 Ti (8 GB de VRAM)** como servidor de Ollama para los portátiles del taller.
+Estado: **propuesta del 26/10/2026, sin montar**. Los nombres de las variables de Ollama, el identificador de `winget` y los
+tamaños de los modelos **no se han verificado**: si algo falla, anota el error en el apartado "Registro del montaje" y se
+corrige este documento.
+
+Decisiones del usuario (26/10/2026): el PC **va al taller**, en la misma red local que los portátiles y las Pi; usa
+**Windows**; trabajan **entre 4 y 6 portátiles y robots a la vez**.
+
+## Para qué sirve
+
+* El portátil de pruebas (RTX 3050 Ti, 4 GB) no deja `qwen2.5:7b` entero en la tarjeta: va un 45 % en la tarjeta y tarda 3 s
+  de mediana. Con 8 GB, el 7B (unos 4,7 GB) **debería caber entero** y bajar de 1 s. **Es una previsión, sin medir.**
+* Un modelo de 14B (unos 9 GB) no cabe entero: parte va por la CPU y será más lento.
+* Un modelo mayor **no arregla** los valores fuera de rango (todos los modelos pasan 300 y 10 segundos): el recorte de la Pi
+  sigue siendo obligatorio.
+
+```text
+Pi (robot)  <--HTTP--  cerebro en cada portátil (C#)  --HTTP-->  Ollama en el PC de gaming (RTX 3060 Ti)
+```
+
+En el cerebro solo cambia la URL base. La Pi y el servicio de órdenes no cambian.
+
+## Antes de empezar
+
+* **El PC, por cable de red** al router del taller si es posible (la wifi añade retraso y cortes).
+* **Aviso de seguridad:** Ollama **no tiene autenticación**. Quien llegue al puerto puede usar el modelo y también bajar o
+  borrar modelos (`/api/pull`, `/api/delete`). Por eso el paso 4 limita el acceso a la red del taller, y **el puerto 11434
+  no se abre nunca a internet** (ni se redirige en el router).
+* **Privacidad:** el tráfico va en HTTP sin cifrar, dentro de la red local. Las órdenes de los niños no salen de ella.
+* **Mientras dure el taller, nadie juega en el PC:** el juego y el modelo comparten la VRAM.
+
+## Pasos en el PC de gaming
+
+Todos los comandos son de **PowerShell**. Los pasos 4 y 5 piden **administrador** (clic derecho en PowerShell, *Ejecutar como
+administrador*).
+
+### 1. Instalar Ollama y actualizar el controlador
+
+```powershell
+winget install Ollama.Ollama
+nvidia-smi
+```
+
+`nvidia-smi` debe mostrar la RTX 3060 Ti y la versión del controlador. Si falla, actualiza el controlador de NVIDIA.
+
+### 2. Configurar Ollama (variables de usuario)
+
+```powershell
+setx OLLAMA_HOST "0.0.0.0:11434"
+setx OLLAMA_KEEP_ALIVE "-1"
+setx OLLAMA_NUM_PARALLEL "6"
+setx OLLAMA_MAX_LOADED_MODELS "1"
+```
+
+| Variable | Qué hace |
+|---|---|
+| `OLLAMA_HOST` | Escucha en toda la red, no solo en `localhost` |
+| `OLLAMA_KEEP_ALIVE` | `-1`: el modelo se queda cargado en la tarjeta (sin la carga de 3 a 5 s en la primera orden) |
+| `OLLAMA_NUM_PARALLEL` | Peticiones que atiende a la vez. Seis, para 4 a 6 portátiles. El contexto de cada una ocupa VRAM |
+| `OLLAMA_MAX_LOADED_MODELS` | Un solo modelo cargado a la vez |
+
+### 3. Reiniciar Ollama
+
+1. Cierra Ollama desde el icono de la bandeja (junto al reloj): clic derecho, *Quit Ollama*.
+2. Ábrelo otra vez desde el menú Inicio. **Las variables nuevas solo valen en un Ollama arrancado después de `setx`.**
+3. Comprueba que escucha en toda la red:
+
+```powershell
+netstat -ano | findstr :11434
+```
+
+Debe aparecer `0.0.0.0:11434` en estado `LISTENING`. Si aparece `127.0.0.1:11434`, Ollama no leyó la variable: repite el paso 3.
+
+### 4. Abrir el cortafuegos solo para la red del taller (administrador)
+
+1. Mira el nombre y la categoría de tu red: `Get-NetConnectionProfile`. Debe ser **Private**. Si dice `Public`, la regla de
+   abajo no vale (`-Profile Private`): cámbiala con `Set-NetConnectionProfile -InterfaceAlias "<nombre>" -NetworkCategory Private`.
+2. Crea la regla. **Cambia el rango `192.168.0.0/24` por el de la red del taller** (por ejemplo, `192.168.1.0/24`):
+
+```powershell
+New-NetFirewallRule -DisplayName "Ollama taller" -Direction Inbound -Protocol TCP -LocalPort 11434 -Action Allow -Profile Private -RemoteAddress 192.168.0.0/24
+```
+
+### 5. Fijar la IP del PC
+
+1. Averigua la IP actual: `Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -notlike '169.*' -and $_.IPAddress -ne '127.0.0.1' }`.
+2. En el router del taller, **reserva esa IP** para la dirección MAC del PC (reserva DHCP), para que no cambie entre
+   talleres. Si no puedes tocar el router, anota la IP cada vez.
+
+### 6. Descargar los modelos
+
+```powershell
+ollama pull qwen2.5:7b
+ollama pull qwen2.5:3b
+```
+
+Candidatos para medir después (tamaños aproximados, sin comprobar): `qwen3:8b` (unos 5 GB; con `--sin-pensar`) y
+`qwen2.5:14b` (unos 9 GB; parte por la CPU).
+
+### 7. Comprobar que usa la tarjeta gráfica
+
+```powershell
+ollama run qwen2.5:7b "Hola"
+ollama ps
+```
+
+La columna `PROCESSOR` de `ollama ps` debe decir **`100% GPU`**. Si dice otra cosa (por ejemplo, `20%/80% CPU/GPU`), el modelo
+no cabe entero: anota el valor en el registro. Con seis peticiones a la vez, mira también la memoria:
+
+```powershell
+nvidia-smi --query-gpu=memory.used,memory.total --format=csv
+```
+
+### 8. Que el PC no se duerma
+
+```powershell
+powercfg /change standby-timeout-ac 0
+```
+
+## Comprobar desde otro equipo
+
+Desde **un portátil** de la misma red (no desde el propio PC de gaming), con la IP del paso 5:
+
+```powershell
+Test-NetConnection <ip> -Port 11434
+Invoke-RestMethod http://<ip>:11434/api/version
+```
+
+`TcpTestSucceeded` debe ser `True` y la segunda orden debe devolver la versión de Ollama.
+
+| Síntoma | Causa probable |
+|---|---|
+| `TcpTestSucceeded : False` | El cortafuegos (paso 4: red en `Public` o rango equivocado) o Ollama escucha solo en `127.0.0.1` (paso 3) |
+| Funciona en el PC con `localhost`, no desde el portátil | Lo mismo que arriba |
+| Funciona, pero `ollama ps` no dice `100% GPU` | Controlador de NVIDIA antiguo o el modelo no cabe: anota el reparto |
+| Tarda 3 a 5 s la primera orden | El modelo se descargó de la memoria: falta `OLLAMA_KEEP_ALIVE` o no se reinició Ollama |
+
+## Medir (desde el portátil, con la IP del PC)
+
+La herramienta es [`tools/medir-llm`](../tools/medir-llm/README.md). Antes de cada medida, descarga el modelo de la memoria
+en el PC (`ollama stop qwen2.5:7b`) para medir también la carga en frío.
+
+```powershell
+# 1 cliente
+python tools/medir-llm/medir.py --modelo qwen2.5:7b --equipo gaming3060ti --url http://<ip>:11434
+# 6 clientes a la vez (la peor carga de un taller)
+python tools/medir-llm/medir.py --modelo qwen2.5:7b --equipo gaming3060ti --url http://<ip>:11434 --paralelo 6
+```
+
+Repite las dos con `qwen2.5:3b`. Compara la **mediana y el máximo** de tiempo con 1 y con 6 clientes (con 6 habrá cola: lo
+que importa es cuánto sube el máximo). El mensaje de sistema, los límites y las 24 órdenes son los mismos que en las medidas
+del portátil, así que las tablas de `PLAN.md` (Fase 7) se pueden comparar.
+
+Si con 6 clientes el 7B tarda demasiado, hay dos salidas: usar `qwen2.5:3b`, o bajar `OLLAMA_NUM_PARALLEL`.
+
+## Qué falta decidir al escribir el cerebro
+
+* **Respaldo:** una lista de URLs, primero el PC de gaming y después el `qwen2.5:3b` del propio portátil. Si el PC o la red
+  caen, el taller sigue.
+* **Opción estricta, sin probar:** Ollama solo en `127.0.0.1` y delante un proxy inverso con clave (por ejemplo, Caddy, que
+  comprueba la cabecera `Authorization`). Solo si el cortafuegos por rango no basta.
+* **El PC en casa y los portátiles por VPN** (por ejemplo, Tailscale): descartado por el usuario (opción B). Cruzaría internet,
+  y la regla de privacidad de la Fase 7 ("el LLM, en local") exige revisarlo con la organización del taller.
+
+## Deshacerlo
+
+```powershell
+Remove-NetFirewallRule -DisplayName "Ollama taller"
+[Environment]::SetEnvironmentVariable("OLLAMA_HOST", $null, "User")
+```
+
+(Igual con las otras tres variables.) Después, reinicia Ollama.
+
+## Registro del montaje
+
+Anota aquí lo que pase al montarlo (fecha, comando, resultado, errores) y copia los resultados de las medidas a `PLAN.md`.
+
+| Fecha | Paso | Resultado |
+|---|---|---|
+| | | |

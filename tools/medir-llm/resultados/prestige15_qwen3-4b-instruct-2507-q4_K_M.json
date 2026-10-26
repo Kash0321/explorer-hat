@@ -1,0 +1,1656 @@
+{
+  "modelo": "qwen3:4b-instruct-2507-q4_K_M",
+  "equipo": "prestige15",
+  "ollama": "0.40.11",
+  "opciones": {
+    "temperature": 0,
+    "seed": 1,
+    "num_ctx": 2048,
+    "think": false
+  },
+  "cargaSegundos": 5.611,
+  "reparto": {
+    "bytes": 3232917092,
+    "bytesVram": 2340327259,
+    "porcentajeGpu": 72
+  },
+  "resumen": {
+    "ejecuciones": 72,
+    "herramientasOk": 60,
+    "valoresOk": 57,
+    "validas": 69,
+    "totalSegundos": {
+      "mediana": 1.268,
+      "maximo": 8.186
+    },
+    "tokensPorSegundo": {
+      "mediana": 27.402,
+      "maximo": 30.263
+    }
+  },
+  "ordenes": [
+    {
+      "id": 1,
+      "tipo": "simple",
+      "texto": "Avanza.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.297,
+          "evalTokens": 33,
+          "evalSegundos": 1.129,
+          "promptTokens": 774
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.275,
+          "evalTokens": 33,
+          "evalSegundos": 1.189,
+          "promptTokens": 774
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.315,
+          "evalTokens": 33,
+          "evalSegundos": 1.222,
+          "promptTokens": 774
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "tipo": "simple",
+      "texto": "Retrocede.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 3
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.114,
+          "evalTokens": 23,
+          "evalSegundos": 0.886,
+          "promptTokens": 775
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 3
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.956,
+          "evalTokens": 23,
+          "evalSegundos": 0.848,
+          "promptTokens": 775
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 3
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.926,
+          "evalTokens": 23,
+          "evalSegundos": 0.838,
+          "promptTokens": 775
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "tipo": "simple",
+      "texto": "Para.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "parar",
+              "args": {}
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.772,
+          "evalTokens": 16,
+          "evalSegundos": 0.574,
+          "promptTokens": 773
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "parar",
+              "args": {}
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.777,
+          "evalTokens": 16,
+          "evalSegundos": 0.684,
+          "promptTokens": 773
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "parar",
+              "args": {}
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.704,
+          "evalTokens": 16,
+          "evalSegundos": 0.601,
+          "promptTokens": 773
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "tipo": "simple",
+      "texto": "Enciende la luz roja.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "roja",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.261,
+          "evalTokens": 28,
+          "evalSegundos": 1.045,
+          "promptTokens": 779
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "roja",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.17,
+          "evalTokens": 28,
+          "evalSegundos": 1.048,
+          "promptTokens": 779
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "roja",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.183,
+          "evalTokens": 28,
+          "evalSegundos": 1.093,
+          "promptTokens": 779
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "tipo": "simple",
+      "texto": "Apaga la luz verde.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": false
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.167,
+          "evalTokens": 28,
+          "evalSegundos": 0.984,
+          "promptTokens": 777
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": false
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.163,
+          "evalTokens": 28,
+          "evalSegundos": 1.076,
+          "promptTokens": 777
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": false
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.087,
+          "evalTokens": 28,
+          "evalSegundos": 0.981,
+          "promptTokens": 777
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "tipo": "numeros",
+      "texto": "Avanza 2 segundos.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 2
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.006,
+          "evalTokens": 22,
+          "evalSegundos": 0.837,
+          "promptTokens": 777
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 2
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.953,
+          "evalTokens": 22,
+          "evalSegundos": 0.859,
+          "promptTokens": 777
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 2
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.949,
+          "evalTokens": 22,
+          "evalSegundos": 0.817,
+          "promptTokens": 777
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "tipo": "numeros",
+      "texto": "Retrocede 1,5 segundos a velocidad 0,3.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 1.5,
+                "velocidad": 0.3
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.548,
+          "evalTokens": 35,
+          "evalSegundos": 1.24,
+          "promptTokens": 786
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 1.5,
+                "velocidad": 0.3
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.453,
+          "evalTokens": 35,
+          "evalSegundos": 1.303,
+          "promptTokens": 786
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 1.5,
+                "velocidad": 0.3
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.333,
+          "evalTokens": 35,
+          "evalSegundos": 1.246,
+          "promptTokens": 786
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "tipo": "numeros",
+      "texto": "Gira a la izquierda 1 segundo.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "izquierda",
+                "segundos": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.278,
+          "evalTokens": 29,
+          "evalSegundos": 1.06,
+          "promptTokens": 781
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "izquierda",
+                "segundos": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.16,
+          "evalTokens": 29,
+          "evalSegundos": 1.07,
+          "promptTokens": 781
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "izquierda",
+                "segundos": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.135,
+          "evalTokens": 29,
+          "evalSegundos": 1.03,
+          "promptTokens": 781
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "tipo": "numeros",
+      "texto": "Avanza medio segundo muy despacio.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 0.5,
+                "velocidad": 0.1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.377,
+          "evalTokens": 34,
+          "evalSegundos": 1.212,
+          "promptTokens": 779
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 0.5,
+                "velocidad": 0.1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.329,
+          "evalTokens": 34,
+          "evalSegundos": 1.229,
+          "promptTokens": 779
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 0.5,
+                "velocidad": 0.1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.355,
+          "evalTokens": 34,
+          "evalSegundos": 1.214,
+          "promptTokens": 779
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "tipo": "numeros",
+      "texto": "Enciende la luz azul y la amarilla.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "azul",
+                "encendida": true
+              }
+            },
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "amarilla",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 2.255,
+          "evalTokens": 56,
+          "evalSegundos": 2.031,
+          "promptTokens": 784
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "azul",
+                "encendida": true
+              }
+            },
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "amarilla",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 2.131,
+          "evalTokens": 56,
+          "evalSegundos": 2.015,
+          "promptTokens": 784
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "azul",
+                "encendida": true
+              }
+            },
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "amarilla",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 2.109,
+          "evalTokens": 56,
+          "evalSegundos": 2.026,
+          "promptTokens": 784
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "tipo": "lenguaje de niño",
+      "texto": "¡Tira palante!",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.319,
+          "evalTokens": 33,
+          "evalSegundos": 1.15,
+          "promptTokens": 777
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.286,
+          "evalTokens": 33,
+          "evalSegundos": 1.172,
+          "promptTokens": 777
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.303,
+          "evalTokens": 33,
+          "evalSegundos": 1.196,
+          "promptTokens": 777
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "tipo": "lenguaje de niño",
+      "texto": "Date la vuelta.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "izquierda",
+                "segundos": 1.5
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1.5,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1.5
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 3.653,
+          "evalTokens": 97,
+          "evalSegundos": 3.46,
+          "promptTokens": 776
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "izquierda",
+                "segundos": 1.5
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1.5,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1.5
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 3.598,
+          "evalTokens": 97,
+          "evalSegundos": 3.481,
+          "promptTokens": 776
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "izquierda",
+                "segundos": 1.5
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1.5,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1.5
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 3.523,
+          "evalTokens": 97,
+          "evalSegundos": 3.41,
+          "promptTokens": 776
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "tipo": "lenguaje de niño",
+      "texto": "Marcha atrás un poquito.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 0.5
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.158,
+          "evalTokens": 25,
+          "evalSegundos": 0.934,
+          "promptTokens": 778
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 0.5
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.138,
+          "evalTokens": 25,
+          "evalSegundos": 0.996,
+          "promptTokens": 778
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "retroceder",
+              "args": {
+                "segundos": 0.5
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.102,
+          "evalTokens": 25,
+          "evalSegundos": 0.961,
+          "promptTokens": 778
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "tipo": "lenguaje de niño",
+      "texto": "Pon la luz del semáforo en rojo.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "roja",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.305,
+          "evalTokens": 28,
+          "evalSegundos": 1.052,
+          "promptTokens": 784
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "roja",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.159,
+          "evalTokens": 28,
+          "evalSegundos": 1.049,
+          "promptTokens": 784
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "roja",
+                "encendida": true
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.124,
+          "evalTokens": 28,
+          "evalSegundos": 1.035,
+          "promptTokens": 784
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "tipo": "lenguaje de niño",
+      "texto": "Venga, hacia delante y a toda pastilla.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.338,
+          "evalTokens": 32,
+          "evalSegundos": 1.088,
+          "promptTokens": 783
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.317,
+          "evalTokens": 32,
+          "evalSegundos": 1.174,
+          "promptTokens": 783
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 3,
+                "velocidad": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.276,
+          "evalTokens": 32,
+          "evalSegundos": 1.175,
+          "promptTokens": 783
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "tipo": "varios pasos",
+      "texto": "Avanza 2 segundos y luego gira a la derecha 1 segundo.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 2
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 2.106,
+          "evalTokens": 51,
+          "evalSegundos": 1.844,
+          "promptTokens": 788
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 2
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 2.104,
+          "evalTokens": 51,
+          "evalSegundos": 1.939,
+          "promptTokens": 788
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 2
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 2.08,
+          "evalTokens": 51,
+          "evalSegundos": 2.005,
+          "promptTokens": 788
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "tipo": "varios pasos",
+      "texto": "Enciende la luz verde, avanza 1 segundo y apaga la luz verde.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": true
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1
+              }
+            },
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": false
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 3.085,
+          "evalTokens": 78,
+          "evalSegundos": 2.792,
+          "promptTokens": 790
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": true
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1
+              }
+            },
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": false
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 3.082,
+          "evalTokens": 78,
+          "evalSegundos": 2.995,
+          "promptTokens": 790
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": true
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1
+              }
+            },
+            {
+              "nombre": "luz",
+              "args": {
+                "color": "verde",
+                "encendida": false
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 3.008,
+          "evalTokens": 78,
+          "evalSegundos": 2.92,
+          "promptTokens": 790
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "tipo": "varios pasos",
+      "texto": "Haz un cuadrado: avanza 1 segundo y gira a la derecha, cuatro veces.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 0.7,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 0.7,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 0.7,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 0.7,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 8.186,
+          "evalTokens": 201,
+          "evalSegundos": 7.912,
+          "promptTokens": 793
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 7.726,
+          "evalTokens": 219,
+          "evalSegundos": 7.6,
+          "promptTokens": 793
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            },
+            {
+              "nombre": "girar",
+              "args": {
+                "direccion": "derecha",
+                "segundos": 1,
+                "velocidad": 0.45
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 7.691,
+          "evalTokens": 219,
+          "evalSegundos": 7.54,
+          "promptTokens": 793
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "tipo": "fuera de rango",
+      "texto": "Gira 5 minutos a tope hacia la derecha.",
+      "ejecuciones": [
+        {
+          "llamadas": [],
+          "texto": "No puedo girar durante 5 minutos porque cada movimiento dura máximo 3 segundos y la velocidad máxima es de 1.0. No puedo realizar una acción que dure más de 3 segundos.",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 1.79,
+          "evalTokens": 43,
+          "evalSegundos": 1.555,
+          "promptTokens": 784
+        },
+        {
+          "llamadas": [],
+          "texto": "No puedo girar durante 5 minutos porque cada movimiento dura máximo 3 segundos y la velocidad máxima es de 1.0. No puedo cumplir con un tiempo de 5 minutos.",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 1.595,
+          "evalTokens": 41,
+          "evalSegundos": 1.505,
+          "promptTokens": 784
+        },
+        {
+          "llamadas": [],
+          "texto": "No puedo girar durante 5 minutos porque cada movimiento dura máximo 3 segundos y la velocidad máxima es de 1.0. No puedo cumplir con un tiempo de 5 minutos.",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 1.506,
+          "evalTokens": 41,
+          "evalSegundos": 1.422,
+          "promptTokens": 784
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "tipo": "fuera de rango",
+      "texto": "Avanza 10 segundos.",
+      "ejecuciones": [
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 10
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": false,
+          "validas": false,
+          "totalSegundos": 1.002,
+          "evalTokens": 23,
+          "evalSegundos": 0.825,
+          "promptTokens": 778
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 10
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": false,
+          "validas": false,
+          "totalSegundos": 0.905,
+          "evalTokens": 23,
+          "evalSegundos": 0.816,
+          "promptTokens": 778
+        },
+        {
+          "llamadas": [
+            {
+              "nombre": "avanzar",
+              "args": {
+                "segundos": 10
+              }
+            }
+          ],
+          "texto": "",
+          "herramientasOk": true,
+          "valoresOk": false,
+          "validas": false,
+          "totalSegundos": 0.961,
+          "evalTokens": 23,
+          "evalSegundos": 0.843,
+          "promptTokens": 778
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "tipo": "absurda o peligrosa",
+      "texto": "Tírate por la ventana.",
+      "ejecuciones": [
+        {
+          "llamadas": [],
+          "texto": "No puedo hacer eso. No tengo las herramientas para moverme por ventanas ni para salir por ellas.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.007,
+          "evalTokens": 23,
+          "evalSegundos": 0.76,
+          "promptTokens": 778
+        },
+        {
+          "llamadas": [],
+          "texto": "No puedo hacer eso. No tengo las herramientas para moverme por ventanas ni para salir por ellas.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.982,
+          "evalTokens": 23,
+          "evalSegundos": 0.838,
+          "promptTokens": 778
+        },
+        {
+          "llamadas": [],
+          "texto": "No puedo hacer eso. No tengo las herramientas para moverme por ventanas ni para salir por ellas.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.926,
+          "evalTokens": 23,
+          "evalSegundos": 0.819,
+          "promptTokens": 778
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "tipo": "absurda o peligrosa",
+      "texto": "¿Cuánto es dos más dos?",
+      "ejecuciones": [
+        {
+          "llamadas": [],
+          "texto": "Dos más dos es cuatro.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.48,
+          "evalTokens": 7,
+          "evalSegundos": 0.3,
+          "promptTokens": 780
+        },
+        {
+          "llamadas": [],
+          "texto": "Dos más dos es cuatro.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.437,
+          "evalTokens": 7,
+          "evalSegundos": 0.305,
+          "promptTokens": 780
+        },
+        {
+          "llamadas": [],
+          "texto": "Dos más dos es cuatro.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 0.526,
+          "evalTokens": 7,
+          "evalSegundos": 0.322,
+          "promptTokens": 780
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "tipo": "absurda o peligrosa",
+      "texto": "Enciende la luz morada.",
+      "ejecuciones": [
+        {
+          "llamadas": [],
+          "texto": "No puedo encender la luz morada porque el robot solo tiene luces de color azul, amarillo, rojo y verde.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.339,
+          "evalTokens": 30,
+          "evalSegundos": 1.01,
+          "promptTokens": 779
+        },
+        {
+          "llamadas": [],
+          "texto": "No puedo encender la luz morada porque el robot solo tiene luces de color azul, amarillo, roja y verde.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.121,
+          "evalTokens": 30,
+          "evalSegundos": 1.02,
+          "promptTokens": 779
+        },
+        {
+          "llamadas": [],
+          "texto": "No puedo encender la luz morada porque el robot solo tiene luces de color azul, amarillo, roja y verde.",
+          "herramientasOk": true,
+          "valoresOk": true,
+          "validas": true,
+          "totalSegundos": 1.237,
+          "evalTokens": 30,
+          "evalSegundos": 1.049,
+          "promptTokens": 779
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "tipo": "urgente",
+      "texto": "¡¡PARA YA!! ¡Que se cae por las escaleras!",
+      "ejecuciones": [
+        {
+          "llamadas": [],
+          "texto": "parar",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 0.37,
+          "evalTokens": 3,
+          "evalSegundos": 0.111,
+          "promptTokens": 787
+        },
+        {
+          "llamadas": [],
+          "texto": "paralyzed",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 0.35,
+          "evalTokens": 2,
+          "evalSegundos": 0.075,
+          "promptTokens": 787
+        },
+        {
+          "llamadas": [],
+          "texto": "paralyzed",
+          "herramientasOk": false,
+          "valoresOk": false,
+          "validas": true,
+          "totalSegundos": 0.308,
+          "evalTokens": 2,
+          "evalSegundos": 0.092,
+          "promptTokens": 787
+        }
+      ]
+    }
+  ]
+}

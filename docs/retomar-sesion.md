@@ -83,7 +83,7 @@ Esta variante es para la sesión que sigue a la del 25/10/2026. Ese día se midi
 
 1. **Las dos ramas de la Fase 7 están fusionadas** (PR #63 y #64, 25/10/2026): empieza en `main` y al día (`git pull`).
 2. La Pi ya está en `main` (con el servicio de órdenes y los scripts de parada que conocen `Orders`). Vuelve a desplegar `~/apps/ExplorerHat.Orders` solo si cambia su código o el de `Common`.
-3. Ollama está instalado en el portátil (controlador NVIDIA 621.01) con cinco modelos de Hugging Face, porque la red del 25/10/2026 bloqueaba el servidor de archivos de Ollama. Si la red es otra, puede que `ollama pull qwen2.5:3b` funcione.
+3. Ollama está instalado en el portátil (controlador NVIDIA 621.01) con cuatro modelos de la biblioteca de Ollama (`qwen2.5:3b`, `qwen2.5:7b`, `llama3.2:latest` y `qwen3:4b-instruct-2507-q4_K_M`), medidos el 26/10/2026 (`PLAN.md`, Fase 7). El 25/10/2026 la red bloqueaba el servidor de archivos de Ollama; si vuelve a pasar, ver `tools/medir-llm/README.md`. Está pendiente decidir el modelo. El usuario montará un PC de gaming con una RTX 3060 Ti como servidor de Ollama para los portátiles del taller: pasos y registro en [`servidor-modelos-pc-gaming.md`](servidor-modelos-pc-gaming.md) (revisa su "Registro del montaje" y mide con `--url` y `--paralelo 6`).
 4. Si la sesión va a mover el robot (por ejemplo, probar el servicio en el suelo): la Pi encendida y con wifi, la UPS cargada, el robot **sobre un bote o un libro, con las ruedas en el aire** (salvo la prueba en el suelo, que se pide aparte), y una terminal SSH abierta en la Pi.
 
 Pega el prompt de arriba y **añade esto al final**:
