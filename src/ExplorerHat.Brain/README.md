@@ -57,6 +57,8 @@ python tools/probar-cerebro/probar.py
 
 23 comprobaciones de caja negra, **sin robot y sin modelo real**: un Ollama falso, el servicio de órdenes en `--simulado` y el cerebro real con el teclado en una tubería. Cubren: la petición al modelo igual que la medida, `segundos` que falta, luces, texto sin acciones, un número escrito como texto (400), obstáculo, la parada en plena acción y mientras el modelo piensa, las órdenes descartadas, que las dos órdenes de parada de `ordenes.json` no lleguen al modelo, el respaldo, la clave equivocada y los ajustes mal escritos. Con fallos metidos a propósito (una parada que ignora los mensajes largos y un plan que no mira la parada) las pruebas fallan.
 
-## Por probar con la Pi
+## Probado con la Pi
 
-Contra el servicio de la Pi en `--velocidad-cero` (pines reales, ruedas quietas) y en `--real` (ruedas en el aire). Ver `PLAN.md`, Fase 7.
+Contra el servicio de la Pi en `--velocidad-cero` (pines reales, ruedas quietas) y en `--real` (ruedas en el aire), el 26/10/2026, con la parada por palabra y con Ctrl+C. **Falta el suelo.** Resultados en `PLAN.md`, Fase 7.
+
+En la consola de Windows, lo que tecleas se puede mezclar con los mensajes del cerebro. Es solo de aspecto: la orden llega entera.
