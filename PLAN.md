@@ -2068,9 +2068,10 @@ diseño (con la consulta al asesor, que pidió las tres primeras correcciones an
   (`Tírate por la ventana`, `¡¡PARA YA!!`, `Avanza`): las tres líneas llegaron enteras, con tildes y signos.
   * **Fallo de cableado, no del código.** La primera orden de giro movió solo la rueda izquierda, y `adelante 3 segundos a toda
     marcha` (orden del usuario) tampoco movió la derecha. El registro de la Pi mostraba la orden correcta (`One` −0,45 y `Two`
-    +0,45). `tools/probar-cableado.sh`, después de mirar y apretar la borna MOTOR 1: la rueda derecha giró. Es el mismo fallo del
-    04/10/2026 (cable suelto en MOTOR 1): **si una rueda no gira, mira primero la borna.** El servicio no sabe si una rueda gira
-    (solo manda al motor): lo diría el sensor LM393 de cada rueda, y no se usa.
+    +0,45). El usuario tocó todos los cables implicados (en la borna MOTOR 1 y alrededor) y ejecutó `tools/probar-cableado.sh`: la rueda
+    derecha giró. **No vio ningún cable suelto, así que la causa no está confirmada;** lo más probable es un contacto flojo, como el del
+    04/10/2026 (cable suelto en MOTOR 1), y puede volver. **Si una rueda no gira, toca primero los cables de su borna.** El servicio no
+    sabe si una rueda gira (solo manda al motor): lo diría el sensor LM393 de cada rueda, y no se usa.
   * **Con el cable bien salió todo:** `Enciende la luz roja`, `Gira a la derecha 1 segundo` (la derecha hacia atrás y la izquierda
     hacia delante, 1,0 s), `Retrocede medio segundo` (0,5 s), `Avanza 1 segundo` (1,0 s) y `Enciende la luz verde, avanza un
     segundo y apaga la luz verde` (tres acciones seguidas). El usuario vio las ruedas. Sensores al arrancar: centro 39 cm,
