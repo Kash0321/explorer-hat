@@ -34,3 +34,9 @@ Los resultados y su lectura están en `PLAN.md`, Fase 7.
 Usa los modelos de la **biblioteca de Ollama** (`ollama pull qwen2.5:3b`). El 25/10/2026 una red bloqueaba el servidor de archivos de Ollama (`*.r2.cloudflarestorage.com`) y `ollama pull` daba `max retries exceeded ... connectex`; el 26/10/2026 la descarga funcionó. Si vuelve a fallar, Hugging Face suele responder (`ollama pull hf.co/Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M`), pero esos modelos usan la plantilla de su GGUF, que no es la de la biblioteca: **cambia los resultados** (con la de Hugging Face, `qwen2.5:3b` llamaba a `avanzar` ante `Para.`). Si mides uno de Hugging Face, no lo compares con los oficiales.
 
 Para medir un modelo que está en otro equipo (por ejemplo, un PC de gaming con más tarjeta gráfica), usa `--url http://<ip>:11434` y un `--equipo` distinto.
+
+## Varios clientes a la vez (`--paralelo N`)
+
+`--paralelo 6` simula un taller con 6 portátiles: 6 clientes envían a la vez las 24 órdenes (cada uno empieza por una orden distinta) y el resultado va a `<equipo>_<modelo>_paralelo6.json`, con el campo `cliente` en cada ejecución y `segundosDePared` y `peticionesPorSegundo` en el resumen. Es la peor carga: los niños no escriben una orden cada segundo. Los tiempos incluyen la espera en la cola. El servidor atiende a la vez tantas peticiones como diga `OLLAMA_NUM_PARALLEL`; las demás esperan. Compara siempre con la medida de un solo cliente, del mismo modelo y del mismo equipo.
+
+En Windows, mide un Ollama local con `--url http://127.0.0.1:11434`: con `localhost` cada petición pierde unos 2 s y distorsiona `segundosDePared` (no los tiempos de `totalSegundos`, que los mide Ollama).

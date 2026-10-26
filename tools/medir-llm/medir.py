@@ -8,12 +8,17 @@ tools of herramientas.json to /api/chat (no streaming, temperature 0), checks th
 against the expected ones and records the times that Ollama reports. The first request loads
 the model, so it is a separate warm-up and it is not part of the timing statistics.
 The result goes to tools/medir-llm/resultados/<equipo>_<modelo>.json.
+With --paralelo N, N clients send all the orders at the same time (a workshop with N laptops) and the
+result goes to <equipo>_<modelo>_paraleloN.json. The server decides how many requests it runs together
+(OLLAMA_NUM_PARALLEL); the rest wait in a queue, and that wait is part of the times.
 """
 import argparse
 import json
 import statistics
 import sys
+import time
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -132,6 +137,8 @@ def main():
     parser.add_argument("--url", default="http://localhost:11434")
     parser.add_argument("--num-ctx", type=int, default=2048)
     parser.add_argument("--sin-pensar", action="store_true", help="send think=false (for models that think)")
+    parser.add_argument("--paralelo", type=int, default=1,
+                        help="number of clients that send all the orders at the same time (default 1)")
     arguments = parser.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -150,8 +157,7 @@ def main():
         size, vram = processes[0]["size"], processes[0]["size_vram"]
         placement = {"bytes": size, "bytesVram": vram, "porcentajeGpu": round(100 * vram / size) if size else 0}
 
-    results = []
-    for order in orders:
+    def run_order(order, show):
         runs = []
         for _ in range(arguments.repeticiones):
             reply = chat(arguments.url, arguments.modelo, system, tools, order["texto"], options, "30m", think)
@@ -168,15 +174,39 @@ def main():
                 "evalSegundos": round(seconds(reply.get("eval_duration", 0)), 3),
                 "promptTokens": reply.get("prompt_eval_count", 0),
             })
-        results.append({"id": order["id"], "tipo": order["tipo"], "texto": order["texto"], "ejecuciones": runs})
-        first = runs[0]
-        print(f'{order["id"]:>2} {order["tipo"]:<20} herr={"OK" if first["herramientasOk"] else "--"} '
-              f'val={"OK" if first["valoresOk"] else "--"} valid={"OK" if first["validas"] else "--"} '
-              f'{first["totalSegundos"]:>6.2f} s  {order["texto"]}', flush=True)
+        if show:
+            first = runs[0]
+            print(f'{order["id"]:>2} {order["tipo"]:<20} herr={"OK" if first["herramientasOk"] else "--"} '
+                  f'val={"OK" if first["valoresOk"] else "--"} valid={"OK" if first["validas"] else "--"} '
+                  f'{first["totalSegundos"]:>6.2f} s  {order["texto"]}', flush=True)
+        return runs
+
+    def run_client(client):
+        # Each client sends all the orders. The list is rotated so that the clients do not send the same order at the same time.
+        shift = client % len(orders)
+        return [(order, run_order(order, parallel == 1)) for order in orders[shift:] + orders[:shift]]
+
+    parallel = max(1, arguments.paralelo)
+    if parallel > 1:
+        print(f"{parallel} clientes a la vez, {len(orders) * arguments.repeticiones} peticiones cada uno...", flush=True)
+    runs_by_order = {order["id"]: [] for order in orders}
+    started = time.monotonic()
+    with ThreadPoolExecutor(max_workers=parallel) as pool:
+        for client, client_runs in enumerate(pool.map(run_client, range(parallel))):
+            for order, runs in client_runs:
+                for run in runs:
+                    if parallel > 1:
+                        run["cliente"] = client
+                runs_by_order[order["id"]].extend(runs)
+    wall_seconds = time.monotonic() - started
+    results = [{"id": o["id"], "tipo": o["tipo"], "texto": o["texto"], "ejecuciones": runs_by_order[o["id"]]} for o in orders]
 
     all_runs = [run for r in results for run in r["ejecuciones"]]
     total = len(all_runs)
     summary = {
+        "paralelo": parallel,
+        "segundosDePared": round(wall_seconds, 1),
+        "peticionesPorSegundo": round(total / wall_seconds, 2),
         "ejecuciones": total,
         "herramientasOk": sum(r["herramientasOk"] for r in all_runs),
         "valoresOk": sum(r["valoresOk"] for r in all_runs),
@@ -191,9 +221,11 @@ def main():
     folder = HERE / "resultados"
     folder.mkdir(exist_ok=True)
     safe_name = arguments.modelo.replace("hf.co/", "").replace(":", "-").replace("/", "-")
-    path = folder / f"{arguments.equipo}_{safe_name}.json"
+    suffix = f"_paralelo{parallel}" if parallel > 1 else ""
+    path = folder / f"{arguments.equipo}_{safe_name}{suffix}.json"
     path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\nCarga {load_seconds:.1f} s; reparto {placement}")
+    print(f"{parallel} cliente(s): {wall_seconds:.0f} s en total, {total / wall_seconds:.2f} peticiones/s")
     print(f"Herramienta OK {summary['herramientasOk']}/{total}; valores OK {summary['valoresOk']}/{total}; "
           f"válidas {summary['validas']}/{total}")
     print(f"Tiempo total (s) {summary['totalSegundos']}; tokens/s {summary['tokensPorSegundo']}")

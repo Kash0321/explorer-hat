@@ -1880,8 +1880,8 @@ valores fuera de rango (los tres modelos pasan 300 y 10 segundos): el recorte de
 * **En el PC de gaming** (Windows, sin confirmar; PowerShell; el cortafuegos pide administrador):
   1. `winget install Ollama.Ollama` y el controlador de NVIDIA al día.
   2. Variables de usuario: `setx OLLAMA_HOST "0.0.0.0:11434"` (escucha en la red, no solo en `localhost`), `setx
-     OLLAMA_KEEP_ALIVE "-1"` (el modelo se queda en la tarjeta), `setx OLLAMA_NUM_PARALLEL "4"` (cuatro peticiones a la vez;
-     el contexto de cada una ocupa VRAM) y `setx OLLAMA_MAX_LOADED_MODELS "1"`. Salir de Ollama (icono de la bandeja) y abrirlo.
+     OLLAMA_KEEP_ALIVE "-1"` (el modelo se queda en la tarjeta), `setx OLLAMA_NUM_PARALLEL "6"` (seis peticiones a la vez,
+     para 4 a 6 portátiles; el contexto de cada una ocupa VRAM) y `setx OLLAMA_MAX_LOADED_MODELS "1"`. Salir de Ollama (icono de la bandeja) y abrirlo.
   3. Cortafuegos, solo para la red del taller: `New-NetFirewallRule -DisplayName "Ollama taller" -Direction Inbound -Protocol TCP
      -LocalPort 11434 -Action Allow -Profile Private -RemoteAddress 192.168.0.0/24` (cambiar el rango al de la red del
      taller; la red tiene que estar en perfil "Privada").
@@ -1897,8 +1897,12 @@ valores fuera de rango (los tres modelos pasan 300 y 10 segundos): el recorte de
   comprueba la cabecera `Authorization`). El tráfico va en HTTP sin cifrar dentro de la red local: las órdenes de los niños no
   salen de ella. Si el PC estuviera fuera del taller (en casa), haría falta una VPN (por ejemplo, Tailscale), con latencia y
   dependencia de la red del taller: sin probar.
-* **Pendiente de medir:** el tiempo con varios portátiles a la vez. `medir.py` envía las órdenes de una en una: habría que
-  añadirle un modo con N clientes en paralelo (por ejemplo, `--paralelo N`).
+* **Decidido el 26/10/2026:** opción A (el PC va al taller), Windows, y **entre 4 y 6 portátiles y robots a la vez**.
+* **Medir con varios portátiles a la vez:** `medir.py --paralelo N` (hecho el 26/10/2026; probado con el 3B del portátil
+  con 3 clientes). Con el servidor montado: una medida con 1 cliente y otra con `--paralelo 6`, del mismo modelo, y comparar
+  la mediana y el máximo de tiempo. Si con 6 clientes el 7B tarda demasiado, probar `qwen2.5:3b` o `OLLAMA_NUM_PARALLEL`
+  más bajo. Con un Ollama local en Windows, usar `--url http://127.0.0.1:11434` (con `localhost`, 2 s de retraso por
+  petición).
 
 ### Servicio de órdenes (25/10/2026)
 Código en [`src/ExplorerHat.Orders`](src/ExplorerHat.Orders/README.md) y pruebas en
