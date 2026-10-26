@@ -20,13 +20,15 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     en la Fase 7. Ollama en el portátil tiene ahora `qwen2.5:3b`, `qwen2.5:7b`, `llama3.2:latest` (el 3B) y
     `qwen3:4b-instruct-2507-q4_K_M`. Los JSON de la primera tanda se guardaron en
     `tools/medir-llm/resultados/historial-huggingface/`.
-  * **Decisión del modelo: sigue pendiente** (entre `qwen2.5:3b` y `qwen2.5:7b`; Qwen3 no gana en nada y Llama es el peor). El
-    3B oficial acierta las dos órdenes de parada, pero omite `segundos` (obligatorio) en varias órdenes. **Idea
+  * **Decisión del modelo (26/10/2026, del usuario, PROVISIONAL): `qwen2.5:7b` en el servidor del PC de gaming, con el
+    `qwen2.5:3b` del portátil de respaldo** (ver "Decisión del modelo: provisional y revisable", en la Fase 7). Qwen3 no gana
+    en nada y Llama es el peor. El 3B oficial acierta las dos órdenes de parada, pero omite `segundos` (obligatorio) y varía
+    bajo carga. **Idea
     nueva del usuario:** un PC de gaming con una RTX 3060 Ti (8 GB de VRAM) como servidor de Ollama para los portátiles del
     taller, para usar un modelo mejor sin esperar. **Montado y medido el mismo 26/10/2026** (pasos y registro en
     [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md); resultados en la Fase 7): `qwen2.5:7b` baja de
     2,9 s a **0,44 s** de mediana (0,97 s con 6 clientes a la vez) y sigue acertando las 24 herramientas. `medir.py` tiene
-    `--paralelo N`. La IP del PC no está fijada (192.168.0.241 ese día).
+    `--paralelo N`. La IP del PC no está fijada: se pregunta cada día.
 - **Cierre de la sesión de la tarde del 25/10/2026: Fase 7, medida del LLM y servicio de órdenes hechos** (desde el PC; el robot
   solo se movió en las pruebas con las ruedas en el aire, con la confirmación del usuario).
   * **PR #63 (medida del LLM) y #64 (servicio de órdenes) fusionados** (`ed66d71` en `main`, 25/10/2026); las ramas
@@ -374,10 +376,10 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      de los modelos oficiales en "Medida con los modelos de la biblioteca de Ollama (26/10/2026)"), si se prueba la API de
      reserva. **El PC de gaming con la RTX 3060 Ti ya funciona como servidor** (26/10/2026,
      [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md)): el 7B va a 0,44 s de mediana (0,97 s con 6
-     clientes). **Recomendación (sin decidir con el usuario): `qwen2.5:7b` en el servidor, con el 3B local de respaldo**
-     (con 6 clientes el 7B no varía; el 3B sí). Queda por medir `qwen3:8b` y `qwen2.5:14b` en esa tarjeta (hay que bajarlos
-     con `ollama pull` en el PC); la IP del PC no está fijada; y **revisar las reglas del cortafuegos del PC** (comando en
-     el documento); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
+     clientes). **Decidido por el usuario el 26/10/2026, de forma provisional: `qwen2.5:7b` en el servidor, con el 3B local
+     de respaldo** (con 6 clientes el 7B no varía; el 3B sí); ver "Decisión del modelo: provisional y revisable". Queda por
+     medir `qwen3:8b` y `qwen2.5:14b` en esa tarjeta (hay que bajarlos con `ollama pull` en el PC); la IP del PC no está
+     fijada (se pregunta cada día); el cortafuegos del PC ya está revisado y corregido (se repite tras actualizar Ollama); (b) el cerebro en el portátil (C#), con la parada por palabra ("para", "stop") sin
      pasar por el modelo (propuesta sin hacer); (c) más adelante, el servicio en el suelo (pedir la confirmación).
   6b. **Fusión de la Fase 7 hecha** (PR #63 y #64, 25/10/2026): la Pi ya está en `main` y sin la copia provisional
      `~/apps/tools-orders`. Si cambia el código de `src/ExplorerHat.Orders` (o `Common`), hay que volver a desplegar
@@ -1826,8 +1828,9 @@ unsloth y `think: false` (opción `--sin-pensar` de `medir.py`) las llamadas lle
 * **Sin probar (a 26/10/2026):** la API de reserva; otros modelos de 4B (por ejemplo, `phi4-mini`, cuya plantilla puede no
   admitir herramientas); mejorar el mensaje de sistema (por ejemplo, con "`tira palante` = avanzar" y "si piden más de 3
   segundos, usa 3"); modelos que cuenten mejor los pasos; modelos mayores en una tarjeta de 8 GB (ver "Servidor de modelos
-  en un PC de gaming", más abajo). **Decisión pendiente con el usuario:** elegir entre rapidez (3B, con la parada fuera del
-  modelo) y fiabilidad (7B, con más espera).
+  en un PC de gaming", más abajo). **Decisión de la tanda del 25/10/2026 (superada el 26/10/2026):** elegir entre rapidez
+  (3B, con la parada fuera del modelo) y fiabilidad (7B, con más espera); ver "Decisión del modelo: provisional y
+  revisable".
 
 ### Medida con los modelos de la biblioteca de Ollama (26/10/2026)
 Mismo equipo, misma herramienta y mismas 24 órdenes que la tanda del 25/10/2026 (cada orden 3 veces, temperatura 0, semilla
@@ -1870,7 +1873,22 @@ Mismo equipo, misma herramienta y mismas 24 órdenes que la tanda del 25/10/2026
 * **Límite:** 24 órdenes escritas por la misma sesión que escribió los resultados esperados, y con temperatura 0 las
   repeticiones sirven para el tiempo, no para la variación (como en la tanda anterior).
 
-### Servidor de modelos en un PC de gaming (propuesta del 26/10/2026, sin montar)
+### Decisión del modelo: provisional y revisable (26/10/2026)
+**Decidido por el usuario el 26/10/2026: `qwen2.5:7b` en el servidor del PC de gaming, con el `qwen2.5:3b` del portátil de
+respaldo.** Es una decisión **provisional**: los modelos mejoran deprisa y los datos de arriba son de una fecha y de un
+conjunto de 24 órdenes. Para no quedarnos con el dato como si no fuera a cambiar:
+* **El nombre del modelo y la URL del servidor son ajustes del cerebro**, no constantes del código (el modelo de respaldo
+  también). Cambiar de modelo no debe pedir cambiar código.
+* **Cada modelo nuevo se mide igual** (`medir.py --modelo <modelo> --equipo <equipo> --url <url>`, con 1 cliente y con
+  `--paralelo 6`), con las mismas 24 órdenes, y su resultado se compara con las tablas de arriba antes de cambiar el ajuste.
+  Los modelos de Hugging Face no valen para comparar (ver el README de `tools/medir-llm`).
+* **Candidatos, sin medir:** `qwen3:8b` y `qwen2.5:14b` en la tarjeta de 8 GB (el 14B, de unos 9 GB, no cabe entero) y
+  cualquier modelo nuevo de 7B a 8B con llamadas a herramientas. Si la lista de órdenes se queda corta (24, escritas por la
+  misma sesión que los resultados esperados), ampliarla **antes** de medir, y repetir las medidas anteriores con la lista nueva.
+* **Revisar la decisión** al cerrar la Fase 7, o antes si el cerebro falla con el modelo actual o aparece un modelo
+  claramente mejor.
+
+### Servidor de modelos en un PC de gaming (montado y medido el 26/10/2026)
 Idea del usuario: usar un PC de gaming con una **RTX 3060 Ti (8 GB de VRAM)** como servidor de Ollama para los portátiles del
 taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-modelos-pc-gaming.md`](docs/servidor-modelos-pc-gaming.md).**
 * **Decidido el 26/10/2026:** el PC va al taller, en la misma red local (opción A); Windows; **entre 4 y 6 portátiles y
@@ -1892,8 +1910,8 @@ taller. **Pasos de montaje, comprobaciones, medidas y registro: [`docs/servidor-
   `Remota` = `LocalSubnet`, y las dos `ollama.exe` desactivadas. **Revisión final:** sale solo `Ollama taller` (`Private`,
   TCP, 11434, `LocalSubnet`), y el servidor sigue respondiendo desde el portátil. **Repetir la revisión después de actualizar
   Ollama:** Windows puede recrear las reglas automáticas. **Sin comprobar:** el identificador de `winget` y los tamaños de
-  `qwen3:8b` y `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por red local es obligatorio. **La IP del PC no está fijada** (era 192.168.0.241 el 26/10/2026 y
-  puede cambiar: el cerebro la lleva como ajuste, no escrita en el código).
+  `qwen3:8b` y `qwen2.5:14b`. **Seguridad:** Ollama no tiene autenticación; el cortafuegos por red local es obligatorio. **La IP del PC no está fijada** (puede cambiar de un día a otro: se
+  pregunta al usuario y el cerebro la lleva como ajuste, no escrita en el código ni en el repositorio).
 * **Estado:** **montado y medido el 26/10/2026** (lo montó el usuario; las medidas las hizo el asistente desde el portátil).
   Registro en `docs/servidor-modelos-pc-gaming.md`.
 
