@@ -7,7 +7,34 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (26/10/2026)
-- **Sesión del 26/10/2026** (desde el PC; las ruedas giraron solo en la prueba del cerebro con las ruedas en el aire (ver "Cerebro (26/10/2026)"); la Pi, en `main` (`9a57ad4`), pines en `lo`, `get_throttled` =
+- **Cierre de la sesión del 26/10/2026: el cerebro funciona de punta a punta** (desde el PC; las ruedas giraron en el aire y en el
+  suelo, siempre con la confirmación del usuario). `main` en `2ab21a0` (PR #67 y #68 fusionados, ramas borradas); la Pi, en `main`
+  al día, los 8 pines en `lo`, `get_throttled` = `0x0` y ningún programa del robot en marcha.
+  * **Hecho:** el PC de gaming como servidor de modelos (#67); el modelo decidido de forma provisional (`qwen2.5:7b` en el
+    servidor, `qwen2.5:3b` de respaldo); el cerebro `src/ExplorerHat.Brain` (#68), con 23 pruebas sin robot, la Pi en
+    `--velocidad-cero`, `--real` con las ruedas en el aire (parada por palabra a 1,13 s y Ctrl+C a 0,59 s) y el suelo (diez órdenes,
+    parada por obstáculo a 2,85 s). Detalle en "Cerebro (26/10/2026)", Fase 7.
+  * **Cómo arrancarlo (receta; el README del cerebro la explica):** en la Pi, en una terminal SSH y en primer plano,
+    `cd ~/apps/ExplorerHat.Orders && dotnet ExplorerHat.Orders.dll --real` (Ctrl+C la para). En el portátil, `dotnet run --project
+    src/ExplorerHat.Brain -- --llm http://<ip del PC de gaming>:11434=qwen2.5:7b --robot http://<ip de la Pi>:5000`. Las IP
+    cambian: se preguntan cada día y no se anotan. La clave está en `~/.explorerhat-clave` del portátil (copiada con `scp`; no se
+    sube). En el servidor, ningún otro modelo cargado (`OLLAMA_MAX_LOADED_MODELS` = 1). **Antes de poner el robot en el suelo:** el
+    usuario confirma con palabras (robot en el suelo, espacio libre, cargador de la UPS quitado, terminal abierta).
+  * **Siguiente, en el orden recomendado:**
+    1. **Antes de mover ruedas, comprueba que giran las dos.** La derecha no giró en la primera prueba y la causa no está
+       confirmada (contacto flojo probable; `tools/probar-cableado.sh`).
+    2. **Que el modelo entienda mejor, y volver a medir.** Cualquier cambio de `herramientas.json` o del mensaje de sistema
+       invalida los 24 de 24 y se repite con `medir.py`. Cuatro mejoras: la descripción de `retroceder` ("hasta 1 s"); las velocidades
+       (hoy `a toda marcha` y `a media velocidad` suelen dar 0,45: debería ser 1 y 0,5); el estado de los sensores como texto; y los
+       ángulos (el robot no los mide: `gira 20 grados` dio 0,5 s adivinado).
+    3. **Medir `qwen3:8b` y `qwen2.5:14b`** en el servidor (el usuario hace `ollama pull` en el PC de gaming).
+    4. **Voz:** Whisper local con *push-to-talk* (la siguiente casilla de la Fase 7).
+    5. **Para un taller con varios robots:** un nombre de red distinto por robot, la IP del PC de gaming fija y repetir la revisión
+       del cortafuegos tras actualizar Ollama.
+    6. **Defecto de aspecto, sin decidir:** en la consola de Windows, lo que se teclea se mezcla con los mensajes del cerebro.
+    7. **dotnet/iot:** el #2625 espera a pgrawehr; se puede pedir que cierren la #2614 (con el visto bueno del usuario antes de
+       publicar).
+- **Sesión del 26/10/2026** (desde el PC; las ruedas giraron solo en la prueba del cerebro con las ruedas en el aire (ver "Cerebro (26/10/2026)"); la Pi, al empezar en `main` (`9a57ad4`), pines en `lo`, `get_throttled` =
   `0x0`, ningún programa del robot en marcha; estaba apagada al empezar y el usuario la encendió).
   * **dotnet/iot, sin novedades:** el #2625 sigue en `CHANGES_REQUESTED` (pgrawehr, 22/10) sin comentarios ni revisiones nuevas
     desde nuestras tres respuestas del 25/10; las 6 compilaciones, el CLA y los dos linters pasan. #2610 y #2616 fusionados.
@@ -388,6 +415,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      petición, que pisa el `-1` del servidor); `tools/medir-llm/herramientas.json` dice "hasta 3 s" en `retroceder` y el servicio recorta a **1 s**
      (la medida de los modelos se hizo con 3 s); cambiar la descripción de la herramienta a 1 s y repetir la medida si
      importa. El README del servicio dice "la misma lista cerrada": es la lista, no los límites.
+  6c. **Siguiente en la Fase 7, después del cerebro (26/10/2026):** ver "Cierre de la sesión del 26/10/2026" en el "Estado
+     actual" (la receta para arrancar el robot con el cerebro y el orden recomendado). Lo primero, comprobar que giran las dos
+     ruedas; después, mejorar `herramientas.json` (retroceder, velocidades, sensores, ángulos) y volver a medir.
   7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que
