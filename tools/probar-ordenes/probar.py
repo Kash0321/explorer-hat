@@ -67,13 +67,20 @@ class Service:
                               {"izquierda": left, "centro": center, "derecha": right, "sinDatos": no_data})
         assert status == 200, f"PUT /simulado/sensores gave {status}"
 
+    def wheels(self, right_stalled=False, left_stalled=False):
+        """Simulator only: a stalled wheel does not count any pulse, whatever its motor does."""
+        status, _ = self.call("PUT", "/simulado/ruedas",
+                              {"derechaParada": right_stalled, "izquierdaParada": left_stalled})
+        assert status == 200, f"PUT /simulado/ruedas gave {status}"
+
 
 CASES = []
 
 
-def case(name, simulator=False):
+def case(name, simulator=False, only=None):
+    """simulator=True: needs the simulator endpoints (--simulado). only="velocidadCero": runs only in that mode."""
     def register(function):
-        CASES.append((name, simulator, function))
+        CASES.append((name, simulator, only, function))
         return function
     return register
 
@@ -336,6 +343,205 @@ def _(s):
     check(s.state()["distanciasCm"] == {"izquierda": 111, "centro": 222, "derecha": 333}, f"{s.state()}")
 
 
+# ---- Movements by pulses: centimetros and grados (the wheel sensors count; simulator: 60 pulses/s * speed) -----
+# The expected results below were written BEFORE the code. The simulator makes each wheel give 60 pulses per second
+# for speed 1.0 (so 36 per second at the pulse speed 0.6) and 3 more pulses of slide after the motors stop.
+# One pulse is 1.02 cm of wheel and 9 degrees of turn. A wheel that is driven and gives no pulse for 0.7 s is "sin_pulsos". The ranges are wide on purpose: the brake (pulses before the
+# target) is a calibration setting of the service, and these cases must not depend on it.
+
+def both_motors_zero(s, what):
+    check(s.state()["motores"] == {"derecha": 0.0, "izquierda": 0.0}, f"{what}: motors not 0: {s.state()['motores']}")
+
+
+@case("30 (sim) avanzar 20 cm: ends by 'distancia', both wheels count about the same, ajustes empty, motors 0 after", True)
+def _(s):
+    status, body = s.action("avanzar", centimetros=20)
+    check(status == 200 and body["estado"] == "terminada" and body["motivo"] == "distancia", f"{status} {body}")
+    for wheel in ("derecha", "izquierda"):
+        between(body["pulsos"][wheel], 10, 30, f"pulsos {wheel}")
+        check(body["resbalon"][wheel] >= 0, f"resbalon {wheel}: {body['resbalon']}")
+    check(abs(body["pulsos"]["derecha"] - body["pulsos"]["izquierda"]) <= 3, f"wheels differ: {body['pulsos']}")
+    between(body["centimetros"], 10, 30, "centimetros")
+    between(body["segundosReales"], 0.2, 2.0, "segundosReales")
+    check(body["ajustes"] == [], f"ajustes {body['ajustes']}")
+    both_motors_zero(s, "after avanzar 20 cm")
+
+
+@case("31 avanzar with both segundos and centimetros: 400; with neither: 400")
+def _(s):
+    check(s.action("avanzar", segundos=1, centimetros=20)[0] == 400, "both accepted")
+    check(s.action("avanzar")[0] == 400, "neither accepted")
+    check(s.action("retroceder", segundos=1, centimetros=10)[0] == 400, "retroceder: both accepted")
+    check(s.action("girar", direccion="derecha", segundos=1, grados=90)[0] == 400, "girar: both accepted")
+    check(s.action("girar", direccion="derecha")[0] == 400, "girar: neither accepted")
+
+
+@case("32 grados only in girar, centimetros only in avanzar and retroceder: 400 otherwise; numbers as text: 400")
+def _(s):
+    check(s.action("avanzar", grados=90)[0] == 400, "avanzar with grados accepted")
+    check(s.action("retroceder", grados=90)[0] == 400, "retroceder with grados accepted")
+    check(s.action("girar", direccion="izquierda", centimetros=10)[0] == 400, "girar with centimetros accepted")
+    check(s.action("avanzar", centimetros="20")[0] == 400, "cm as text accepted")
+    check(s.action("girar", direccion="izquierda", grados="90")[0] == 400, "degrees as text accepted")
+
+
+@case("33 (sim) avanzar 500 cm: cut to 60 cm, with 'centimetros' in ajustes; avanzar 1 cm: cut up to 5 cm", True)
+def _(s):
+    status, body = s.action("avanzar", centimetros=500)
+    check(status == 200 and "centimetros" in body["ajustes"], f"{status} {body}")
+    between(body["centimetros"], 40, 70, "centimetros of the 500 cm order")
+    between(body["segundosReales"], 0, 3.4, "segundosReales")
+    status, body = s.action("avanzar", centimetros=1)
+    check(status == 200 and "centimetros" in body["ajustes"], f"{status} {body}")
+    between(body["centimetros"], 1, 10, "centimetros of the 1 cm order")
+
+
+@case("34 (sim) retroceder 100 cm: cut to 20 cm (it goes blind), in ajustes; both wheels count; motors 0 after", True)
+def _(s):
+    status, body = s.action("retroceder", centimetros=100)
+    check(status == 200 and body["motivo"] == "distancia" and "centimetros" in body["ajustes"], f"{status} {body}")
+    between(body["centimetros"], 8, 28, "centimetros")
+    between(body["segundosReales"], 0, 1.4, "segundosReales")
+    both_motors_zero(s, "after retroceder")
+
+
+@case("35 (sim) girar derecha 180 degrees: right wheel backwards, left forwards while it turns; ends by 'angulo'", True)
+def _(s):
+    run = s.background("girar", direccion="derecha", grados=180)
+    time.sleep(0.15)
+    motors = s.state()["motores"]
+    check(motors["derecha"] < 0 < motors["izquierda"], f"motors {motors}")
+    run["thread"].join()
+    body = run["body"]
+    check(run["status"] == 200 and body["motivo"] == "angulo", f"{run['status']} {body}")
+    between(body["grados"], 120, 240, "grados")
+    both_motors_zero(s, "after girar")
+
+
+@case("36 (sim) girar izquierda 180 degrees: right wheel forwards, left backwards while it turns", True)
+def _(s):
+    run = s.background("girar", direccion="izquierda", grados=180)
+    time.sleep(0.15)
+    motors = s.state()["motores"]
+    check(motors["izquierda"] < 0 < motors["derecha"], f"motors {motors}")
+    run["thread"].join()
+    check(run["body"]["motivo"] == "angulo", f"{run['body']}")
+
+
+@case("37 (sim) girar 1000 degrees: cut to 360 and girar 5 degrees: cut up to the minimum, both in ajustes", True)
+def _(s):
+    status, body = s.action("girar", direccion="derecha", grados=1000)
+    check(status == 200 and "grados" in body["ajustes"] and body["motivo"] == "angulo", f"{status} {body}")
+    between(body["grados"], 270, 450, "grados of the 1000 order")
+    status, body = s.action("girar", direccion="izquierda", grados=5)
+    check(status == 200 and "grados" in body["ajustes"], f"{status} {body}")
+    between(body["grados"], 9, 90, "grados of the 5 order")
+
+
+@case("38 (sim) a speed asked in a movement by pulses is not used: the pulse speed is fixed and 'velocidad' is in ajustes", True)
+def _(s):
+    run = s.background("avanzar", centimetros=30, velocidad=0.3)
+    time.sleep(0.2)
+    motors = s.state()["motores"]
+    between(motors["derecha"], 0.55, 0.65, "right motor")
+    between(motors["izquierda"], 0.55, 0.65, "left motor")
+    run["thread"].join()
+    check("velocidad" in run["body"]["ajustes"], f"ajustes {run['body']['ajustes']}")
+    status, body = s.action("avanzar", centimetros=10)
+    check(body["ajustes"] == [], f"no speed asked, but ajustes {body['ajustes']}")
+
+
+@case("39 (sim) avanzar by pulses with the right wheel stalled: ends by 'ruedas_distintas' in < 1 s, motors 0 after", True)
+def _(s):
+    s.wheels(right_stalled=True)
+    status, body = s.action("avanzar", centimetros=30)
+    check(status == 200 and body["motivo"] == "ruedas_distintas", f"{status} {body}")
+    between(body["segundosReales"], 0.05, 1.0, "segundosReales")
+    both_motors_zero(s, "after stalled avanzar")
+
+
+@case("40 (sim) girar with the right wheel stalled: 'sin_pulsos' after about 0.7 s; the same for retroceder", True)
+def _(s):
+    s.wheels(right_stalled=True)
+    status, body = s.action("girar", direccion="derecha", grados=90)
+    check(status == 200 and body["motivo"] == "sin_pulsos", f"{status} {body}")
+    between(body["segundosReales"], 0.5, 1.6, "segundosReales")
+    both_motors_zero(s, "after stalled girar")
+    status, body = s.action("retroceder", centimetros=10)
+    check(status == 200 and body["motivo"] == "sin_pulsos", f"retroceder: {status} {body}")
+
+
+@case("41 (sim) avanzar with both wheels stalled (a dead sensor on both): 'sin_pulsos', motors 0 after", True)
+def _(s):
+    s.wheels(right_stalled=True, left_stalled=True)
+    status, body = s.action("avanzar", centimetros=30)
+    check(status == 200 and body["motivo"] == "sin_pulsos", f"{status} {body}")
+    between(body["segundosReales"], 0.5, 1.6, "segundosReales")
+    both_motors_zero(s, "after")
+
+
+@case("42 (sim) /parar in the middle of avanzar 60 cm: 'parada' and the motors stay 0 for the next 300 ms (no late write)", True)
+def _(s):
+    run = s.background("avanzar", centimetros=60)
+    time.sleep(0.4)
+    status, body = s.call("POST", "/parar")
+    check(status == 200, f"{status} {body}")
+    for _ in range(10):
+        check(s.state()["motores"] == {"derecha": 0.0, "izquierda": 0.0}, f"a motor came back on: {s.state()['motores']}")
+        time.sleep(0.03)
+    run["thread"].join()
+    check(run["body"]["motivo"] == "parada", f"motivo {run['body']}")
+    both_motors_zero(s, "after /parar")
+
+
+@case("43 (sim) /parar in the middle of girar 360: 'parada', motors 0 and they stay 0", True)
+def _(s):
+    run = s.background("girar", direccion="derecha", grados=360)
+    time.sleep(0.3)
+    check(s.call("POST", "/parar")[0] == 200, "parar")
+    for _ in range(10):
+        check(s.state()["motores"] == {"derecha": 0.0, "izquierda": 0.0}, f"a motor came back on: {s.state()['motores']}")
+        time.sleep(0.03)
+    run["thread"].join()
+    check(run["body"]["motivo"] == "parada", f"motivo {run['body']}")
+
+
+@case("44 (sim) obstacle in front: avanzar by centimetros does not move ('obstaculo'); girar and retroceder by pulses still work", True)
+def _(s):
+    s.sensors(center=20)
+    status, body = s.action("avanzar", centimetros=30)
+    check(status == 200 and body["motivo"] == "obstaculo", f"{status} {body}")
+    between(body["segundosReales"], 0, 0.3, "segundosReales")
+    check(s.action("retroceder", centimetros=10)[1]["motivo"] == "distancia", "retroceder blocked")
+    check(s.action("girar", direccion="derecha", grados=90)[1]["motivo"] == "angulo", "girar blocked")
+
+
+@case("45 (sim) sensors without data: avanzar by centimetros gives 503; girar by grados still works", True)
+def _(s):
+    s.sensors(no_data=True)
+    status, body = s.action("avanzar", centimetros=20)
+    check(status == 503 and "error" in body, f"{status} {body}")
+    check(s.action("girar", direccion="izquierda", grados=90)[0] == 200, "girar blocked")
+
+
+@case("46 (sim) a movement by time also reports the pulses it counted (about 36 per second per wheel)", True)
+def _(s):
+    status, body = s.action("avanzar", segundos=1.0, velocidad=0.6)
+    check(status == 200 and body["motivo"] == "tiempo", f"{status} {body}")
+    for wheel in ("derecha", "izquierda"):
+        between(body["pulsos"][wheel], 25, 45, f"pulsos {wheel}")
+
+
+@case("47 (zero speed, real pins and real wheel sensors) avanzar 10 cm: the wheels never turn, so 'sin_pulsos' after about 0.7 s with 0 pulses",
+      only="velocidadCero")
+def _(s):
+    status, body = s.action("avanzar", centimetros=10)
+    check(status == 200 and body["motivo"] == "sin_pulsos", f"{status} {body}")
+    between(body["segundosReales"], 0.5, 1.6, "segundosReales")
+    check(body["pulsos"] == {"derecha": 0, "izquierda": 0}, f"pulsos {body['pulsos']}")
+    both_motors_zero(s, "after")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://localhost:5000")
@@ -352,16 +558,17 @@ def main():
         return 2
 
     passed = failed = skipped = 0
-    for name, needs_simulator, function in CASES:
+    for name, needs_simulator, only_mode, function in CASES:
         if arguments.solo and not name.startswith(arguments.solo):
             continue
-        if needs_simulator and mode != "simulado":
+        if (needs_simulator and mode != "simulado") or (only_mode is not None and mode != only_mode):
             print(f"SKIP  {name}")
             skipped += 1
             continue
         try:
             if mode == "simulado":
                 service.sensors()
+                service.wheels()
             rest(service)
             function(service)
             print(f"ok    {name}")

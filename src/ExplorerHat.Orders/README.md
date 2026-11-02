@@ -28,8 +28,20 @@ Todas las peticiones llevan la cabecera `X-Clave`. La clave está en `~/.explore
 | `POST /parar` | Para los motores al momento. Es lo mismo que la acción `parar` |
 | `GET /estado` | Modo, si está ocupado, velocidad de las ruedas, luces y distancias |
 | `PUT /simulado/sensores` | Solo con `--simulado`: fija las distancias de las pruebas |
+| `PUT /simulado/ruedas` | Solo con `--simulado`: `{"derechaParada": true}` hace que una rueda no cuente pulsos (prueba `sin_pulsos`) |
 
-Acciones (la misma lista cerrada que `tools/medir-llm/herramientas.json`): `avanzar(segundos, velocidad?)`, `retroceder(segundos, velocidad?)`, `girar(direccion, segundos, velocidad?)`, `luz(color, encendida)` y `parar()`.
+Acciones: `avanzar`, `retroceder`, `girar(direccion)`, `luz(color, encendida)` y `parar()`. Un movimiento lleva **`segundos` o una medida en pulsos, nunca los dos**: `centimetros` en `avanzar` y `retroceder`, `grados` en `girar` (400 si vienen los dos o ninguno). Además, `velocidad?` (0 a 1). **`tools/medir-llm/herramientas.json` (lo que ve el modelo) todavía solo ofrece `segundos`**: `centimetros` y `grados` los usa el cerebro cuando se actualice el contrato (Fase 7, etapa 1 de la autonomía).
+
+## Movimientos por pulsos (`centimetros` y `grados`)
+
+El robot cuenta los pulsos de los sensores de rueda LM393 (el derecho en GPIO 25 y el izquierdo en GPIO 18) con el método de la lección 10: un hilo lee los dos pines cada milisegundo mientras el robot se mueve y cuenta los cambios de Low a High. Cada disco tiene 20 ranuras: **un pulso son 1,02 cm de rueda** y, al girar sobre sí mismo con las ruedas a 13 cm, **un pulso son 9°**.
+
+* **`avanzar`** (de 5 a 60 cm): las dos ruedas van a la vez y el servicio corrige la velocidad de cada una según los pulsos de diferencia (como la lección 10, parte 2). **`retroceder`** (de 5 a 20 cm) y **`girar`** (de 20 a 360°): cada rueda se para sola al llegar a sus pulsos.
+* **El freno:** el robot resbala un poco después de parar los motores, así que cada rueda se para unos pulsos **antes** del objetivo. Los valores iniciales (6 al avanzar, 4 al retroceder y 4 al girar) son los de la lección 10 y **se calibran en el suelo**; se cambian al arrancar el servicio, sin compilar: `--freno-avance`, `--freno-atras` y `--freno-giro`.
+* **La velocidad es fija** (`--velocidad-pulsos`, 0,6 por defecto): el freno está calibrado para una sola velocidad. Si el cerebro pide otra, no se usa y la respuesta lo dice en `ajustes`.
+* **Los tiempos máximos no cambian:** 3 s (1 s hacia atrás). Si no llega, termina con `tiempo_agotado`. Los límites en cm y grados son iniciales y se revisan con las medidas del suelo.
+* **Motivos de fin de un movimiento por pulsos:** `distancia` o `angulo` (llegó); `tiempo_agotado`, `sin_pulsos` (una rueda que se mueve no cuenta ningún pulso en 0,7 s: no gira o su sensor no cuenta), `ruedas_distintas` (al avanzar, más de 10 pulsos de diferencia entre las ruedas), `obstaculo`, `sensores` y `parada`. **El motivo `tiempo` solo es de los movimientos por tiempo**, así no se confunde con haber llegado.
+* **La respuesta trae lo que pasó de verdad:** `pulsos` de cada rueda (también en los movimientos por tiempo), y en los de pulsos `resbalon` (pulsos contados en los 0,3 s siguientes a parar) y `centimetros` o `grados` reales. Sirven para calibrar el freno.
 
 ## Reglas de seguridad
 
@@ -42,7 +54,7 @@ Acciones (la misma lista cerrada que `tools/medir-llm/herramientas.json`): `avan
 
 ## Pruebas
 
-`tools/probar-ordenes/probar.py` hace pruebas de caja negra por HTTP: 29 casos con el resultado esperado escrito antes del servicio. Rechaza ejecutarse contra un servicio en modo `--real`.
+`tools/probar-ordenes/probar.py` hace pruebas de caja negra por HTTP: 47 casos con el resultado esperado escrito antes del servicio (los 29 primeros, de los movimientos por tiempo; del 30 al 47, de los de pulsos, con ruedas simuladas: 60 pulsos por segundo a velocidad 1 y 3 pulsos de resbalón). Rechaza ejecutarse contra un servicio en modo `--real`. En `--velocidad-cero` pasan solo los casos que no usan el simulador y **el camino de `avanzar` necesita los sensores de distancia despejados** (con algo a menos de 30 cm, termina al instante por `obstaculo`: es la protección, no un fallo).
 
 ```bash
 dotnet run --project src/ExplorerHat.Orders -- --simulado --puerto 5099 --clave-archivo <ruta>

@@ -99,3 +99,27 @@ herramientas.json o el mensaje de sistema, hay que volver a medir con medir.py: 
 de valer. Cuéntame cuánto puede tardar cada comando largo. Al terminar, anota los resultados en PLAN.md,
 en una rama nueva con su PR.
 ```
+
+## Variante: seguir la etapa 1 de la autonomía (pulsos), tras la parada del 02/11/2026
+
+Esta variante es para la sesión que sigue a la tarde del 02/11/2026. Ese día se escribió, en la Pi, que `avanzar`, `retroceder` y `girar` acepten `centimetros` y `grados` contados con los sensores de rueda, y se probó hasta el aire (PC con ruedas simuladas, Pi en `--velocidad-cero` y `--real` con las ruedas en el aire). **Falta el suelo y la calibración del freno.** Ver `PLAN.md`: el "Estado actual" (primer punto, "Parada de la sesión del 02/11/2026"), con **qué falta, en este orden**, y "Hoja de ruta de la autonomía" en la Fase 7.
+
+**Antes de pegarla:**
+
+1. **El trabajo está confirmado y subido (un commit, sin PR) en la rama `fase-7-pulsos`.** No empieces en `main`: el PC debe estar en `fase-7-pulsos` (`git status`). La Pi está en `main` y tiene desplegado `~/apps/ExplorerHat.Orders` con el código de esa rama (hash de la DLL `a54d3406…`).
+2. **Mañana hace falta:** la Pi encendida y con wifi, la UPS cargada y **dos terminales SSH abiertas en la Pi** (una para el servicio y otra para `senal-en-movimiento.sh`). **Para el suelo:** cinta métrica, transportador, unos 1,2 m libres delante y más de 30 cm libres a los dos lados del camino, y el cargador de la UPS quitado. **Despeja el frente de los tres sensores de distancia** (a menos de 30 cm de cualquiera, `avanzar` se para al instante: el 02/11/2026 pasó con algo a 8 cm del sensor derecho).
+3. Si vas a tocar el modelo (PR B), necesitas el servidor de modelos del PC de gaming encendido y su IP del día (no se anota en el repositorio), sin otro modelo cargado. **La etapa del modelo va después del suelo.**
+
+Pega el prompt de arriba y **añade esto al final**:
+
+```text
+Hoy seguimos la etapa 1 de la autonomía (centimetros y grados por pulsos). Haz los pasos 1 a 3 (incluido
+dotnet/iot, que son 5 minutos) y después lee en PLAN.md el primer punto del "Estado actual" ("Parada de la
+sesión del 02/11/2026") y "Hoja de ruta de la autonomía" (Fase 7). Trabajas en la rama fase-7-pulsos
+(ya subida, sin PR): no cambies de rama. Empieza por "Qué falta", punto 0, y pregúntame qué vi en los
+movimientos del aire y qué dijo calibrar.py. No muevas el robot sin mi confirmación explícita (ruedas en el aire, o las palabras del suelo).
+Cualquier cambio de código del servicio es código nuevo con motores: consulta al asesor antes de moverlos.
+Antes de fijar el plan de hoy, consulta al asesor. Una pregunta por decisión, con contexto y tu
+recomendación. Cuéntame cuánto puede tardar cada comando largo. Anota cada ronda de calibración en PLAN.md
+según la haces. Al terminar, commit, PR (el merge lo hago yo) y deja "Al retomar" al día.
+```

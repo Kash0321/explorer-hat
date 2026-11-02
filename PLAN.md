@@ -7,6 +7,72 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
 ## Estado actual (02/11/2026)
+- **Parada de la sesión del 02/11/2026 (tarde, sobre las 18:10): la etapa 1 de la autonomía está escrita y probada hasta el aire; falta el suelo.**
+  El usuario tuvo que irse y pidió **commit y push de la rama, sin PR** (hecho al final de la sesión). Nada se movió en el suelo.
+  * **Dónde está el trabajo.** En el PC y en GitHub (`origin`), rama **`fase-7-pulsos`** (sale de `main` en `93cfae8`), con **un commit y sin PR todavía**:
+    `src/ExplorerHat.Orders/OrderParser.cs`, `OrderRunner.cs`, `Program.cs` y `Wheels.cs` (nuevo), el README del servicio,
+    `tools/probar-ordenes/probar.py` (47 casos) y `calibrar.py` (nuevo), `tools/probar-ordenes/senal-en-movimiento.sh` (nuevo) y
+    estos documentos. La rama **no está fusionada ni tiene PR**: el freno sigue sin calibrar en el suelo. La Pi sigue en `main` (`93cfae8`) y tiene desplegado
+    `~/apps/ExplorerHat.Orders` con el código de esa rama (hash de la DLL `a54d3406…`, publicado el 02/11/2026 a las 17:41): si el
+    código cambia, hay que volver a publicar y copiar (receta en "Qué falta", punto 0). Servicio parado, 8 pines en `lo`,
+    `get_throttled` = `0x0`, registro de pines borrado.
+  * **Qué se hizo.** El servicio de órdenes acepta `centimetros` (`avanzar` 5 a 60 cm, `retroceder` 5 a 20 cm) y `grados` (`girar` 20 a 360°)
+    **en vez de** `segundos` (los dos juntos o ninguno dan 400). Cuenta los pulsos de los sensores de rueda con el método de la lección 10
+    (un hilo lee GPIO 25 y 18 cada milisegundo; un pulso = 1,02 cm o 9°). `avanzar` corrige la velocidad entre ruedas; `retroceder` y `girar` paran
+    cada rueda al llegar a sus pulsos. Los tiempos máximos no cambian (3 s, 1 s hacia atrás). Motivos de fin nuevos: `distancia`, `angulo`,
+    `tiempo_agotado`, `sin_pulsos` (una rueda que se mueve no cuenta nada en 0,7 s), `ruedas_distintas`; `tiempo` queda solo para los
+    movimientos por tiempo. La respuesta trae `pulsos` (también en los movimientos por tiempo), `resbalon` y `centimetros` o `grados` reales.
+    La velocidad de estos movimientos es fija (`--velocidad-pulsos`, 0,6) y el freno se ajusta al arrancar (`--freno-avance` 6, `--freno-atras` 4,
+    `--freno-giro` 4: los de la lección 10, **sin calibrar en el suelo**). `/estado` dice qué freno usa. Detalle en el README del servicio.
+  * **Probado.** (1) PC, `--simulado`: **46 de 47 casos** (los 29 antiguos sin cambios; el 47 es solo de la Pi), escritos antes del código, y **4 fallos
+    metidos a propósito** (parada tardía sin la guarda del `lock`, giro al revés, rueda parada sin aviso, objetivo mal calculado) que las pruebas
+    detectaron. (2) Pi, `--velocidad-cero` (sensores de rueda reales, ruedas quietas): 26 casos bien, incluido el 47 (0 pulsos y `sin_pulsos` a los
+    0,7 s); `INT` y `TERM` durante un movimiento dan 130 y 143, con el mensaje de parada y los pines en `lo`. (3) Pi, **`--real`, ruedas en el aire,
+    con la confirmación del usuario y la consulta al asesor:** `avanzar` 2 s a 0,6 dio **86 pulsos a la derecha y 89 a la izquierda** (la lección 10 midió 92 en la
+    derecha): **el sondeo de 1 ms no pierde pulsos con el servicio en marcha**. `girar` 360° dio 39 y 40 pulsos (objetivo 40), `avanzar` 60 cm dio 57
+    pulsos (58,2 cm), `retroceder` 20 cm dio 18 y 19 (18,9 cm); `/parar` a los 0,5 s de `avanzar` 60 cm terminó con `parada` a los 0,48 s y los
+    motores se quedaron en 0. El registro de pines (`vigilar-pines.sh`, 8796 muestras) **no tuvo ningún pin en alto sin programa en marcha**.
+    **Falta que el usuario confirme con los ojos el sentido de cada rueda en esos movimientos** (no contestó la tabla) y el resultado de `calibrar.py` en el aire: el
+    registro de pines mostró más movimientos después de mi última revisión, así que probablemente lo ejecutó (sin salida que yo haya visto).
+  * **Qué falta, en este orden:**
+    0. **Al empezar:** `main` y la Pi como siempre, pero **estás en `fase-7-pulsos`** (`git status`). Comprueba que la Pi tiene el servicio nuevo
+       (`sha256sum ~/apps/ExplorerHat.Orders/ExplorerHat.Orders.dll` = `a54d3406…`). Si cambias código: `dotnet build` + `python tools/probar-ordenes/probar.py`
+       con `--simulado` (46 ok), `dotnet publish src/ExplorerHat.Orders/ExplorerHat.Orders.csproj -c Release -r linux-arm64 --self-contained false -o <carpeta>`,
+       copiar solo los archivos (no las subcarpetas de idiomas) con el `scp.exe` de Windows a `~/apps/ExplorerHat.Orders/`, `chmod -R go-w` y `sync`.
+       **Cualquier cambio de código del servicio es código nuevo con motores: otra consulta al asesor antes de moverlos.**
+    1. **Pregunta al usuario** qué vio en la tabla de movimientos del aire (sentido de cada rueda) y qué dijo `calibrar.py` (sin `--medir`).
+    2. **Arrancar el servicio en la terminal del usuario** (`cd ~/apps/ExplorerHat.Orders && dotnet ExplorerHat.Orders.dll --real`), con el
+       registro de pines (`tools/vigilar-pines.sh`, línea al principio del script, con el registro en `~`) y **los tres sensores de distancia a más de
+       30 cm**: el 02/11/2026 un objeto a 8 cm del sensor derecho paró todos los `avanzar` (`obstaculo`), y no era un fallo.
+    3. **Señal `INT` en pleno `avanzar` por pulsos** (el asesor lo pidió **antes del suelo**: ese camino escribe en los motores cada 2 ms, como el
+       fallo del 17/10; `--velocidad-cero` no lo cubre porque solo escribe 0,0): `bash tools/probar-ordenes/senal-en-movimiento.sh` en la Pi, **en una
+       segunda terminal** (con el servicio en la primera, `--real` y las ruedas en el aire; pregunta si están en el aire). Manda `avanzar` 60 cm, un `INT`
+       a los 0,4 s y lee los pines 15 veces. Cierra el servicio: hay que reiniciarlo después. **Probado el 02/11/2026 solo la mecánica, con `--velocidad-cero`**
+       (BIEN, sin pines en alto); en ese caso el hilo del movimiento recibió `Cannot access a disposed object ... HatMotor` (500) porque la parada de
+       emergencia cerró el hardware mientras escribía: es el camino previsto (el servicio lo captura y el motor no se enciende), no una alarma. Con
+       motores reales, lo que decide es que los pines queden en `lo` y que el usuario vea las ruedas paradas.
+    4. **El suelo**, con las palabras de confirmación (robot en el suelo, espacio libre, cargador de la UPS quitado y terminal abierta). Espacio: unos
+       1,2 m libres delante y **más de 30 cm libres a los dos lados del camino** (un sensor lateral también para `avanzar`). Referencias: cinta en la salida y
+       medir siempre el mismo punto (la línea del eje); para los giros, una cinta a lo largo del eje del robot y medir el cambio de rumbo en el punto medio
+       entre las ruedas. `python tools/probar-ordenes/calibrar.py --url http://<ip de la Pi>:5000 --medir` (en el PC) y se sigue su sugerencia de freno:
+       **cada cambio es reiniciar el servicio** con `--freno-avance N`, `--freno-atras N` o `--freno-giro N`. **Anota cada ronda aquí** (frenos, pedido,
+       medido), no al final. Los giros de 20° y 45° saldrán poco precisos (un pulso son 9°): sirven para fijar el mínimo. Si `0,6` no arranca bien o
+       resulta poco fiable, la velocidad de los pulsos es una opción (`--velocidad-pulsos`) y el freno se calibra para ella.
+    5. **Con los datos:** fijar los límites en cm y grados (`OrderParser`: hoy 5 a 60, 5 a 20 y 20 a 360, iniciales), los frenos por defecto
+       (`PulseSettings.Default`) y el README del servicio. Repetir `probar.py` y volver a desplegar.
+    6. **PR A** (de `fase-7-pulsos`, con un commit nuevo si hay cambios; el usuario hace el merge; después, rama borrada, `main` al día y la Pi con `git pull`).
+    7. **PR B: contrato v2, cerebro y medida** (ver "Hoja de ruta de la autonomía", más abajo): `herramientas.json` con `centimetros` y `grados`,
+       `retroceder` "hasta 1 s", velocidades por palabra (toda = 1, media = 0,5), regla de obstáculo cerca, y el texto de los sensores.
+  * **Decisiones del usuario, 02/11/2026.** (a) **Grados con los discos perforados:** sí, y **primero la etapa 1 en la Pi y después medir el modelo con el
+    contrato definitivo** (opción B de la pregunta). (b) **Texto de los sensores para el modelo: hoy sí** (opción 2 de la pregunta del alcance): el cerebro
+    lee `/estado` antes de cada orden. (c) **Obstáculo cerca (decisión B):** si algún sensor marca menos de 30 cm y piden avanzar, **el modelo no llama a
+    ninguna herramienta y avisa** ("hay algo a 8 cm delante, ¿giro?"); `girar` y `retroceder` no se bloquean. (La Pi sigue siendo la autoridad de seguridad;
+    el asesor avisó de que el modelo decide con un dato que puede tener ruido: medirlo.) (d) **El modo autónomo de A a B esquivando obstáculos:** el
+    usuario quiere llegar a él; la valoración y las etapas están en "Hoja de ruta de la autonomía".
+  * **Lo aprendido hoy.** El sensor de rueda cuenta a toda velocidad (unos 43 a 44 pulsos por segundo a 0,6 en el aire). Un objeto a menos de 30 cm de **cualquier**
+    sensor de distancia para `avanzar`. `pgrep -f` se encuentra a sí mismo en un comando por SSH (lo ya sabido): para el PID del servicio, usa `pgrep -x dotnet`.
+    La IP del PC de gaming **no se anota**: se pregunta cada día. El 02/11/2026 el servidor tenía `qwen2.5:3b`, `qwen2.5:7b` y dos `qwen2.5-coder`, y ningún
+    modelo cargado (`/api/ps` vacío).
 - **Sesión del 02/11/2026** (desde el PC; las ruedas giraron solo en la prueba de las ruedas, en el aire y con la confirmación del
   usuario; la Pi estaba apagada al empezar y el usuario la encendió; ya encendida: `main` en `70f4181`, 8 pines en `lo`,
   `get_throttled` = `0x0`, ningún programa del robot en marcha).
@@ -2173,3 +2239,37 @@ diseño (con la consulta al asesor, que pidió las tres primeras correcciones an
     `a toda velocidad` sí dio 1); `a media velocidad` dio 0,45 y no 0,5; `a poca velocidad`, 0,2. `gira a la izquierda 20 grados` dio
     `girar(segundos=0.5)`: **el robot no mide ángulos** y el modelo adivina un tiempo. Idea para más adelante, sin medir: giros por
     ángulo con los sensores de velocidad LM393 (cuentan los pasos de rueda) o una equivalencia de segundos a grados medida.
+    (Ya en marcha el 02/11/2026: ver "Hoja de ruta de la autonomía".)
+
+### Hoja de ruta de la autonomía (02/11/2026)
+Petición del usuario: llegar a un modo en el que el robot, con un campo de obstáculos, vaya de un punto A a un punto B sorteando los obstáculos
+"de la mejor forma que pueda, con cierta eficiencia teniendo en cuenta los modelos que manejamos". **Valoración (con la consulta al asesor): viable en
+una versión acotada; no como camino óptimo ni con el modelo dentro del bucle rápido.**
+* **Quién conduce.** El código de la Pi (pulsos de rueda y sensores de distancia) cierra el bucle rápido: es seguro y da la eficiencia. El modelo interpreta el objetivo,
+  elige la estrategia y explica lo que hace. Un modelo dentro del bucle (parar, pensar, actuar) tarda de 0,5 a 1 s por decisión más el movimiento (el 7B del servidor
+  midió 0,44 s de mediana) y razona mal sobre el espacio: sirve como **experimento, medido contra una línea base determinista** (buen material de taller: "reflejo
+  contra modelo").
+* **Límites, con nuestros datos.** Los 3 sensores de distancia miran hacia delante con un cono estrecho (pueden no ver objetos finos o inclinados) y los lados y la parte
+  de atrás están ciegos (por eso `retroceder` dura 1 s como máximo). La odometría se desvía: ±9° por giro (un pulso), de 4 a 7 pulsos de resbalón, el robot tira a la
+  izquierda sin corrección y no hay giroscopio ni brújula, así que el error se acumula. Por eso: **campo pequeño (por ejemplo 2 × 2 m), obstáculos con forma de caja,
+  huecos anchos y un camino "suficientemente bueno"**. La eficiencia se mide: tasa de éxito y tiempo en N pruebas sobre un campo fijo.
+* **Etapas (cada una se mide):**
+  1. **`grados` y `centimetros` por pulsos en la Pi, con calibración en el suelo.** En marcha (02/11/2026): ver el "Estado actual" y el README del servicio. Es la rama `fase-7-pulsos`.
+  2. **Posición (x, y, rumbo) y distancias en `/estado`:** integrar los pulsos de las dos ruedas (el sentido se sabe por lo que se manda al motor: el sensor tiene un solo canal).
+  3. **Bucle de navegación:** primero determinista (ir hacia B; si un sensor ve algo cerca, girar hacia el lado más libre: línea base) y después con el modelo en el bucle, con el
+     mismo campo y las mismas pruebas. Cada paso del bucle con el modelo **vuelve a leer `/estado`** (las distancias que se leyeron antes de empezar ya no valen).
+* **Seguridad del modo autónomo (diseñarla antes de la primera prueba en el suelo):** mueve el robot sin una orden por cada acción. Necesita un límite de tiempo y de pasos totales,
+  la parada por palabra y Ctrl+C, la capa de obstáculos de la Pi y las palabras de confirmación del suelo.
+* **PR B (contrato, cerebro y medida), lo que no se debe perder:**
+  * `herramientas.json` v2: `centimetros` y `grados` (el cerebro **no añade `segundos`** si ya hay una de esas medidas), `retroceder` "hasta 1 s" (y límites por acción en `limites`),
+    velocidades por palabra (toda = 1, media = 0,5, poca = 0,2; sin el "por defecto 0,45" que el 7B copia), la regla de obstáculo cerca (**cualquier sensor a menos de 30 cm y
+    piden avanzar: ninguna herramienta y un aviso**, solo para `avanzar`) y el texto de los sensores.
+  * **Texto de los sensores:** el cerebro lee `/estado` una vez antes de cada orden, **con un límite de tiempo corto** (si falla, la orden sigue) y con el mismo formato que `medir.py`
+    (incluido el texto de "sin datos"). Está **fuera** de lo medido el 26/10: hay que volver a medir.
+  * **`medir.py`:** opción `--herramientas <ruta>` para medir otra configuración, límites por acción, una línea de sensores en cada orden (la misma que el cerebro) y, para las
+    órdenes de sensores, una comprobación del texto o una lectura a mano (hoy solo puntúa las llamadas). **No pisar los resultados del 26/10.**
+  * **Método:** medir por pasos: v1 (configuración antigua con las órdenes nuevas), v2a (retroceder y velocidades) y v2b (más el texto de sensores), cada una con 1 cliente y con
+    6. **`ordenes.json` va a git antes de la primera medida** y no se edita después de ver los resultados. Frases de velocidad que no estén en el mensaje de sistema ("a todo gas",
+    "lentito", "a medio gas"). Comprobar `promptTokens` contra `num_ctx` 2048 (si el mensaje crece más, Ollama recorta el principio sin avisar).
+  * **Pruebas del cerebro (`probar.py`):** el texto de sensores llega al modelo, un `/estado` lento o caído deja pasar la orden, la parada por palabra sigue funcionando; con un fallo
+    metido a propósito. Sin ruedas: `--simulado` (las distancias con `PUT /simulado/sensores`) y `--velocidad-cero`. Un `--real` es código nuevo con motores: asesor y confirmación.

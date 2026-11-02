@@ -247,7 +247,7 @@ El entorno está organizado en soluciones independientes según el nivel de apre
 
 ## 🧰 Herramientas (`tools/`)
 
-Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `probar-ruedas.sh` (comprueba solo que las dos ruedas giran en los dos sentidos, con las ruedas en el aire: sirve antes de cada taller), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Para la Fase 7: `medir-llm/` (mide un modelo de lenguaje local con 24 órdenes en español), `probar-ordenes/` (pruebas del servicio de órdenes por HTTP) y `probar-obstaculo.sh` (su capa de obstáculos con los sensores reales, sin mover las ruedas). Cada script explica su uso al principio.
+Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `probar-ruedas.sh` (comprueba solo que las dos ruedas giran en los dos sentidos, con las ruedas en el aire: sirve antes de cada taller), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Para la Fase 7: `medir-llm/` (mide un modelo de lenguaje local con 24 órdenes en español), `probar-ordenes/` (pruebas del servicio de órdenes por HTTP; incluye `calibrar.py`, que prueba y calibra los movimientos por pulsos, y `senal-en-movimiento.sh`) y `probar-obstaculo.sh` (su capa de obstáculos con los sensores reales, sin mover las ruedas). Cada script explica su uso al principio.
 
 ---
 

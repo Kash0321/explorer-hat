@@ -12,6 +12,9 @@ using ExplorerHat.Orders;
 //   dotnet ExplorerHat.Orders.dll --velocidad-cero              (real pins, the wheels never turn)
 //   dotnet ExplorerHat.Orders.dll --real                        (the wheels turn: wheels in the air first!)
 //   Options: --puerto 5000   --clave-archivo <path>
+//   Calibration of the movements by pulses (centimetros, grados), no rebuild needed:
+//     --velocidad-pulsos 0.6   --freno-avance 6   --freno-atras 4   --freno-giro 4
+//     (the brake is how many pulses before the target each wheel stops: the robot slides a bit after the motors stop)
 
 string mode = args.Contains("--simulado") ? "simulado" : args.Contains("--velocidad-cero") ? "velocidadCero" : args.Contains("--real") ? "real" : "";
 if (mode == "")
@@ -30,17 +33,35 @@ int port = int.Parse(Option("--puerto", "5000"));
 string keyFile = Option("--clave-archivo", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".explorerhat-clave"));
 string key = ReadOrCreateKey(keyFile);
 
+var defaults = PulseSettings.Default;
+var pulseSettings = new PulseSettings(
+    double.Parse(Option("--velocidad-pulsos", defaults.Speed.ToString(System.Globalization.CultureInfo.InvariantCulture)), System.Globalization.CultureInfo.InvariantCulture),
+    int.Parse(Option("--freno-avance", defaults.BrakeForwards.ToString())),
+    int.Parse(Option("--freno-atras", defaults.BrakeBackwards.ToString())),
+    int.Parse(Option("--freno-giro", defaults.BrakeTurn.ToString())));
+if (pulseSettings.Speed < 0.3 || pulseSettings.Speed > 1.0 || pulseSettings.BrakeForwards < 0 || pulseSettings.BrakeBackwards < 0 || pulseSettings.BrakeTurn < 0)
+{
+    Console.WriteLine("Valores fuera de rango: --velocidad-pulsos de 0.3 a 1.0 y los frenos, 0 o más.");
+    return 2;
+}
+
 SafeExplorerHat? hat = null;
 HatSensors? hatSensors = null;
+HatWheelCounter? hatWheels = null;
 IRobotBody body;
 IDistanceSensors sensors;
+IWheelCounter wheels;
 SimulatedSensors? simulatedSensors = null;
+SimulatedWheelCounter? simulatedWheels = null;
 
 if (mode == "simulado")
 {
-    body = new SimulatedBody();
+    var simulatedBody = new SimulatedBody();
+    body = simulatedBody;
     simulatedSensors = new SimulatedSensors();
     sensors = simulatedSensors;
+    simulatedWheels = new SimulatedWheelCounter(simulatedBody);
+    wheels = simulatedWheels;
 }
 else
 {
@@ -48,14 +69,18 @@ else
     hatSensors = new HatSensors();
     body = new HatBody(hat, zeroSpeed: mode == "velocidadCero");
     sensors = hatSensors;
+    hatWheels = new HatWheelCounter();
+    wheels = hatWheels;
 }
 
 // SafeExplorerHat stops the motors on Ctrl+C, kill, SSH loss or an unhandled error: Run() stays inside "using"
 using (hat)
 using (hatSensors)
+using (hatWheels)
+using (simulatedWheels)
 using (var monitor = new ObstacleMonitor(sensors))
 {
-    var runner = new OrderRunner(body, monitor);
+    var runner = new OrderRunner(body, monitor, wheels, pulseSettings);
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Logging.SetMinimumLevel(LogLevel.Warning);
@@ -116,6 +141,7 @@ using (var monitor = new ObstacleMonitor(sensors))
                 verde = body.IsLightOn("verde"),
             },
             distanciasCm = distances is null ? null : new { izquierda = distances.Left, centro = distances.Center, derecha = distances.Right },
+            pulsos = new { velocidad = pulseSettings.Speed, frenoAvance = pulseSettings.BrakeForwards, frenoAtras = pulseSettings.BrakeBackwards, frenoGiro = pulseSettings.BrakeTurn },
         });
     });
 
@@ -131,7 +157,19 @@ using (var monitor = new ObstacleMonitor(sensors))
         });
     }
 
+    if (simulatedWheels is not null)
+    {
+        // Only in --simulado: a stalled wheel counts no pulse, whatever its motor does
+        app.MapPut("/simulado/ruedas", async (HttpRequest request) =>
+        {
+            var values = await request.ReadFromJsonAsync<SimulatedWheels>();
+            simulatedWheels.SetStalled(values?.DerechaParada ?? false, values?.IzquierdaParada ?? false);
+            return Results.Json(new { estado = "ok" });
+        });
+    }
+
     Log($"Servicio de órdenes en el puerto {port}, modo {mode}. Clave en {keyFile}");
+    Log($"Movimientos por pulsos: velocidad {pulseSettings.Speed}, frenos {pulseSettings.BrakeForwards} (avance), {pulseSettings.BrakeBackwards} (atrás), {pulseSettings.BrakeTurn} (giro)");
     app.Run();
 }
 
@@ -170,3 +208,5 @@ static string ReadOrCreateKey(string path)
 }
 
 record SimulatedValues(double Izquierda = 400, double Centro = 400, double Derecha = 400, bool SinDatos = false);
+
+record SimulatedWheels(bool DerechaParada = false, bool IzquierdaParada = false);
