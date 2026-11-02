@@ -6,9 +6,52 @@ y robótica) con Raspberry Pi 3 B+, Pimoroni Explorer HAT Pro y .NET 10, y revis
 
 Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
 
-## Estado actual (26/10/2026)
+## Estado actual (02/11/2026)
+- **Sesión del 02/11/2026** (desde el PC; las ruedas giraron solo en la prueba de las ruedas, en el aire y con la confirmación del
+  usuario; la Pi estaba apagada al empezar y el usuario la encendió; ya encendida: `main` en `70f4181`, 8 pines en `lo`,
+  `get_throttled` = `0x0`, ningún programa del robot en marcha).
+  * **dotnet/iot, sin novedades** desde el 26/10: el #2625 sigue en `CHANGES_REQUESTED` (pgrawehr, 22/10) y no hay respuesta a
+    nuestras tres del 25/10; las 6 compilaciones, el CLA y los dos linters pasan y el PR es fusionable. #2614 (el último
+    comentario es el nuestro), #2615 (sin comentarios) y #2617 (el último es de pgrawehr, 22/10). `upstream/main` en `41086078`;
+    clon `C:\work\iot` en `explorerhat-io` (`c4119033`), limpio.
+  * **Herramienta nueva: `tools/probar-ruedas.sh`** (rama `fase-7-probar-ruedas`). Comprueba **solo las ruedas**, a toda velocidad
+    con `pinctrl` (sin PWM, independiente de .NET), con las ruedas en el aire: derecha hacia delante y hacia atrás, izquierda hacia
+    delante y hacia atrás, 2 a 3 s cada una. **Enter antes de cada giro y `s/n` después** (así se sabe qué paso falló y una
+    persona responde antes de cada giro). Se niega sin terminal o con un programa del robot en marcha; deja los pines en `lo` con
+    Ctrl+C, `parar-robot.sh` o una sesión SSH perdida. `probar-cableado.sh` sigue para revisar todo el cableado.
+  * **Fallo encontrado por el asesor antes de la primera prueba (con motores):** `parar-robot.sh` no conocía el script y, como la
+    primera versión pasaba sola de un paso al siguiente, tras la parada habría vuelto a encender un motor. La misma revisión
+    llevó a pedir Enter antes de cada giro y `s/n` después. **Arreglado:** `[p]robar-ruedas[.]sh` está en `tools/parar-robot.sh`,
+    `tools/vigilar-pines.sh` y la tarea de VS Code; la regla (un script de `tools/` que mueve motores y los para con un
+    temporizador tiene que estar en la lista; `probar-cableado.sh` no, porque sus motores giran hasta que se pulsa Enter) está en
+    `AGENTS.md`. **Probado en la Pi sin mover nada** (copia
+    en la que `op dh` pasa a `op dl` y cada giro dura 12 s, con el mismo nombre): `parar-robot.sh` desde otra sesión, en pleno giro,
+    termina el script (exit 1); con el `parar-robot.sh` antiguo el script sigue y pide el paso siguiente. En el PC, con un
+    `pinctrl` falso: secuencia, respuestas `n`, cortes con `INT`, `TERM` y `HUP`, y un fallo metido a propósito (sin `trap`, el motor
+    queda en alto).
+  * **Resultado con las ruedas en el aire (02/11/2026): las dos ruedas giran en los dos sentidos** (el usuario contestó `s` en los
+    cuatro pasos; los pines acabaron en `lo`). **Contadores de los sensores LM393** (cambios en 2 a 3 s, a toda velocidad):
+
+    | Paso | Sensor derecho (GPIO 25) | Sensor izquierdo (GPIO 18) |
+    |---|---|---|
+    | Derecha, hacia delante | 207 | 0 |
+    | Derecha, hacia atrás | 182 | 0 |
+    | Izquierda, hacia delante | 0 | 183 |
+    | Izquierda, hacia atrás | 0 | 207 |
+
+    **Lectura:** el sondeo con un proceso `pinctrl` por lectura **sí cuenta a toda velocidad** (unos 70 a 100 cambios por segundo, no
+    "pocos e irregulares" como se temió). Con la rueda quieta marcó 0 (en seco) y la rueda contraria marcó 0 en los cuatro pasos:
+    **el contador separa bien una rueda que gira (más de 180) de una quieta (0)**. Es un solo canal por rueda: **no da el sentido**,
+    que sigue viendo el usuario. **La causa del fallo del 26/10 (rueda derecha quieta) sigue sin confirmar:** esta vez no falló;
+    si vuelve, el contador de esa rueda marcará 0 aunque el servicio mande bien el motor. **Idea, sin decidir:** que el script
+    dé también un aviso automático si el sensor de una rueda cuenta menos de unos 20 cambios (una rueda quieta o un sensor
+    suelto), además de lo que ve el usuario.
+  * **Siguiente** (ver el "Cierre de la sesión del 26/10/2026", más abajo): el punto 1 está hecho; sigue el 2 (mejorar
+    `herramientas.json` y volver a medir). **Repite `bash tools/probar-ruedas.sh` antes de cada sesión que mueva ruedas.** Hasta que se
+    fusione el PR, el script está en la Pi como `~/probar-ruedas.sh` (copia fuera del repositorio): **bórralo después del merge**
+    y usa `tools/probar-ruedas.sh` (`git pull` en la Pi).
 - **Cierre de la sesión del 26/10/2026: el cerebro funciona de punta a punta** (desde el PC; las ruedas giraron en el aire y en el
-  suelo, siempre con la confirmación del usuario). `main` en `2ab21a0` (PR #67 y #68 fusionados, ramas borradas); la Pi, en `main`
+  suelo, siempre con la confirmación del usuario). `main` en `70f4181` (PR #67 a #69 fusionados, ramas borradas); la Pi, en `main`
   al día, los 8 pines en `lo`, `get_throttled` = `0x0` y ningún programa del robot en marcha.
   * **Hecho:** el PC de gaming como servidor de modelos (#67); el modelo decidido de forma provisional (`qwen2.5:7b` en el
     servidor, `qwen2.5:3b` de respaldo); el cerebro `src/ExplorerHat.Brain` (#68), con 23 pruebas sin robot, la Pi en
@@ -25,8 +68,9 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
     sube). En el servidor, ningún otro modelo cargado (`OLLAMA_MAX_LOADED_MODELS` = 1). **Antes de poner el robot en el suelo:** el
     usuario confirma con palabras (robot en el suelo, espacio libre, cargador de la UPS quitado, terminal abierta).
   * **Siguiente, en el orden recomendado:**
-    1. **Antes de mover ruedas, comprueba que giran las dos.** La derecha no giró en la primera prueba y la causa no está
-       confirmada (contacto flojo probable; `tools/probar-cableado.sh`).
+    1. ~~**Antes de mover ruedas, comprueba que giran las dos.**~~ **Hecho el 02/11/2026** con `tools/probar-ruedas.sh` (ver la
+       sesión del 02/11/2026, arriba). La derecha no giró en la primera prueba del 26/10 y la causa no está confirmada (contacto
+       flojo probable): **repite `bash tools/probar-ruedas.sh` antes de cada sesión que mueva ruedas.**
     2. **Que el modelo entienda mejor, y volver a medir.** Cualquier cambio de `herramientas.json` o del mensaje de sistema
        invalida los 24 de 24 y se repite con `medir.py`. Cuatro mejoras: la descripción de `retroceder` ("hasta 1 s"); las velocidades
        (hoy `a toda marcha` y `a media velocidad` suelen dar 0,45: debería ser 1 y 0,5); el estado de los sensores como texto; y los
@@ -421,7 +465,7 @@ Leyenda: `[ ]` pendiente · `[x]` hecho · `[~]` en curso
      importa. El README del servicio dice "la misma lista cerrada": es la lista, no los límites.
   6c. **Siguiente en la Fase 7, después del cerebro (26/10/2026):** ver "Cierre de la sesión del 26/10/2026" en el "Estado
      actual" (la receta para arrancar el robot con el cerebro y el orden recomendado). Lo primero, comprobar que giran las dos
-     ruedas; después, mejorar `herramientas.json` (retroceder, velocidades, sensores, ángulos) y volver a medir.
+     ruedas (con `tools/probar-ruedas.sh`; el 02/11/2026 giraron las dos; repetirlo antes de cada sesión que mueva ruedas); después, mejorar `herramientas.json` (retroceder, velocidades, sensores, ángulos) y volver a medir.
   7. Ideas opcionales: `Brake()` en `HatMotor` (el DRV8833 frena con los dos pines en alto: paradas más cortas),
      medir la corriente de cada motor con el INA219 (Pimoroni dice 200 mA por canal), condensadores de 100 nF en los
      motores, un disipador o ventilador para la Pi y repetir en el suelo la medida del pin de 5 V. Para la pantalla, que

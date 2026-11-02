@@ -50,7 +50,7 @@
             "label": "Parar el robot",
             "detail": "Para los programas del robot en la Raspberry Pi y pone a nivel bajo los pines de motores y luces",
             "type": "shell",
-            "command": "ssh ${config:explorerHat.host} \"pkill -INT -f '[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard|Orders)|[L]esson[0-9]+[.]'; sleep 1; pinctrl set 19,20,21,26,4,17,27,5,16 op dl\"",
+            "command": "ssh ${config:explorerHat.host} \"pkill -INT -f '[E]xplorerHat[.](BasicSample|ObstacleAvoidance|SonarDashboard|Orders)|[L]esson[0-9]+[.]|[p]robar-ruedas[.]sh'; sleep 1; pinctrl set 19,20,21,26,4,17,27,5,16 op dl\"",
             "problemMatcher": []
         }
     ],

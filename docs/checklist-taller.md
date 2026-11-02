@@ -71,7 +71,8 @@ Haz esto con cada robot, **con las ruedas en el aire**:
 - [ ] Comprobar los chips: `/usr/sbin/i2cdetect -y 1` debe mostrar 0x27, 0x28, 0x42 y 0x48. Si falta el 0x27, mira los
   cables de la pantalla (SDA y SCL cambiados, o un cable suelto).
 - [ ] Ejecutar `bash tools/probar-cableado.sh` (luces, sensores de velocidad, sentido de cada motor, pantalla y sensores de
-  distancia). Tú ves el sentido real de las ruedas: los pines solo dicen lo que manda la Pi.
+  distancia). Tú ves el sentido real de las ruedas: los pines solo dicen lo que manda la Pi. Si solo quieres comprobar las
+  ruedas (lo mínimo antes de cada taller), ejecuta `bash tools/probar-ruedas.sh` con las ruedas en el aire: tarda un minuto.
 - [ ] `vcgencmd get_throttled` debe dar `0x0` (sin tensión baja ni límite de temperatura).
 - [ ] Probar la parada: lanzar una lección, pulsar Ctrl+C y comprobar que los pines vuelven a `lo`. Tener a mano
   `bash tools/parar-robot.sh`.
@@ -111,7 +112,7 @@ Haz esto con cada robot, **con las ruedas en el aire**:
 | Qué pasa | Qué mirar |
 |---|---|
 | La pantalla da `Error 5 (Input/output error)` | Nadie contesta en 0x27. `i2cdetect -y 1` debe mostrarlo. Mira la alimentación (VCC a 3v3), SDA y SCL (cambiados) o un cable suelto. |
-| Una rueda no gira | Mira que el cable no esté suelto en la borna del motor. Prueba el motor con `probar-cableado.sh` y ve si el sensor de velocidad de esa rueda cuenta. |
+| Una rueda no gira | Mira que el cable no esté suelto en la borna del motor. Prueba los motores con `probar-ruedas.sh` (con las ruedas en el aire) y ve si el sensor de velocidad de esa rueda cuenta. |
 | El robot no para | Ctrl+C. Si no, `bash tools/parar-robot.sh`. Si se cortó la wifi, ninguna de las dos llega a la Pi: **levanta el robot del suelo o apaga la UPS en el momento**. La Pi cierra la sesión y para los motores sola en unos 15–30 s. |
 | El robot va más lento o se reinicia | `vcgencmd get_throttled` (`0x0` está bien). Mira las baterías de la UPS y el cable de alimentación. |
 | El portátil no encuentra la Pi | Mira la red, la IP y `ssh <nombre> true`. Con `harlequin.local`, puede tardar varios segundos. |
