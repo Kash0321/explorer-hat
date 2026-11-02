@@ -41,7 +41,7 @@
    | MOTOR 1 | rueda derecha | morado | azul |
    | MOTOR 2 | rueda izquierda | azul | morado |
 
-   Un motor de corriente continua no se estropea si se conecta al revés: solo gira hacia el otro lado. Los dos motores van montados en espejo, así que el mismo color en el + no hace que las dos ruedas avancen. Comprueba el resultado con `bash tools/probar-cableado.sh` (con las ruedas en el aire): si una rueda gira al revés, intercambia los dos cables de ese motor; si gira la otra rueda, los motores están cambiados de borna.
+   Un motor de corriente continua no se estropea si se conecta al revés: solo gira hacia el otro lado. Los dos motores van montados en espejo, así que el mismo color en el + no hace que las dos ruedas avancen. Comprueba el resultado con `bash tools/probar-ruedas.sh` (solo las ruedas, con las ruedas en el aire) o con `bash tools/probar-cableado.sh` (todo el cableado): si una rueda gira al revés, intercambia los dos cables de ese motor; si gira la otra rueda, los motores están cambiados de borna.
 6. Monta los tres sensores en la parte delantera del robot, cada uno con su soporte, mirando hacia delante: izquierda, centro y derecha.
 7. Conecta los sensores como indica la tabla de cableado de abajo.
 8. Pon el interruptor deslizante de la UPS en **OFF**. Después coloca las dos baterías 18650, respetando la polaridad (+ y −) que marca el soporte. Si colocas las baterías con el interruptor en ON, la placa se puede dañar por un cortocircuito.
@@ -247,7 +247,7 @@ El entorno está organizado en soluciones independientes según el nivel de apre
 
 ## 🧰 Herramientas (`tools/`)
 
-Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Para la Fase 7: `medir-llm/` (mide un modelo de lenguaje local con 24 órdenes en español), `probar-ordenes/` (pruebas del servicio de órdenes por HTTP) y `probar-obstaculo.sh` (su capa de obstáculos con los sensores reales, sin mover las ruedas). Cada script explica su uso al principio.
+Scripts para la Raspberry Pi: `parar-robot.sh` (parada de emergencia), `probar-cableado.sh` (comprueba todo el cableado paso a paso, después de desmontar el robot), `probar-ruedas.sh` (comprueba solo que las dos ruedas giran en los dos sentidos, con las ruedas en el aire: sirve antes de cada taller), `vigilar-pines.sh` (registra los pines de los motores y si hay un programa en marcha) y `vigilar-tension.sh` + `comparar-tension.sh` (registran y resumen las bajadas de tensión). Para la Fase 7: `medir-llm/` (mide un modelo de lenguaje local con 24 órdenes en español), `probar-ordenes/` (pruebas del servicio de órdenes por HTTP) y `probar-obstaculo.sh` (su capa de obstáculos con los sensores reales, sin mover las ruedas). Cada script explica su uso al principio.
 
 ---
 

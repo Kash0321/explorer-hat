@@ -71,4 +71,4 @@ En la consola de Windows, lo que tecleas se puede mezclar con los mensajes del c
 4. **Retroceder y girar van a ciegas:** los sensores miran hacia delante. La Pi recorta `retroceder` a 1 s y el resto a 3 s.
 5. **Al terminar:** Ctrl+C en el cerebro y en el servicio, y `pinctrl get 19,20,21,26,4,17,27,5` con todos los pines en `lo`.
 
-Si una rueda no gira, toca primero los cables de su borna y repite `tools/probar-cableado.sh`.
+Si una rueda no gira, toca primero los cables de su borna y repite `tools/probar-ruedas.sh` (con las ruedas en el aire).
